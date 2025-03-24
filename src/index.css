@@ -8,6 +8,17 @@
   transition: 0.2s background-color;
 }
 
+button,
+select,
+label,
+checkbox {
+  cursor: pointer;
+}
+
+input {
+  color: black;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -136,13 +147,14 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--muted);
+  /* background-color: var(--muted); */
+  background-color: green;
   border-radius: 10px;
   border: 3px solid var(--background);
   transition: 0.3s all;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--muted-foreground);
+  background-color: lime;
   cursor: grab;
 }

@@ -11,7 +11,9 @@ import Cart from "./pages/Cartpage";
 import Productpage from "./pages/Productpage";
 import Profilepage from "./pages/ProfilePage";
 import Loginpage from "./pages/Loginpage";
-import Registerpage from "./pages/Registerpage";
+import Registerpage from "./pages/About";
+import About from "./pages/About";
+import Wishlist from "./pages/Wishlist";
 
 const router = createBrowserRouter([
   {
@@ -19,8 +21,8 @@ const router = createBrowserRouter([
     element: <Loginpage />,
   },
   {
-    path: "/register",
-    element: <Registerpage />,
+    path: "/about",
+    element: <About />,
   },
   
   {
@@ -32,6 +34,10 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       // ADD MORE PAGES HERE IF NEEDED
+      {
+        path: "/wishlist",
+        element: <Wishlist />,
+      },
       {
         path: "/home",
         element: <Homepage />,
@@ -57,7 +63,5 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
 );
