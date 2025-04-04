@@ -40,13 +40,6 @@ export default function Card({ data: product }) {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="p-2 bg-white rounded-full text-emerald-600 hover:bg-emerald-50"
-          >
-            <FiHeart size={20} />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
             onClick={() => handleNavigate("/product")}
             className="p-2 bg-white rounded-full text-emerald-600 hover:bg-emerald-50"
           >
