@@ -125,6 +125,14 @@ export default function Homepage() {
           ))}
         </div>
       </div>
+      <div className="relative container mx-auto px-4 h-full flex items-center">
+        <p className="text-emerald-100 text-xl mb-8">
+          Discover our collection of eco-friendly products that make a
+          difference.
+
+          -jason
+        </p>
+      </div>
     </div>
   );
 }
