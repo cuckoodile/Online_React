@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FiShoppingCart, FiHeart, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Card from "@/components/Card";
+import Footer from "@/components/footer";
 
 export default function Homepage() {
   // Mock data for new arrivals
@@ -124,14 +125,6 @@ export default function Homepage() {
             <Card key={product.id} data={product} />
           ))}
         </div>
-      </div>
-      <div className="relative container mx-auto px-4 h-full flex items-center">
-        <p className="text-emerald-100 text-xl mb-8">
-          Discover our collection of eco-friendly products that make a
-          difference.
-
-          -jason
-        </p>
       </div>
     </div>
   );
