@@ -4,14 +4,14 @@ import { FiEdit2, FiStar, FiShoppingBag, FiHeart } from 'react-icons/fi';
 
 export default function Profilepage() {
     const [profile, setProfile] = useState({
-        fullName: "Ryan Delos Santos",
-        email: "ryanrinon0913@gmail.com",
+        fullName: "Zanjoe Gonzales",
+        email: "zanjoegonzales519@gmail.com",
         mobile: "09** *** ****",
-        birthday: "March 25 2006",
+        birthday: "May 19 2006",
         gender: "Male",
         shippingAddress: {
-            fullName: "Ryan Delos Santos",
-            address: "140 west bank road",
+            fullName: "Zanjoe Gonzales",
+            address: "Pateros",
             postcode: "Metro Manila~Pasig,Pasig City~Maybunga",
             phoneNumber: "09** *** ****"
         }
