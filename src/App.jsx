@@ -9,6 +9,7 @@ import SideBar from "./components/SideBar";
 // Imported media and tools
 import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
+import Footer from "./components/footer";
 
 function App() {
   const [theme, setTheme] = useState("light");
@@ -106,6 +107,9 @@ function App() {
               {/* </div> */}
             {/* </div> */}
           </div> 
+
+          {/* Footer Content */}
+          <Footer />
         </ThemeProvider>
       </div>
     </>

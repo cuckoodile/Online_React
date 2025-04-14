@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FiShoppingCart, FiHeart, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Card from "@/components/Card";
+import Footer from "@/components/footer";
 
 export default function Homepage() {
   // Mock data for new arrivals
