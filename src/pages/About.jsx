@@ -33,7 +33,7 @@ export default function About() {
         transition={{ duration: 0.5 }}
         className="absolute top-8 left-8 z-20"
       >
-        <Link to="/">
+        <Link to="/welcome">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -42,7 +42,7 @@ export default function About() {
             transition-all duration-300"
           >
             <FiArrowLeft className="text-xl" />
-            <span>Back to Landing Page</span>
+            <span>Join Us</span>
           </motion.button>
         </Link>
       </motion.div>
@@ -54,7 +54,7 @@ export default function About() {
         transition={{ duration: 0.5 }}
         className="absolute top-8 right-8 z-20"
       >
-        <Link to="/home">
+        <Link to="/">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

@@ -27,7 +27,7 @@ function App() {
                 {/* Logo and Main Nav */}
                 <div className="flex items-center gap-8">
                   <Link
-                    to="/home"
+                    to="/"
                     className="text-xl font-bold bg-gradient-to-r from-emerald-300 to-teal-200 
                     text-transparent bg-clip-text"
                   >
@@ -41,12 +41,12 @@ function App() {
                     >
                       Shop
                     </Link>
-                    <Link
+                    {/* <Link
                       to="/about"
                       className="hover:text-emerald-300 transition-colors"
                     >
                       About
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
 
@@ -88,18 +88,13 @@ function App() {
                       <User className="h-5 w-5" />
                     </Link>
                   </button>
-
-                  {/* Mobile Menu Button */}
-                  <button className="md:hidden p-2 hover:bg-emerald-800 rounded-full transition-colors">
-                    <Menu className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
             </div>
           </nav>
 
           {/* Main Content */}
-          <div className="bg-red-500 flex flex-col">
+          <div className="flex flex-col">
             {/* <div className="flex-1 flex flex-col"> */}
               {/* Content Outlet */}
               {/* <div className="bg-red-500 flex-1 flex flex-col"> */}
