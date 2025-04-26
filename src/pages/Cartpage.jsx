@@ -135,7 +135,7 @@ export default function Cartpage() {
         </div>
         
         {/* Recommended Products Section */}
-        <div className="mt-16">
+        {/* <div className="mt-16">
           <h2 className="text-2xl font-bold text-emerald-900 mb-6">Recommended Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[    
@@ -256,7 +256,7 @@ export default function Cartpage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
