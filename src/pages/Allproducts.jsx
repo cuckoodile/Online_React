@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import { FiFilter } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiFilter, FiGrid, FiList, FiChevronUp, FiChevronDown } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
+import Footer from '@/components/footer';
 
+// Update products to fashion items
 const products = [
   {
     id: 1,
-    name: "Natural Face Serum",
+    name: "Designer Silk Blouse",
     price: 1299,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Cosmetics"
+    image: "https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    category: "Tops"
   },
   {
     id: 2,
-    name: "Organic Pet Shampoo",
+    name: "Premium Leather Belt",
     price: 449,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Pet Products"
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    category: "Accessories"
   },
   {
     id: 3,
@@ -100,13 +103,27 @@ const categories = ['All', 'Cosmetics', 'Pet Products', 'Household Essentials'];
     { label: 'Over ₱1000', value: '1000+' }
   ];
 
+const sortOptions = [
+  { label: 'Newest', value: 'newest' },
+  { label: 'Price: Low to High', value: 'price-asc' },
+  { label: 'Price: High to Low', value: 'price-desc' },
+  { label: 'Name: A to Z', value: 'name-asc' },
+];
+
 export default function Allproducts() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [priceRange, setPriceRange] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [viewMode, setViewMode] = useState('grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState(products);
   
+  useEffect(() => {
+    setFilteredProducts(filterAndSortProducts());
+  }, [selectedCategory, priceRange, sortBy]);
 
-  const filterProducts = () => {
-    return products.filter(product => {
+  const filterAndSortProducts = () => {
+    let result = products.filter(product => {
       const categoryMatch = selectedCategory === 'All' || product.category === selectedCategory;
       
       let priceMatch = true;
@@ -121,54 +138,140 @@ export default function Allproducts() {
 
       return categoryMatch && priceMatch;
     });
+
+    // Sort the filtered products
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'name-asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'newest':
+      default:
+        // Assuming id represents the order of addition (newest first)
+        result.sort((a, b) => b.id - a.id);
+    }
+
+    return result;
   };
 
   return (
-    <div className="min-h-screen bg-emerald-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-emerald-900">All Products</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero banner */}
+      <div className="bg-gradient-to-r from-emerald-950 to-emerald-800 text-white py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl font-light mb-4 bg-gradient-to-r from-emerald-100 via-white to-emerald-100 text-transparent bg-clip-text">COLLECTION</h1>
+          <div className="w-24 h-0.5 bg-emerald-400 mx-auto mb-6"></div>
+          <p className="text-emerald-100 max-w-2xl mx-auto">
+            Explore our curated selection of premium sustainable fashion pieces designed for the eco-conscious individual.
+          </p>
         </div>
+      </div>
 
-        <div className="mb-8 flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <select
-              value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value)}
-              className="px-4 py-2 rounded-lg border text-black border-emerald-200 focus:outline-none 
-              focus:ring-2 focus:ring-emerald-500"
+      <div className="container mx-auto px-4 py-12">
+        {/* Filter and sort controls */}
+        <div className="mb-8">
+          <div className="flex flex-wrap justify-between items-center mb-4">
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              {priceRanges.map(range => (
-                <option key={range.value} value={range.value}>
-                  {range.label}
-                </option>
-              ))}
-            </select>
-            <button className="p-2 rounded-lg border border-emerald-200 hover:bg-emerald-100">
-              <FiFilter className="text-emerald-600" />
+              <FiFilter />
+              Filters
+              {showFilters ? <FiChevronUp /> : <FiChevronDown />}
             </button>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${selectedCategory === category 
-                    ? 'bg-emerald-600 text-white' 
-                    : 'bg-white text-emerald-600 hover:bg-emerald-50'}`}
+          
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
               >
-                {category}
-              </button>
-            ))}
-          </div>
+                <div className="bg-gray-100 p-6 rounded-lg mb-6">
+                  <div className="mb-4">
+                    <h3 className="font-medium mb-3 text-gray-700">Categories</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map(category => (
+                        <button
+                          key={category}
+                          onClick={() => setSelectedCategory(category)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                            ${selectedCategory === category 
+                              ? 'bg-gray-900 text-white' 
+                              : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h3 className="font-medium mb-3 text-gray-700">Price Range</h3>
+                    <select
+                      value={priceRange}
+                      onChange={(e) => setPriceRange(e.target.value)}
+                      className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
+                    >
+                      {priceRanges.map(range => (
+                        <option key={range.value} value={range.value}>
+                          {range.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium mb-3 text-gray-700">Sort By</h3>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
+                    >
+                      {sortOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filterProducts().map((product) => (
-            <Card key={product.id} data={product} />
-          ))}
+        {/* Results count */}
+        <div className="mb-6">
+          <p className="text-gray-500">Showing {filteredProducts.length} products</p>
+        </div>
+
+        {/* Product grid */}
+        <div className={viewMode === 'grid' 
+          ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          : "flex flex-col gap-4"
+        }>
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <Card key={product.id} data={product} viewMode={viewMode} />
+            ))
+          ) : (
+            <div className="col-span-full py-16 text-center">
+              <h3 className="text-xl font-medium text-gray-700 mb-2">No products found</h3>
+              <p className="text-gray-500">Try adjusting your filters to find what you're looking for.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

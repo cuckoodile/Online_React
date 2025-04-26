@@ -10,88 +10,110 @@ export default function Homepage() {
   const newArrivals = [
     {
       id: 1,
-      name: "Bamboo Toothbrush Set",
-      price: 399,
+      name: "Premium Denim Jacket",
+      price: 1299,
       image:
-        "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Household Essentials",
+        "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+      category: "Outerwear",
     },
     {
       id: 2,
-      name: "Natural Clay Face Mask",
+      name: "Silk Scarf Collection",
       price: 799,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Cosmetics",
+      category: "Accessories",
     },
     {
       id: 3,
-      name: "Eco Pet Toy Bundle",
-      price: 649,
+      name: "Designer Sunglasses",
+      price: 1499,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Pet Products",
+      category: "Accessories",
     },
     {
       id: 4,
-      name: "Organic Bath Bombs",
-      price: 499,
+      name: "Leather Crossbody Bag",
+      price: 2499,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Cosmetics",
+      category: "Bags",
     },
     {
       id: 5,
-      name: "Biodegradable Pet Wipes",
-      price: 299,
+      name: "Cotton Graphic Tee",
+      price: 599,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Pet Products",
+      category: "Tops",
     },
     {
       id: 6,
-      name: "Zero Waste Cleaning Kit",
-      price: 899,
+      name: "High-Waisted Jeans",
+      price: 1099,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Household Essentials",
+      category: "Bottoms",
     },
     {
       id: 7,
-      name: "Natural Pet Shampoo",
-      price: 449,
+      name: "Cashmere Sweater",
+      price: 1899,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Pet Products",
+      category: "Tops",
     },
     {
       id: 8,
-      name: "Organic Face Serum",
-      price: 1299,
+      name: "Leather Ankle Boots",
+      price: 2799,
       image:
         "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      category: "Cosmetics",
+      category: "Footwear",
     },
   ];
 
-  // Carousel slides data
-  const carouselSlides = [
+  // Featured collections section
+  const collections = [
     {
       id: 1,
-      title: "Sustainable Living Starts Here",
-      description: "Discover our collection of eco-friendly products that make a difference.",
-      buttonText: "Shop Now",
-      bgColor: "bg-emerald-900",
-      gradientFrom: "from-emerald-300",
-      gradientVia: "via-emerald-200",
-      gradientTo: "to-teal-200",
-      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80"
+      title: "Summer Essentials",
+      image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      link: "/collection/summer"
     },
     {
       id: 2,
-      title: "Eco-Friendly Pet Products",
-      description: "Give your furry friends the natural care they deserve.",
-      buttonText: "Explore Pet Items",
+      title: "Formal Wear",
+      image: "https://images.unsplash.com/photo-1507680434567-5739c80be1ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      link: "/collection/formal"
+    },
+    {
+      id: 3,
+      title: "Accessories",
+      image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      link: "/collection/accessories"
+    }
+  ];
+
+  // Carousel slides data with fashion-specific images
+  const carouselSlides = [
+    {
+      id: 1,
+      title: "Elevate Your Style",
+      description: "Discover our latest collection of premium fashion pieces for every occasion.",
+      buttonText: "Shop Now",
+      bgColor: "bg-gray-900",
+      gradientFrom: "from-rose-300",
+      gradientVia: "via-pink-200",
+      gradientTo: "to-purple-200",
+      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+    },
+    {
+      id: 2,
+      title: "Accessories That Impress",
+      description: "Complete your look with our stunning collection of designer accessories.",
+      buttonText: "Explore Accessories",
       bgColor: "bg-teal-900",
       gradientFrom: "from-teal-300",
       gradientVia: "via-teal-200",
@@ -100,8 +122,8 @@ export default function Homepage() {
     },
     {
       id: 3,
-      title: "Natural Cosmetics",
-      description: "Beauty products that are kind to your skin and the environment.",
+      title: "Seasonal Collections",
+      description: "Stay ahead of trends with our curated seasonal fashion collections.",
       buttonText: "View Collection",
       bgColor: "bg-green-900",
       gradientFrom: "from-green-300",
@@ -112,64 +134,80 @@ export default function Homepage() {
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [direction, setDirection] = useState(1);
   
   // Auto slide effect
   useEffect(() => {
     const interval = setInterval(() => {
+      setDirection(1);
       setCurrentSlide((prev) => (prev === carouselSlides.length - 1 ? 0 : prev + 1));
-    }, 5000); // Change slide every 5 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
-
+  
   const nextSlide = () => {
+    setDirection(1);
     setCurrentSlide((prev) => (prev === carouselSlides.length - 1 ? 0 : prev + 1));
   };
-
+  
   const prevSlide = () => {
+    setDirection(-1);
     setCurrentSlide((prev) => (prev === 0 ? carouselSlides.length - 1 : prev - 1));
   };
-
+  
   const goToSlide = (index) => {
+    setDirection(index > currentSlide ? 1 : -1);
     setCurrentSlide(index);
   };
-
-  // Variants for slide animations
+  
+  // 3D slot effect variants
   const slideVariants = {
-    enter: {
-      x: 1000,
+    enter: (direction) => ({
+      x: direction > 0 ? 1000 : -1000,
       opacity: 0,
-      scale: 0.95,
-    },
+      rotateY: direction > 0 ? 90 : -90,
+      scale: 0.8,
+      zIndex: 0
+    }),
     center: {
       x: 0,
       opacity: 1,
+      rotateY: 0,
       scale: 1,
+      zIndex: 1
     },
-    exit: {
-      x: -1000,
+    exit: (direction) => ({
+      x: direction > 0 ? -1000 : 1000,
       opacity: 0,
-      scale: 0.95,
-    },
+      rotateY: direction > 0 ? -90 : 90,
+      scale: 0.8,
+      zIndex: 0
+    })
   };
 
   return (
-    <div className="min-h-screen bg-emerald-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section Carousel */}
-      <div className="relative h-[500px] overflow-hidden">
+      <div className="relative h-[600px] overflow-hidden">
         <AnimatePresence initial={false}>
           <motion.div
             key={currentSlide}
+            custom={direction}
             variants={slideVariants}
             initial="enter"
             animate="center"
             exit="exit"
             transition={{ 
-              x: { type: "spring", stiffness: 200, damping: 25, mass: 1 },
-              opacity: { duration: 0.7, ease: "easeInOut" },
-              scale: { duration: 0.7, ease: "easeInOut" }
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.7 },
+              rotateY: { duration: 0.7 },
+              scale: { duration: 0.7 }
             }}
             className={`absolute inset-0 ${carouselSlides[currentSlide].bgColor}`}
+            style={{
+              perspective: "1000px",
+              transformStyle: "preserve-3d"
+            }}
           >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
@@ -222,7 +260,7 @@ export default function Homepage() {
         </AnimatePresence>
 
         {/* Navigation buttons */}
-        {/* <button 
+        <button 
           onClick={prevSlide}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm p-3 rounded-full text-white transition-all duration-300 z-30"
           aria-label="Previous slide"
@@ -235,7 +273,7 @@ export default function Homepage() {
           aria-label="Next slide"
         >
           <FiChevronRight size={24} />
-        </button> */}
+        </button>
 
         {/* Carousel indicators */}
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-30">
@@ -254,11 +292,36 @@ export default function Homepage() {
         </div>
       </div>
 
+      {/* Brand Statement */}
+      {/* hindi ko trip baduy */}
+      {/* <div className="bg-gray-100 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-light text-gray-800 mb-6 tracking-wider">ELEGANCE IN EVERY THREAD</h2>
+          <div className="w-24 h-0.5 bg-gray-400 mx-auto mb-6"></div>
+          <p className="max-w-2xl mx-auto text-gray-600 leading-relaxed text-lg">
+            Curated collections that blend timeless elegance with contemporary trends.
+            Our pieces are designed for those who appreciate quality craftsmanship and distinctive style.
+          </p>
+          <div className="flex justify-center gap-8 mt-8">
+            <span className="text-gray-700 font-light">QUALITY</span>
+            <span className="text-gray-700 font-light">•</span>
+            <span className="text-gray-700 font-light">STYLE</span>
+            <span className="text-gray-700 font-light">•</span>
+            <span className="text-gray-700 font-light">SUSTAINABILITY</span>
+          </div>
+        </div>
+      </div> */}
+
       {/* New Arrivals Section */}
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-emerald-900 mb-8">
-          New Arrivals
-        </h2>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900">
+            New Arrivals
+          </h2>
+          <Link to="/allproducts" className="text-gray-700 hover:text-gray-900 underline-offset-4 underline">
+            View All
+          </Link>
+        </div>
         <div className="grid md:grid-cols-4 gap-6">
           {newArrivals.map((product) => (
             <Card key={product.id} data={product} />

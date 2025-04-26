@@ -41,12 +41,14 @@ function App() {
                     >
                       Shop
                     </Link>
-                    {/* <Link
-                      to="/about"
+
+                    {/* kayo na mag ayos ng privacy nito hayop ka */}
+                    <Link
+                      to="/admin"
                       className="hover:text-emerald-300 transition-colors"
                     >
-                      About
-                    </Link> */}
+                      Admin
+                    </Link>
                   </div>
                 </div>
 

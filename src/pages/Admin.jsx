@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { FaChartLine, FaBox, FaTag, FaWarehouse, FaShoppingCart, FaChartBar, FaUser, FaNewspaper, FaCog, FaSearch, FaBell, FaUserCircle } from 'react-icons/fa'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useNavigate } from 'react-router-dom'
 
 export default function Admin() {
   const [currentMonth, setCurrentMonth] = useState('Jul 2023')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [notifications, setNotifications] = useState(3)
+  const navigate = useNavigate()
   
   // Sample data - in a real app, this would come from an API
   const dashboardData = {
@@ -32,10 +34,10 @@ export default function Admin() {
       { id: 5, name: 'Nike Air Force', sales: 752, image: 'https://via.placeholder.com/100' }
     ],
     recentOrders: [
-      { id: '#ORD-001', customer: 'John Doe', date: '2023-07-28', status: 'Delivered', amount: 245.99 },
-      { id: '#ORD-002', customer: 'Jane Smith', date: '2023-07-27', status: 'Processing', amount: 189.50 },
-      { id: '#ORD-003', customer: 'Robert Johnson', date: '2023-07-26', status: 'Shipped', amount: 312.75 },
-      { id: '#ORD-004', customer: 'Emily Davis', date: '2023-07-25', status: 'Delivered', amount: 178.25 },
+      { id: '#ORD-001', customer: 'Zanjoe Gonzales', date: '2023-07-28', status: 'Delivered', amount: 245.99 },
+      { id: '#ORD-002', customer: 'Ian Sube', date: '2023-07-27', status: 'Processing', amount: 189.50 },
+      { id: '#ORD-003', customer: 'Jason De Guzman', date: '2023-07-26', status: 'Shipped', amount: 312.75 },
+      { id: '#ORD-004', customer: 'Ryan Delos Santos', date: '2023-07-25', status: 'Delivered', amount: 178.25 },
     ]
   }
 
@@ -56,15 +58,29 @@ export default function Admin() {
     setActiveTab(tab)
   }
 
+  // Navigate to Product Management page
+  const goToProductManagement = () => {
+    navigate('/controller')
+  }
+
   return (
     <div className="flex bg-gray-50">
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Dashboard Content - This is the only scrollable container */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Overview</h1>
-            <p className="text-gray-500">Welcome back, Admin! Here's what's happening today.</p>
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Overview</h1>
+              <p className="text-gray-500">Welcome back, Admin! Here's what's happening today.</p>
+            </div>
+            <button 
+              onClick={goToProductManagement}
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center gap-2"
+            >
+              <FaBox />
+              Product Management
+            </button>
           </div>
           
           {/* Stats Cards */}
@@ -116,8 +132,8 @@ export default function Admin() {
                   <span className="mr-2 text-gray-500">Sort by</span>
                   <select className="border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <option>{currentMonth}</option>
-                    <option>Jun 2023</option>
-                    <option>May 2023</option>
+                    <option>Jun 2025</option>
+                    <option>May 2025</option>
                   </select>
                 </div>
               </div>
@@ -276,6 +292,180 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+          
+          {/* New Section: Business Insights and Customer Analytics */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Customer Demographics */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h2 className="text-xl font-bold text-gray-800 mb-6">Customer Demographics</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-gray-600">Age 18-24</span>
+                    <span className="text-gray-600">35%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '35%' }}></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-gray-600">Age 25-34</span>
+                    <span className="text-gray-600">45%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '45%' }}></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-gray-600">Age 35-44</span>
+                    <span className="text-gray-600">15%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '15%' }}></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-gray-600">Age 45+</span>
+                    <span className="text-gray-600">5%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '5%' }}></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="font-medium text-gray-800 mb-4">Gender Distribution</h3>
+                <div className="flex items-center">
+                  <div className="w-1/2">
+                    <div className="flex items-center mb-2">
+                      <span className="w-3 h-3 bg-blue-500 rounded-full inline-block mr-2"></span>
+                      <span className="text-gray-600">Male</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800">42%</div>
+                  </div>
+                  <div className="w-1/2">
+                    <div className="flex items-center mb-2">
+                      <span className="w-3 h-3 bg-pink-500 rounded-full inline-block mr-2"></span>
+                      <span className="text-gray-600">Female</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800">58%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Inventory Status */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Inventory Status</h2>
+                <button className="text-teal-600 hover:text-teal-800 font-medium">Manage</button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center p-3 bg-red-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">
+                    <FaWarehouse />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">Low Stock Alert</p>
+                    <p className="text-sm text-gray-500">5 products below threshold</p>
+                  </div>
+                  <button className="ml-auto text-red-600 hover:text-red-800">View</button>
+                </div>
+                
+                <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-3">
+                    <FaBox />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">Well Stocked</p>
+                    <p className="text-sm text-gray-500">42 products at optimal levels</p>
+                  </div>
+                  <button className="ml-auto text-green-600 hover:text-green-800">View</button>
+                </div>
+                
+                <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-3">
+                    <FaTag />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">Pending Restocks</p>
+                    <p className="text-sm text-gray-500">8 orders awaiting delivery</p>
+                  </div>
+                  <button className="ml-auto text-yellow-600 hover:text-yellow-800">View</button>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="font-medium text-gray-800 mb-4">Storage Capacity</h3>
+                <div className="mb-2 flex justify-between">
+                  <span className="text-gray-600">Current Usage</span>
+                  <span className="text-gray-600">68%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className="bg-teal-500 h-2.5 rounded-full" style={{ width: '68%' }}></div>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">32% storage space available</p>
+              </div>
+            </div>
+            
+            {/* Recent Activities */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h2 className="text-xl font-bold text-gray-800 mb-6">Recent Activities</h2>
+              
+              <div className="relative">
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                
+                <div className="relative pl-10 pb-6">
+                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                    <FaUser className="w-4 h-4" />
+                  </div>
+                  <p className="font-medium text-gray-800">New Customer Registration</p>
+                  <p className="text-sm text-gray-500">Maria Santos created an account</p>
+                  <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+                </div>
+                
+                <div className="relative pl-10 pb-6">
+                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+                    <FaShoppingCart className="w-4 h-4" />
+                  </div>
+                  <p className="font-medium text-gray-800">New Order Placed</p>
+                  <p className="text-sm text-gray-500">Order #ORD-005 for ₱4,250.00</p>
+                  <p className="text-xs text-gray-400 mt-1">3 hours ago</p>
+                </div>
+                
+                <div className="relative pl-10 pb-6">
+                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500">
+                    <FaTag className="w-4 h-4" />
+                  </div>
+                  <p className="font-medium text-gray-800">Price Update</p>
+                  <p className="text-sm text-gray-500">Air Jordan 8 price updated to ₱8,995.00</p>
+                  <p className="text-xs text-gray-400 mt-1">5 hours ago</p>
+                </div>
+                
+                <div className="relative pl-10">
+                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-500">
+                    <FaNewspaper className="w-4 h-4" />
+                  </div>
+                  <p className="font-medium text-gray-800">New Review</p>
+                  <p className="text-sm text-gray-500">Ryan Delos Santos left a 5-star review</p>
+                  <p className="text-xs text-gray-400 mt-1">8 hours ago</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-center">
+                <button className="text-teal-600 hover:text-teal-800 font-medium">View All Activities</button>
               </div>
             </div>
           </div>
