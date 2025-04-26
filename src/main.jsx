@@ -1,7 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Router, RouterProvider } from "react-router-dom";
 
-// Sino yung jejemon dito na nag papangalan ng LandingPage like bakit d nalang Landingpage, see the difference?! -ian
 import "./index.css";
 import App from "./App.jsx";
 import Landingpage from "./pages/Landingpage";
@@ -13,6 +12,7 @@ import Profilepage from "./pages/Profilepage";
 import Loginpage from "./pages/Loginpage";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
+import Controller from "./pages/Controller";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: <Admin />,
+      },
+      {
+        path: "/controller",
+        element: <Controller />,
       }
     ],
   },

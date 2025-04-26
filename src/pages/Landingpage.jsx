@@ -1,85 +1,100 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FiArrowRight, FiBook } from "react-icons/fi";
-import { BsRocketTakeoff } from "react-icons/bs";
+import { FiArrowRight, FiShoppingBag } from "react-icons/fi";
 import { Routes, Route, Link } from "react-router-dom";
 import Loginpage from "./Loginpage";
 
 export default function Landingpage() {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[url('https://i.pinimg.com/736x/c1/57/c0/c157c0ee56bb4fd7171d9965c7dba5e6.jpg')] bg-cover bg-center bg-no-repeat">
-      {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-emerald-950/70"></div>
-
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-900">
       {/* Decorative background elements */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
 
+      {/* Navigation */}
+      <nav className="relative z-10 container mx-auto px-6 py-6 flex justify-between items-center">
+        <div className="text-white font-bold text-xl">DEV SIXTECH</div>
+        <Link to="/login">
+          <button className="bg-transparent border border-emerald-300 text-emerald-300 px-4 py-2 rounded-full hover:bg-emerald-900/30 transition-colors">
+            Sign Up | Login
+          </button>
+        </Link>
+      </nav>
+
       {/* Main content */}
-      <motion.div
-        className="h-screen flex items-center justify-center px-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="text-center max-w-3xl mx-auto relative z-10">
-          <motion.div
+      <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center relative z-10">
+        {/* Left side - Text content */}
+        <motion.div 
+          className="md:w-1/2 mb-12 md:mb-0"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h1 
+            className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-emerald-300 via-emerald-200 to-teal-200 text-transparent bg-clip-text leading-tight mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
-            <h1
-              className="text-6xl mb-6 font-bold bg-gradient-to-r from-emerald-300 via-emerald-200 to-teal-200 
-              text-transparent bg-clip-text drop-shadow-lg flex items-center justify-center gap-4"
-            >
-              <BsRocketTakeoff className="text-emerald-300" />
-              Welcome to DevSix
-            </h1>
-          </motion.div>
-
-          <motion.div
+            Elevate Your<br />
+            Fashion<br />
+            Statement
+          </motion.h1>
+          
+          <motion.p 
+            className="text-emerald-200 text-lg mb-8 max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <p className="text-2xl mb-8 text-emerald-200/90 leading-relaxed">
-              Your journey starts here. Discover a new way to connect and grow.
-            </p>
-          </motion.div>
-
+            Discover our curated collection of sustainable fashion pieces designed to elevate your style while respecting our planet. Timeless elegance meets contemporary trends.
+          </motion.p>
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="flex gap-6 justify-center"
           >
-            <Link to="/login">
+            <Link to="/">
               <motion.button
                 className="px-8 py-4 text-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl
-              hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-lg shadow-emerald-900/30
-              flex items-center gap-2"
+                hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-lg shadow-emerald-900/30
+                flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <p>Get Started</p>
-                <FiArrowRight className="text-2xl" />
-              </motion.button>
-            </Link>
-            <Link to="/about" className="flex items-center gap-2">
-              <motion.button
-                className="px-8 py-4 text-xl bg-emerald-950/50 text-emerald-300 rounded-xl hover:bg-emerald-900/50
-              transition-all duration-300 backdrop-blur-sm flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FiBook className="text-2xl" />
-                Learn More
+                Shop Collection
+                <FiShoppingBag className="text-xl" />
               </motion.button>
             </Link>
           </motion.div>
-        </div>
-      </motion.div>
+        </motion.div>
+        
+        {/* Right side - Image */}
+        <motion.div 
+          className="md:w-1/2"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <div className="relative perspective-1000">
+            <motion.div
+              initial={{ rotateY: 10, rotateX: 10 }}
+              animate={{ rotateY: 0, rotateX: 0 }}
+              transition={{ duration: 1.2, delay: 0.6 }}
+              className="relative z-20"
+            >
+              <img 
+                src="https://img.freepik.com/premium-photo/dj-girl-posing-studio-urban-style-hip-hop-dancer-fresh-casual-beige-mint-outfit-fashion-monochrome-aesthetic-colours_161568-10055.jpg?uid=R190146106&ga=GA1.1.1040919255.1745600407&semt=ais_hybrid&w=740" 
+                alt="Fashion Collection" 
+                className="w-full h-auto rounded-lg shadow-2xl"
+              />
+            </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-lg blur-xl -z-10 transform scale-105"></div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

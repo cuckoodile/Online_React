@@ -144,13 +144,13 @@ export default function Productpage() {
                     whileTap={{ scale: 0.98 }}
                     className="p-3 rounded-lg border border-emerald-200 hover:bg-emerald-50"
                   >
-                    <FiHeart className="text-emerald-600" />
+                    {/* <FiHeart className="text-emerald-600" />
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="p-3 rounded-lg border border-emerald-200 hover:bg-emerald-50"
-                  >
+                  > */}
                     <FiShare2 className="text-emerald-600" />
                   </motion.button>
                 </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from 'framer-motion';
-import { FiEdit2, FiStar, FiShoppingBag, FiHeart } from 'react-icons/fi';
+import { FiEdit2, FiStar, FiShoppingBag, FiHeart, FiUser, FiMail, FiPhone, FiCalendar } from 'react-icons/fi';
 
 export default function Profilepage() {
     const [profile, setProfile] = useState({
@@ -20,6 +20,15 @@ export default function Profilepage() {
     const [showAllPrev, setShowAllPrev] = useState(false);
     const [showAllRec, setShowAllRec] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
+    // Profile field icons mapping
+    const fieldIcons = {
+        fullName: <FiUser className="text-emerald-600" />,
+        email: <FiMail className="text-emerald-600" />,
+        mobile: <FiPhone className="text-emerald-600" />,
+        birthday: <FiCalendar className="text-emerald-600" />,
+        gender: <FiUser className="text-emerald-600" />
+    };
 
     // Mock data for previous purchases
     const prevPurchases = [
@@ -61,288 +70,338 @@ export default function Profilepage() {
         }
     ];
 
+    // Recent activity data
+    const recentActivity = [
+        {
+            id: 1,
+            type: "review",
+            icon: <FiStar className="w-6 h-6" />,
+            title: "Left a Review",
+            description: "Natural Face Serum - 5 stars",
+            time: "2 hours ago"
+        },
+        {
+            id: 2,
+            type: "purchase",
+            icon: <FiShoppingBag className="w-6 h-6" />,
+            title: "Made a Purchase",
+            description: "2 items - ₱1,748.00",
+            time: "1 day ago"
+        },
+        {
+            id: 3,
+            type: "review",
+            icon: <FiStar className="w-6 h-6" />,
+            title: "Left a Review",
+            description: "Eco Laundry Detergent - 4 stars",
+            time: "1 week ago"
+        },
+        {
+            id: 4,
+            type: "purchase",
+            icon: <FiShoppingBag className="w-6 h-6" />,
+            title: "Made a Purchase",
+            description: "3 items - ₱2,547.00",
+            time: "2 weeks ago"
+        }
+    ];
+
     const handleSave = () => {
         console.log("Profile saved", profile);
+        setIsEditing(false);
     };
+
+    // Reusable product card component
+    const ProductCard = ({ product }) => (
+        <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="flex bg-emerald-50 rounded-lg overflow-hidden"
+        >
+            <img
+                src={product.image}
+                alt={product.name}
+                className="w-24 h-24 object-cover"
+            />
+            <div className="p-4 flex-1">
+                <h4 className="font-semibold text-emerald-900">{product.name}</h4>
+                <p className="text-emerald-600">₱{product.price.toLocaleString()}</p>
+                <div className="flex items-center mt-2 text-yellow-400">
+                    {[...Array(product.rating)].map((_, i) => (
+                        <FiStar key={i} className="fill-current" />
+                    ))}
+                </div>
+            </div>
+        </motion.div>
+    );
+
+    // Reusable section component
+    const ProfileSection = ({ title, children, actionText, onActionClick }) => (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-emerald-900">{title}</h3>
+                {actionText && (
+                    <button 
+                        onClick={onActionClick}
+                        className="text-emerald-600 hover:text-emerald-700"
+                    >
+                        {actionText}
+                    </button>
+                )}
+            </div>
+            {children}
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-emerald-50 py-8">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Profile Section - Takes 4 columns */}
-                    <div className="lg:col-span-4">
-                        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                            {/* Profile Header/Banner */}
-                            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-center">
-                                <div className="flex justify-center">
-                                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                                        <img 
-                                            src="https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg" 
-                                            alt="Profile" 
-                                            className="w-full h-full object-cover"
-                                        />
+                {/* Profile Header - Full width */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+                    <div className="relative">
+                        {/* Banner with animated gradient */}
+                        <div className="h-56 relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-700 animate-gradient-x"></div>
+                            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+                            
+                            {/* Decorative elements */}
+                            <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl"></div>
+                            <div className="absolute top-20 left-20 w-32 h-32 bg-teal-300/20 rounded-full blur-2xl"></div>
+                            <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl"></div>
+                            
+                            {/* Header content - visible on desktop */}
+                            <div className="hidden sm:flex justify-between items-center h-full px-10 relative z-10">
+                                <div className="text-white">
+                                    <h1 className="text-3xl font-bold mb-1">Welcome back,</h1>
+                                    <p className="text-emerald-100 text-lg">How are you doing today?</p>
+                                </div>
+                                <div className="flex space-x-4">
+                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                                        <div className="text-2xl font-bold text-white">{prevPurchases.length}</div>
+                                        <div className="text-emerald-100 text-sm">Orders</div>
+                                    </div>
+                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
+                                        <div className="text-2xl font-bold text-white">4.8</div>
+                                        <div className="text-emerald-100 text-sm">Rating</div>
                                     </div>
                                 </div>
-                                <h2 className="text-2xl font-bold text-white mt-4 mb-2">{profile.fullName}</h2>
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                    bg-white/20 text-white">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-300 mr-2"></span>
-                                    Active Member
-                                </span>
                             </div>
-
-                            {/* Quick Stats */}
-                            <div className="grid grid-cols-3 gap-4 p-6 bg-emerald-50 border-b border-emerald-100">
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-emerald-700">{prevPurchases.length}</div>
-                                    <div className="text-sm text-emerald-600">Orders</div>
-                                </div>
-                                <div className="text-center border-x border-emerald-200">
-                                    <div className="text-2xl font-bold text-emerald-700">4.8</div>
-                                    <div className="text-sm text-emerald-600">Rating</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-emerald-700">2</div>
-                                    <div className="text-sm text-emerald-600">Reviews</div>
+                        </div>
+                        
+                        {/* Profile Info Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 px-6 sm:px-10 flex flex-col sm:flex-row items-center sm:items-end">
+                            {/* Profile image with border animation */}
+                            <div className="relative group">
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 blur-sm group-hover:blur-md transition-all duration-300"></div>
+                                <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white relative">
+                                    <img 
+                                        src="https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg" 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
                             </div>
-
-                            {/* Profile Details */}
-                            <div className="p-6 space-y-4">
-                                {Object.entries(profile).map(([key, value]) => {
-                                    if (key !== 'shippingAddress') {
-                                        return (
-                                            <div key={key} className="p-3 bg-emerald-50 rounded-lg">
-                                                <div className="flex items-center mb-2">
-                                                    <span className="text-emerald-600 mr-2">
-                                                        {key === 'email' && '📧'}
-                                                        {key === 'mobile' && '📱'}
-                                                        {key === 'birthday' && '🎂'}
-                                                        {key === 'gender' && '👤'}
-                                                        {key === 'fullName' && '📝'}
-                                                    </span>
-                                                    <p className="text-sm text-emerald-600">
-                                                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                                                    </p>
-                                                </div>
-                                                {isEditing ? (
-                                                    <input 
-                                                        type="text"
-                                                        value={value}
-                                                        onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
-                                                        className="w-full p-2 border border-emerald-200 rounded-lg 
-                                                        focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-                                                    />
-                                                ) : (
-                                                    <p className="text-emerald-900 pl-7">{value}</p>
-                                                )}
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })}
-
-                                {/* Shipping Address */}
-                                <div className="mt-6 pt-6 border-t border-emerald-100">
-                                    <h3 className="flex items-center text-lg font-semibold text-emerald-900 mb-4">
-                                        <FiShoppingBag className="mr-2" />
-                                        Shipping Address
-                                    </h3>
-                                    <div className="space-y-3 bg-emerald-50 p-4 rounded-lg">
-                                        {Object.entries(profile.shippingAddress).map(([key, value]) => (
-                                            <div key={key}>
-                                                <p className="text-sm text-emerald-600 mb-1">
-                                                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                                                </p>
-                                                {isEditing ? (
-                                                    <input 
-                                                        type="text"
-                                                        value={value}
-                                                        onChange={(e) => setProfile({
-                                                            ...profile,
-                                                            shippingAddress: {
-                                                                ...profile.shippingAddress,
-                                                                [key]: e.target.value
-                                                            }
-                                                        })}
-                                                        className="w-full p-2 border border-emerald-200 rounded-lg 
-                                                        focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-                                                    />
-                                                ) : (
-                                                    <p className="text-emerald-900">{value}</p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                            
+                            <div className="sm:ml-6 text-center sm:text-left mt-4 sm:mt-0 mb-4">
+                                <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-800 to-teal-600 bg-clip-text text-transparent drop-shadow-sm">
+                                    {profile.fullName}
+                                </h2>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        bg-emerald-100 text-emerald-700">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                                        Active Member
+                                    </span>
+                                    <span className="text-emerald-600 text-sm sm:ml-2">{profile.email}</span>
                                 </div>
-
-                                {/* Edit/Save Button */}
+                            </div>
+                            
+                            <div className="sm:ml-auto mb-4">
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={() => {
                                         if (isEditing) {
                                             handleSave();
+                                        } else {
+                                            setIsEditing(true);
                                         }
-                                        setIsEditing(!isEditing);
                                     }}
-                                    className="w-full mt-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white 
-                                    rounded-lg font-semibold hover:from-emerald-500 hover:to-teal-500 
-                                    transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+                                    className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white 
+                                    rounded-lg font-medium hover:from-emerald-500 hover:to-teal-500 
+                                    transition-all duration-300 shadow-lg flex items-center gap-2"
                                 >
-                                    <FiEdit2 />
+                                    <FiEdit2 className="text-lg" />
                                     {isEditing ? 'Save Changes' : 'Edit Profile'}
                                 </motion.button>
                             </div>
                         </div>
                     </div>
+                    
+                    {/* Stats Bar - Mobile only */}
+                    <div className="pt-24 pb-6 px-6 sm:hidden">
+                        <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                            <div className="text-center p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                                <div className="text-2xl font-bold text-emerald-700">{prevPurchases.length}</div>
+                                <div className="text-sm text-emerald-600">Orders</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                                <div className="text-2xl font-bold text-emerald-700">4.8</div>
+                                <div className="text-sm text-emerald-600">Rating</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                                <div className="text-2xl font-bold text-emerald-700">2</div>
+                                <div className="text-sm text-emerald-600">Reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Desktop Stats - visible only on desktop */}
+                    <div className="hidden sm:block pt-24 pb-6 px-6">
+                        <div className="flex justify-end">
+                            <div className="bg-emerald-50 rounded-lg p-3 px-5 flex items-center">
+                                <div className="text-emerald-700 font-medium mr-6">Member since: <span className="text-emerald-900">May 2025</span></div>
+                                <div className="text-emerald-700 font-medium mr-6">Reviews: <span className="text-emerald-900">2</span></div>
+                                <div className="text-emerald-700 font-medium">Status: <span className="text-emerald-900">Verified</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Left Column - Personal Info */}
+                    <div className="lg:col-span-4 space-y-8">
+                        {/* Personal Information */}
+                        <ProfileSection title="Personal Information">
+                            <div className="space-y-4">
+                                {Object.entries(profile).map(([key, value]) => {
+                                    if (key !== 'shippingAddress' && key !== 'fullName') {
+                                        return (
+                                            <div key={key} className="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                                                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-3">
+                                                    {fieldIcons[key]}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-sm text-emerald-600">
+                                                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                                                    </p>
+                                                    {isEditing ? (
+                                                        <input 
+                                                            type="text"
+                                                            value={value}
+                                                            onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
+                                                            className="w-full p-2 border border-emerald-200 rounded-lg 
+                                                            focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                                                        />
+                                                    ) : (
+                                                        <p className="text-emerald-900 font-medium">{value}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                            </div>
+                        </ProfileSection>
+                        
+                        {/* Shipping Address */}
+                        <ProfileSection title="Shipping Address">
+                            <div className="space-y-4">
+                                {Object.entries(profile.shippingAddress).map(([key, value]) => (
+                                    <div key={key} className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                                        <p className="text-sm text-emerald-600 mb-1">
+                                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                                        </p>
+                                        {isEditing ? (
+                                            <input 
+                                                type="text"
+                                                value={value}
+                                                onChange={(e) => setProfile({
+                                                    ...profile,
+                                                    shippingAddress: {
+                                                        ...profile.shippingAddress,
+                                                        [key]: e.target.value
+                                                    }
+                                                })}
+                                                className="w-full p-2 border border-emerald-200 rounded-lg 
+                                                focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                                            />
+                                        ) : (
+                                            <p className="text-emerald-900 font-medium">{value}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </ProfileSection>
+                        
+                        {/* Recent Activity - Mobile Only */}
+                        <div className="lg:hidden">
+                            <ProfileSection title="Recent Activity">
+                                <div className="space-y-4">
+                                    {recentActivity.slice(0, 2).map(activity => (
+                                        <div key={activity.id} className="flex items-center p-4 bg-emerald-50 rounded-lg">
+                                            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                                                {activity.icon}
+                                            </div>
+                                            <div className="ml-4">
+                                                <p className="text-emerald-900 font-medium">{activity.title}</p>
+                                                <p className="text-emerald-600 text-sm">{activity.description}</p>
+                                            </div>
+                                            <span className="ml-auto text-sm text-emerald-500">{activity.time}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </ProfileSection>
+                        </div>
+                    </div>
 
-                    {/* Main Content Section - Takes 8 columns */}
+                    {/* Right Column - Orders & Activity */}
                     <div className="lg:col-span-8 space-y-8">
                         {/* Previous Purchases */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-bold text-emerald-900">Previous Purchases</h3>
-                                <button 
-                                    onClick={() => setShowAllPrev(!showAllPrev)}
-                                    className="text-emerald-600 hover:text-emerald-700"
-                                >
-                                    {showAllPrev ? "View Less" : "View All"}
-                                </button>
-                            </div>
+                        <ProfileSection 
+                            title="Previous Purchases" 
+                            actionText={showAllPrev ? "View Less" : "View All"}
+                            onActionClick={() => setShowAllPrev(!showAllPrev)}
+                        >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {prevPurchases.map(product => (
-                                    <motion.div
-                                        key={product.id}
-                                        whileHover={{ scale: 1.02 }}
-                                        className="flex bg-emerald-50 rounded-lg overflow-hidden"
-                                    >
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                            className="w-24 h-24 object-cover"
-                                        />
-                                        <div className="p-4 flex-1">
-                                            <h4 className="font-semibold text-emerald-900">{product.name}</h4>
-                                            <p className="text-emerald-600">₱{product.price.toLocaleString()}</p>
-                                            <div className="flex items-center mt-2 text-yellow-400">
-                                                {[...Array(product.rating)].map((_, i) => (
-                                                    <FiStar key={i} className="fill-current" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </motion.div>
+                                    <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
-                        </div>
+                        </ProfileSection>
 
                         {/* Recommended Products */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-bold text-emerald-900">Recommended for You</h3>
-                                <button 
-                                    onClick={() => setShowAllRec(!showAllRec)}
-                                    className="text-emerald-600 hover:text-emerald-700"
-                                >
-                                    {showAllRec ? "View Less" : "View All"}
-                                </button>
-                            </div>
+                        <ProfileSection 
+                            title="Recommended for You" 
+                            actionText={showAllRec ? "View Less" : "View All"}
+                            onActionClick={() => setShowAllRec(!showAllRec)}
+                        >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {recommendedProducts.map(product => (
-                                    <motion.div
-                                        key={product.id}
-                                        whileHover={{ scale: 1.02 }}
-                                        className="flex bg-emerald-50 rounded-lg overflow-hidden"
-                                    >
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                            className="w-24 h-24 object-cover"
-                                        />
-                                        <div className="p-4 flex-1">
-                                            <h4 className="font-semibold text-emerald-900">{product.name}</h4>
-                                            <p className="text-emerald-600">₱{product.price.toLocaleString()}</p>
-                                            <div className="flex items-center mt-2 text-yellow-400">
-                                                {[...Array(product.rating)].map((_, i) => (
-                                                    <FiStar key={i} className="fill-current" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </motion.div>
+                                    <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
-                        </div>
+                        </ProfileSection>
 
-                        {/* Recent Activity */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-2xl font-bold text-emerald-900 mb-6">Recent Activity</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiStar className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Left a Review</p>
-                                        <p className="text-emerald-600 text-sm">Natural Face Serum - 5 stars</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">2 hours ago</span>
+                        {/* Recent Activity - Desktop Only */}
+                        <div className="hidden lg:block">
+                            <ProfileSection title="Recent Activity">
+                                <div className="space-y-4">
+                                    {recentActivity.map(activity => (
+                                        <div key={activity.id} className="flex items-center p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                                            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                                                {activity.icon}
+                                            </div>
+                                            <div className="ml-4">
+                                                <p className="text-emerald-900 font-medium">{activity.title}</p>
+                                                <p className="text-emerald-600 text-sm">{activity.description}</p>
+                                            </div>
+                                            <span className="ml-auto text-sm text-emerald-500">{activity.time}</span>
+                                        </div>
+                                    ))}
                                 </div>
-
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiShoppingBag className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Made a Purchase</p>
-                                        <p className="text-emerald-600 text-sm">2 items - ₱1,748.00</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">1 day ago</span>
-                                </div>
-
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiHeart className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Added to Wishlist</p>
-                                        <p className="text-emerald-600 text-sm">Bamboo Toothbrush Set</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">3 days ago</span>
-                                </div>
-
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiStar className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Left a Review</p>
-                                        <p className="text-emerald-600 text-sm">Eco Laundry Detergent - 4 stars</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">1 week ago</span>
-                                </div>
-
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiShoppingBag className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Made a Purchase</p>
-                                        <p className="text-emerald-600 text-sm">3 items - ₱2,547.00</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">2 weeks ago</span>
-                                </div>
-
-                                <div className="flex items-center p-4 bg-emerald-50 rounded-lg">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                        <FiHeart className="w-6 h-6" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-emerald-900 font-medium">Added to Wishlist</p>
-                                        <p className="text-emerald-600 text-sm">Natural Clay Face Mask</p>
-                                    </div>
-                                    <span className="ml-auto text-sm text-emerald-500">2 weeks ago</span>
-                                </div>
-                            </div>
+                            </ProfileSection>
                         </div>
                     </div>
                 </div>
