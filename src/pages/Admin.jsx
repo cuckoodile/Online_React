@@ -130,7 +130,7 @@ export default function Admin() {
                 <h2 className="text-xl font-bold text-gray-800">Sales Analytics</h2>
                 <div className="flex items-center">
                   <span className="mr-2 text-gray-500">Sort by</span>
-                  <select className="border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <select className="border rounded px-3 py-1.5 text-black focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <option>{currentMonth}</option>
                     <option>Jun 2025</option>
                     <option>May 2025</option>
