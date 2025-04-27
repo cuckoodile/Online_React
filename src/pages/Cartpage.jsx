@@ -270,16 +270,18 @@ export default function Cartpage() {
                   )}
                 </div>
                 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white 
-                  rounded-lg font-semibold hover:from-emerald-500 hover:to-teal-500 
-                  transition-all duration-300 shadow-md flex items-center justify-center gap-2"
-                >
-                  <ShoppingBag size={18} />
-                  Proceed to Checkout
-                </motion.button>
+                <Link to="/checkout">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white 
+                    rounded-lg font-semibold hover:from-emerald-500 hover:to-teal-500 
+                    transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag size={18} />
+                    Proceed to Checkout
+                  </motion.button>
+                </Link>
                 
                 <div className="mt-4 text-center">
                   <p className="text-emerald-600 text-sm">

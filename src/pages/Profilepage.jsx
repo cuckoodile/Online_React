@@ -174,16 +174,6 @@ export default function Profilepage() {
                                     <h1 className="text-3xl font-bold mb-1">Welcome back,</h1>
                                     <p className="text-emerald-100 text-lg">How are you doing today?</p>
                                 </div>
-                                <div className="flex space-x-4">
-                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
-                                        <div className="text-2xl font-bold text-white">{prevPurchases.length}</div>
-                                        <div className="text-emerald-100 text-sm">Orders</div>
-                                    </div>
-                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
-                                        <div className="text-2xl font-bold text-white">4.8</div>
-                                        <div className="text-emerald-100 text-sm">Rating</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         
@@ -244,14 +234,6 @@ export default function Profilepage() {
                                 <div className="text-2xl font-bold text-emerald-700">{prevPurchases.length}</div>
                                 <div className="text-sm text-emerald-600">Orders</div>
                             </div>
-                            <div className="text-center p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                                <div className="text-2xl font-bold text-emerald-700">4.8</div>
-                                <div className="text-sm text-emerald-600">Rating</div>
-                            </div>
-                            <div className="text-center p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                                <div className="text-2xl font-bold text-emerald-700">2</div>
-                                <div className="text-sm text-emerald-600">Reviews</div>
-                            </div>
                         </div>
                     </div>
                     
@@ -260,8 +242,7 @@ export default function Profilepage() {
                         <div className="flex justify-end">
                             <div className="bg-emerald-50 rounded-lg p-3 px-5 flex items-center">
                                 <div className="text-emerald-700 font-medium mr-6">Member since: <span className="text-emerald-900">May 2025</span></div>
-                                <div className="text-emerald-700 font-medium mr-6">Reviews: <span className="text-emerald-900">2</span></div>
-                                <div className="text-emerald-700 font-medium">Status: <span className="text-emerald-900">Verified</span></div>
+                                <div className="text-emerald-700 font-medium mr-6">Orders: <span className="text-emerald-900">2</span></div>
                             </div>
                         </div>
                     </div>

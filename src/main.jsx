@@ -13,6 +13,7 @@ import Loginpage from "./pages/Loginpage";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import Controller from "./pages/Controller";
+import Checkout from "./pages/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "/controller",
         element: <Controller />,
+      },
+      {
+        path: "/checkout",
+        element: <Checkout />,
       }
     ],
   },

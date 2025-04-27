@@ -1,10 +1,48 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FiMinus, FiPlus, FiHeart, FiShare2, FiStar, FiShoppingCart } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiMinus, FiPlus, FiHeart, FiShare2, FiStar, FiShoppingCart, FiX, FiMessageSquare } from 'react-icons/fi';
 
 export default function Productpage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: ''
+  });
+
+  // Handle review form changes
+  const handleReviewChange = (e) => {
+    const { name, value } = e.target;
+    setReviewForm({
+      ...reviewForm,
+      [name]: value
+    });
+  };
+
+  // Handle review submission
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    // Here you would typically send the review to your backend
+    console.log('Review submitted:', reviewForm);
+    // Close the modal and reset form
+    setIsReviewModalOpen(false);
+    setReviewForm({ rating: 5, comment: '' });
+  };
+
+  // Handle reply submission
+  const handleReplySubmit = (reviewId) => {
+    if (replyText.trim() === '') return;
+    
+    // Here you would typically send the reply to your backend
+    console.log('Reply submitted for review ID:', reviewId, 'Reply:', replyText);
+    
+    // Reset reply state
+    setReplyingTo(null);
+    setReplyText('');
+  };
 
   // Mock product data
   const product = {
@@ -28,28 +66,36 @@ export default function Productpage() {
       "Cruelty-free",
       "30ml bottle"
     ],
-    ingredients: "Aloe Vera, Jojoba Oil, Vitamin E, Rose Water, Green Tea Extract",
     reviewsList: [
       {
         id: 1,
         user: "Ian Sube",
         rating: 5,
         date: "2 days ago",
-        comment: "Amazing product! My skin feels so much better after just a week of use."
+        comment: "Amazing product! My skin feels so much better after just a week of use.",
+        replies: [
+          {
+            user: "Store Admin",
+            date: "1 day ago",
+            text: "Thank you for your feedback, Ian! We're glad you're enjoying the serum."
+          }
+        ]
       },
       {
         id: 2,
         user: "Jason De Guzman",
         rating: 4,
         date: "1 week ago",
-        comment: "Good quality serum, absorbs quickly and doesn't feel greasy."
+        comment: "Good quality serum, absorbs quickly and doesn't feel greasy.",
+        replies: []
       },
       {
         id: 3,
         user: "Alex Miguel",
         rating: 5,
         date: "2 weeks ago",
-        comment: "Love how natural the ingredients are. Will definitely buy again!"
+        comment: "Love how natural the ingredients are. Will definitely buy again!",
+        replies: []
       }
     ]
   };
@@ -165,12 +211,6 @@ export default function Productpage() {
                   ))}
                 </ul>
               </div>
-
-              {/* Ingredients */}
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold text-emerald-900">Ingredients</h2>
-                <p className="text-emerald-600">{product.ingredients}</p>
-              </div>
             </div>
           </div>
         </div>
@@ -183,12 +223,88 @@ export default function Productpage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg 
-                hover:bg-emerald-100 transition-colors"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg 
+                hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-sm"
+                onClick={() => setIsReviewModalOpen(true)}
               >
                 Write a Review
               </motion.button>
             </div>
+
+            {/* Review Modal */}
+            <AnimatePresence>
+              {isReviewModalOpen && (
+                <div className="fixed inset-0 bg-emerald-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ type: "spring", damping: 20 }}
+                    className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden"
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold text-emerald-900">Write a Review</h3>
+                        <button 
+                          onClick={() => setIsReviewModalOpen(false)}
+                          className="text-emerald-500 hover:text-emerald-700 transition-colors"
+                        >
+                          <FiX className="w-6 h-6" />
+                        </button>
+                      </div>
+                      
+                      <form onSubmit={handleReviewSubmit} className="space-y-4">
+                        <div>
+                          <label className="block text-emerald-800 mb-2">Your Rating</label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setReviewForm({...reviewForm, rating: star})}
+                                className="text-2xl text-yellow-400 focus:outline-none"
+                              >
+                                <FiStar className={reviewForm.rating >= star ? 'fill-current' : ''} />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label htmlFor="comment" className="block text-emerald-800 mb-2">Your Review</label>
+                          <textarea
+                            id="comment"
+                            name="comment"
+                            value={reviewForm.comment}
+                            onChange={handleReviewChange}
+                            rows="4"
+                            placeholder="Share your experience with this product..."
+                            className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          ></textarea>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsReviewModalOpen(false)}
+                            className="px-4 py-2 border border-emerald-200 text-emerald-600 rounded-lg hover:bg-emerald-50"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-500 hover:to-teal-500"
+                          >
+                            Submit Review
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
 
             <div className="grid md:grid-cols-2 gap-8">
               {/* Overall Rating */}
@@ -241,6 +357,57 @@ export default function Productpage() {
                     ))}
                   </div>
                   <p className="text-emerald-600">{review.comment}</p>
+                  
+                  {/* Reply button and form */}
+                  <div className="mt-3">
+                    {replyingTo !== review.id ? (
+                      <button 
+                        onClick={() => setReplyingTo(review.id)}
+                        className="flex items-center text-sm text-emerald-600 hover:text-emerald-800 mt-2"
+                      >
+                        <FiMessageSquare className="mr-1" /> Reply
+                      </button>
+                    ) : (
+                      <div className="mt-3 bg-emerald-50 p-3 rounded-lg">
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="Write your reply..."
+                          className="w-full p-2 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                          rows="2"
+                        ></textarea>
+                        <div className="flex justify-end gap-2 mt-2">
+                          <button
+                            onClick={() => setReplyingTo(null)}
+                            className="px-3 py-1 text-sm border border-emerald-200 text-emerald-600 rounded-lg hover:bg-emerald-100"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleReplySubmit(review.id)}
+                            className="px-3 py-1 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-500 hover:to-teal-500"
+                          >
+                            Submit Reply
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Display existing replies if any */}
+                  {review.replies && review.replies.length > 0 && (
+                    <div className="ml-6 mt-3 space-y-3">
+                      {review.replies.map((reply, index) => (
+                        <div key={index} className="bg-emerald-50 p-3 rounded-lg">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-medium text-emerald-800 text-sm">{reply.user}</span>
+                            <span className="text-xs text-emerald-600">{reply.date}</span>
+                          </div>
+                          <p className="text-sm text-emerald-700">{reply.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

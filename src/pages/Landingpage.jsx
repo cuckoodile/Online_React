@@ -55,6 +55,7 @@ export default function Landingpage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex gap-4 mt-4"
           >
             <Link to="/">
               <motion.button
@@ -66,6 +67,18 @@ export default function Landingpage() {
               >
                 Shop Collection
                 <FiShoppingBag className="text-xl" />
+              </motion.button>
+            </Link>
+            <Link to="/about">
+              <motion.button
+                className="px-8 py-4 text-xl bg-transparent border-2 border-emerald-400 text-emerald-200 rounded-xl
+                hover:bg-emerald-900/30 hover:border-emerald-300 hover:text-white transition-all duration-300 
+                flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Learn More
+                <FiArrowRight className="text-xl" />
               </motion.button>
             </Link>
           </motion.div>
