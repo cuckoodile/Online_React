@@ -13,7 +13,7 @@ export default function Homepage() {
       name: "Premium Denim Jacket",
       price: 1299,
       image:
-        "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+        "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg",
       category: "Outerwear",
     },
     {
@@ -107,7 +107,7 @@ export default function Homepage() {
       gradientFrom: "from-rose-300",
       gradientVia: "via-pink-200",
       gradientTo: "to-purple-200",
-      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
     {
       id: 2,
@@ -118,7 +118,7 @@ export default function Homepage() {
       gradientFrom: "from-teal-300",
       gradientVia: "via-teal-200",
       gradientTo: "to-emerald-200",
-      image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
     {
       id: 3,
@@ -129,7 +129,7 @@ export default function Homepage() {
       gradientFrom: "from-green-300",
       gradientVia: "via-emerald-200",
       gradientTo: "to-teal-200",
-      image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
   ];
 
@@ -293,7 +293,7 @@ export default function Homepage() {
       </div>
 
       {/* Brand Statement */}
-      {/* hindi ko trip baduy */}
+      {/* hindi ko trip baduy -joe */}
       {/* <div className="bg-gray-100 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-light text-gray-800 mb-6 tracking-wider">ELEGANCE IN EVERY THREAD</h2>

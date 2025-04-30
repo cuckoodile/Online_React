@@ -99,7 +99,7 @@ export default function Landingpage() {
               className="relative z-20"
             >
               <img 
-                src="https://img.freepik.com/premium-photo/dj-girl-posing-studio-urban-style-hip-hop-dancer-fresh-casual-beige-mint-outfit-fashion-monochrome-aesthetic-colours_161568-10055.jpg?uid=R190146106&ga=GA1.1.1040919255.1745600407&semt=ais_hybrid&w=740" 
+                src="https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg" 
                 alt="Fashion Collection" 
                 className="w-full h-auto rounded-lg shadow-2xl"
               />

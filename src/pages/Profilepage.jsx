@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from 'framer-motion';
-import { FiEdit2, FiStar, FiShoppingBag, FiHeart, FiUser, FiMail, FiPhone, FiCalendar } from 'react-icons/fi';
+import { FiEdit2, FiStar, FiShoppingBag, FiHeart, FiUser, FiMail, FiPhone, FiCalendar, FiLogOut } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 export default function Profilepage() {
     const [profile, setProfile] = useState({
@@ -191,11 +192,11 @@ export default function Profilepage() {
                                 </div>
                             </div>
                             
-                            <div className="sm:ml-6 text-center sm:text-left mt-4 sm:mt-0 mb-4">
+                            <div className="sm:ml-6 text-center sm:text-left mt-4 sm:mt-0 mb-1">
                                 <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-800 to-teal-600 bg-clip-text text-transparent drop-shadow-sm">
                                     {profile.fullName}
                                 </h2>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 mt-2">
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                         bg-emerald-100 text-emerald-700">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
@@ -205,7 +206,7 @@ export default function Profilepage() {
                                 </div>
                             </div>
                             
-                            <div className="sm:ml-auto mb-4">
+                            <div className="sm:ml-auto mb-4 flex gap-3">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
@@ -222,6 +223,22 @@ export default function Profilepage() {
                                 >
                                     <FiEdit2 className="text-lg" />
                                     {isEditing ? 'Save Changes' : 'Edit Profile'}
+                                </motion.button>
+                                
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => {
+                                        // Add logout functionality here
+                                        console.log("Logging out");
+                                        // You can add navigation to login page or clear auth state
+                                    }}
+                                    className="px-6 py-3 border-2 border-red-500 text-red-500 
+                                    rounded-lg font-medium hover:bg-red-50
+                                    transition-all duration-300 shadow-sm flex items-center gap-2"
+                                >
+                                    <FiLogOut className="text-lg" />
+                                    Logout
                                 </motion.button>
                             </div>
                         </div>
@@ -243,6 +260,12 @@ export default function Profilepage() {
                             <div className="bg-emerald-50 rounded-lg p-3 px-5 flex items-center">
                                 <div className="text-emerald-700 font-medium mr-6">Member since: <span className="text-emerald-900">May 2025</span></div>
                                 <div className="text-emerald-700 font-medium mr-6">Orders: <span className="text-emerald-900">2</span></div>
+                                <Link to="/shipping" className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white 
+                                    rounded-lg font-medium hover:from-emerald-500 hover:to-teal-500 
+                                    transition-all duration-300 shadow-sm flex items-center gap-2">
+                                    <FiShoppingBag className="text-sm" />
+                                    Track Orders
+                                </Link>
                             </div>
                         </div>
                     </div>
