@@ -229,7 +229,7 @@ export default function Profilepage() {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => {
-                                        // Add logout functionality here
+                                        // Add logout functionality here`
                                         console.log("Logging out");
                                         // You can add navigation to login page or clear auth state
                                     }}

@@ -293,24 +293,53 @@ export default function Homepage() {
       </div>
 
       {/* Brand Statement */}
-      {/* hindi ko trip baduy -joe */}
-      {/* <div className="bg-gray-100 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-light text-gray-800 mb-6 tracking-wider">ELEGANCE IN EVERY THREAD</h2>
-          <div className="w-24 h-0.5 bg-gray-400 mx-auto mb-6"></div>
-          <p className="max-w-2xl mx-auto text-gray-600 leading-relaxed text-lg">
+      <div className="relative bg-gradient-to-b from-gray-100 to-white py-20 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-5xl font-light text-gray-800 mb-8 tracking-wider"
+          >
+            ELEGANCE IN EVERY THREAD
+          </motion.h2>
+          
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-32 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto mb-8"
+          />
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="max-w-3xl mx-auto text-gray-600 leading-relaxed text-xl"
+          >
             Curated collections that blend timeless elegance with contemporary trends.
             Our pieces are designed for those who appreciate quality craftsmanship and distinctive style.
-          </p>
-          <div className="flex justify-center gap-8 mt-8">
-            <span className="text-gray-700 font-light">QUALITY</span>
-            <span className="text-gray-700 font-light">•</span>
-            <span className="text-gray-700 font-light">STYLE</span>
-            <span className="text-gray-700 font-light">•</span>
-            <span className="text-gray-700 font-light">SUSTAINABILITY</span>
-          </div>
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex justify-center gap-8 mt-12"
+          >
+            {['QUALITY', 'STYLE', 'SUSTAINABILITY'].map((item, index) => (
+              <div key={index} className="flex items-center">
+                <span className="text-emerald-600 font-medium text-lg">{item}</span>
+                {index < 2 && <span className="text-gray-400 mx-4">•</span>}
+              </div>
+            ))}
+          </motion.div>
         </div>
-      </div> */}
+      </div>
 
       {/* New Arrivals Section */}
       <div className="container mx-auto px-4 py-16">
