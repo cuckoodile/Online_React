@@ -13,7 +13,7 @@ export default function Homepage() {
       name: "Premium Denim Jacket",
       price: 1299,
       image:
-        "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+        "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg",
       category: "Outerwear",
     },
     {
@@ -107,7 +107,7 @@ export default function Homepage() {
       gradientFrom: "from-rose-300",
       gradientVia: "via-pink-200",
       gradientTo: "to-purple-200",
-      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
     {
       id: 2,
@@ -118,7 +118,7 @@ export default function Homepage() {
       gradientFrom: "from-teal-300",
       gradientVia: "via-teal-200",
       gradientTo: "to-emerald-200",
-      image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
     {
       id: 3,
@@ -129,7 +129,7 @@ export default function Homepage() {
       gradientFrom: "from-green-300",
       gradientVia: "via-emerald-200",
       gradientTo: "to-teal-200",
-      image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80"
+      image: "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg"
     },
   ];
 
@@ -293,24 +293,53 @@ export default function Homepage() {
       </div>
 
       {/* Brand Statement */}
-      {/* hindi ko trip baduy */}
-      {/* <div className="bg-gray-100 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-light text-gray-800 mb-6 tracking-wider">ELEGANCE IN EVERY THREAD</h2>
-          <div className="w-24 h-0.5 bg-gray-400 mx-auto mb-6"></div>
-          <p className="max-w-2xl mx-auto text-gray-600 leading-relaxed text-lg">
+      <div className="relative bg-gradient-to-b from-gray-100 to-white py-20 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-5xl font-light text-gray-800 mb-8 tracking-wider"
+          >
+            ELEGANCE IN EVERY THREAD
+          </motion.h2>
+          
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-32 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto mb-8"
+          />
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="max-w-3xl mx-auto text-gray-600 leading-relaxed text-xl"
+          >
             Curated collections that blend timeless elegance with contemporary trends.
             Our pieces are designed for those who appreciate quality craftsmanship and distinctive style.
-          </p>
-          <div className="flex justify-center gap-8 mt-8">
-            <span className="text-gray-700 font-light">QUALITY</span>
-            <span className="text-gray-700 font-light">•</span>
-            <span className="text-gray-700 font-light">STYLE</span>
-            <span className="text-gray-700 font-light">•</span>
-            <span className="text-gray-700 font-light">SUSTAINABILITY</span>
-          </div>
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex justify-center gap-8 mt-12"
+          >
+            {['QUALITY', 'STYLE', 'SUSTAINABILITY'].map((item, index) => (
+              <div key={index} className="flex items-center">
+                <span className="text-emerald-600 font-medium text-lg">{item}</span>
+                {index < 2 && <span className="text-gray-400 mx-4">•</span>}
+              </div>
+            ))}
+          </motion.div>
         </div>
-      </div> */}
+      </div>
 
       {/* New Arrivals Section */}
       <div className="container mx-auto px-4 py-16">

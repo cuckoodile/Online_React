@@ -47,27 +47,6 @@ export default function About() {
         </Link>
       </motion.div>
 
-      {/* Shop Button */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-        className="absolute top-8 right-8 z-20"
-      >
-        <Link to="/">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 
-            text-white rounded-lg hover:from-emerald-500 hover:to-teal-500 
-            transition-all duration-300 shadow-lg shadow-emerald-900/30"
-          >
-            <FiShoppingCart className="text-xl" />
-            <span>Go to Shop</span>
-          </motion.button>
-        </Link>
-      </motion.div>
-
       {/* Main content */}
       <div className="relative z-10 container mx-auto px-4 py-16">
         <motion.div

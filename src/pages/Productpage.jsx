@@ -54,9 +54,9 @@ export default function Productpage() {
     reviews: 124,
     stock: 15,
     images: [
-      "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
+      "https://i.pinimg.com/736x/5d/98/4a/5d984a008b2e95bdc05d47ab49bb467c.jpg",
+      "https://i.pinimg.com/474x/2f/34/08/2f3408b8dba1886248af2b33771da741.jpg",
+      "https://i.pinimg.com/474x/15/9a/78/159a7886755fa9a3ab769fdaa51ae963.jpg",
       "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg"
     ],
     details: [
@@ -190,13 +190,6 @@ export default function Productpage() {
                     whileTap={{ scale: 0.98 }}
                     className="p-3 rounded-lg border border-emerald-200 hover:bg-emerald-50"
                   >
-                    {/* <FiHeart className="text-emerald-600" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-3 rounded-lg border border-emerald-200 hover:bg-emerald-50"
-                  > */}
                     <FiShare2 className="text-emerald-600" />
                   </motion.button>
                 </div>
