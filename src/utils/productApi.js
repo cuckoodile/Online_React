@@ -4,6 +4,10 @@ import { BASE_URL } from "./api_config";
 
 const api = axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+  },
 });
 
 
@@ -11,7 +15,7 @@ export const fetchProducts = async () => {
   try {
     const response = await api.get("/api/products");
     console.log("API Response:", response.data);
-    return response.data;
+    return await response.data;
   } catch (error) {
     console.error("API Error (fetchProducts):", error);
     throw new Error("Failed to fetch products");

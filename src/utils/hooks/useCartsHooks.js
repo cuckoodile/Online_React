@@ -1,10 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  fetchCartItems,
-  createCartItem,
-  updateCartItem,
-  deleteCartItem,
-} from "../cart_api";
+import {fetchCartItems,createCartItem,updateCartItem,deleteCartItem} from "../cart_api";
 
 export const useCartItems = () => {
   return useQuery(["cartItems"], fetchCartItems);
