@@ -3,6 +3,10 @@ import { BASE_URL } from "./api_config";
 
 const api = axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 export const fetchUsers = async () => {

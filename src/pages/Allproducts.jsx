@@ -1,134 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { FiFilter, FiGrid, FiList, FiChevronUp, FiChevronDown } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import Card from '@/components/Card';
-import Footer from '@/components/footer';
+import React, { useState, useEffect } from "react";
+import {
+  FiFilter,
+  FiGrid,
+  FiList,
+  FiChevronUp,
+  FiChevronDown,
+} from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import Card from "@/components/Card";
+import Footer from "@/components/footer";
+import { useProducts } from "../utils/hooks/useProductsHooks";
+import { useCategory } from "../utils/hooks/useCategoriesHooks";
 
-// Update products to fashion items
-const products = [
-  {
-    id: 1,
-    name: "Designer Silk Blouse",
-    price: 1299,
-    image: "https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
-    category: "Tops"
-  },
-  {
-    id: 2,
-    name: "Premium Leather Belt",
-    price: 449,
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
-    category: "Accessories"
-  },
-  {
-    id: 3,
-    name: "Bamboo Cleaning Set",
-    price: 899,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Household Essentials"
-  },
-  {
-    id: 4,
-    name: "Natural Lip Balm Set",
-    price: 299,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Cosmetics"
-  },
-  {
-    id: 5,
-    name: "Pet Bamboo Bowl",
-    price: 599,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Pet Products"
-  },
-  {
-    id: 6,
-    name: "Eco Laundry Detergent",
-    price: 449,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Household Essentials"
-  },
-  {
-    id: 7,
-    name: "Organic Face Mask",
-    price: 399,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Cosmetics"
-  },
-  {
-    id: 8,
-    name: "Bamboo Pet Brush",
-    price: 349,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Pet Products"
-  },
-  {
-    id: 9,
-    name: "Natural Hand Cream",
-    price: 499,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Cosmetics"
-  },
-  {
-    id: 10,
-    name: "Eco-Friendly Dish Soap",
-    price: 279,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Household Essentials"
-  },
-  {
-    id: 11,
-    name: "Pet Dental Care Kit",
-    price: 799,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Pet Products"
-  },
-  {
-    id: 12,
-    name: "Organic Shampoo Bar",
-    price: 349,
-    image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-    category: "Cosmetics"
-  }
+const priceRanges = [
+  { label: "All Prices", value: "all" },
+  { label: "Under ₱300", value: "0-300" },
+  { label: "₱300 - ₱500", value: "300-500" },
+  { label: "₱500 - ₱1000", value: "500-1000" },
+  { label: "Over ₱1000", value: "1000+" },
 ];
 
-const categories = ['All', 'Cosmetics', 'Pet Products', 'Household Essentials'];
-
-  const priceRanges = [
-    { label: 'All Prices', value: 'all' },
-    { label: 'Under ₱300', value: '0-300' },
-    { label: '₱300 - ₱500', value: '300-500' },
-    { label: '₱500 - ₱1000', value: '500-1000' },
-    { label: 'Over ₱1000', value: '1000+' }
-  ];
-
 const sortOptions = [
-  { label: 'Newest', value: 'newest' },
-  { label: 'Price: Low to High', value: 'price-asc' },
-  { label: 'Price: High to Low', value: 'price-desc' },
-  { label: 'Name: A to Z', value: 'name-asc' },
+  { label: "Newest", value: "newest" },
+  { label: "Price: Low to High", value: "price-asc" },
+  { label: "Price: High to Low", value: "price-desc" },
+  { label: "Name: A to Z", value: "name-asc" },
 ];
 
 export default function Allproducts() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [priceRange, setPriceRange] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
-  const [viewMode, setViewMode] = useState('grid');
+  const { data: products, error: productsError, isLoading: productLoading } = useProducts();
+  const { data: categories, error: categoriesError, isLoading: categoriesLoading } = useCategory();
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [priceRange, setPriceRange] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
   useEffect(() => {
-    setFilteredProducts(filterAndSortProducts());
-  }, [selectedCategory, priceRange, sortBy]);
+    if (products) {
+      setFilteredProducts(filterAndSortProducts());
+    }
+  }, [products, selectedCategory, priceRange, sortBy]);
 
   const filterAndSortProducts = () => {
-    let result = products.filter(product => {
-      const categoryMatch = selectedCategory === 'All' || product.category === selectedCategory;
-      
+    let result = products.filter((product) => {
+      const categoryMatch =
+        selectedCategory === "All" || product.category === selectedCategory;
+
       let priceMatch = true;
-      if (priceRange !== 'all') {
-        const [min, max] = priceRange.split('-').map(Number);
+      if (priceRange !== "all") {
+        const [min, max] = priceRange.split("-").map(Number);
         if (max) {
           priceMatch = product.price >= min && product.price <= max;
         } else {
@@ -141,23 +65,32 @@ export default function Allproducts() {
 
     // Sort the filtered products
     switch (sortBy) {
-      case 'price-asc':
+      case "price-asc":
         result.sort((a, b) => a.price - b.price);
         break;
-      case 'price-desc':
+      case "price-desc":
         result.sort((a, b) => b.price - a.price);
         break;
-      case 'name-asc':
+      case "name-asc":
         result.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      case 'newest':
+      case "newest":
       default:
-        // Assuming id represents the order of addition (newest first)
         result.sort((a, b) => b.id - a.id);
     }
 
     return result;
   };
+
+  if (categoriesLoading || productLoading) {
+    return <div className="text-center py-16">Loading...</div>;
+  }
+  if (categoriesError) {
+    return <div className="text-center py-16">Error loading categories</div>;
+  }
+  if (productsError) {
+    return <div className="text-center py-16">Error loading products</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -167,10 +100,13 @@ export default function Allproducts() {
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-light mb-4 bg-gradient-to-r from-emerald-100 via-white to-emerald-100 text-transparent bg-clip-text">COLLECTION</h1>
+          <h1 className="text-4xl md:text-5xl font-light mb-4 bg-gradient-to-r from-emerald-100 via-white to-emerald-100 text-transparent bg-clip-text">
+            COLLECTION
+          </h1>
           <div className="w-24 h-0.5 bg-emerald-400 mx-auto mb-6"></div>
           <p className="text-emerald-100 max-w-2xl mx-auto">
-            Explore our curated selection of premium sustainable fashion pieces designed for the eco-conscious individual.
+            Explore our curated selection of premium sustainable fashion pieces
+            designed for the eco-conscious individual.
           </p>
         </div>
       </div>
@@ -179,7 +115,7 @@ export default function Allproducts() {
         {/* Filter and sort controls */}
         <div className="mb-8">
           <div className="flex flex-wrap justify-between items-center mb-4">
-            <button 
+            <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
@@ -188,50 +124,59 @@ export default function Allproducts() {
               {showFilters ? <FiChevronUp /> : <FiChevronDown />}
             </button>
           </div>
-          
+
           <AnimatePresence>
             {showFilters && (
-              <motion.div 
+              <motion.div
                 initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
+                animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
                 <div className="bg-gray-100 p-6 rounded-lg mb-6">
                   <div className="mb-4">
-                    <h3 className="font-medium mb-3 text-gray-700">Categories</h3>
+                    <h3 className="font-medium mb-3 text-gray-700">
+                      Categories
+                    </h3>
                     <div className="flex flex-wrap gap-2">
-                      {categories.map(category => (
+                      <button onClick={() => setSelectedCategory("All")}>
+                        All
+                      </button>
+                      {categories.map((category) => (
                         <button
                           key={category}
                           onClick={() => setSelectedCategory(category)}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                            ${selectedCategory === category 
-                              ? 'bg-gray-900 text-white' 
-                              : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+                            ${
+                              selectedCategory === category
+                                ? "bg-gray-900 text-white"
+                                : "bg-white text-gray-700 hover:bg-gray-200"
+                            }`}
                         >
                           {category}
                         </button>
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="mb-4">
-                    <h3 className="font-medium mb-3 text-gray-700">Price Range</h3>
+                    <h3 className="font-medium mb-3 text-gray-700">
+                      Price Range
+                    </h3>
                     <select
                       value={priceRange}
                       onChange={(e) => setPriceRange(e.target.value)}
                       className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
                     >
-                      {priceRanges.map(range => (
+                      {priceRanges.map((range) => (
                         <option key={range.value} value={range.value}>
                           {range.label}
                         </option>
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-medium mb-3 text-gray-700">Sort By</h3>
                     <select
@@ -239,7 +184,7 @@ export default function Allproducts() {
                       onChange={(e) => setSortBy(e.target.value)}
                       className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
                     >
-                      {sortOptions.map(option => (
+                      {sortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -254,22 +199,31 @@ export default function Allproducts() {
 
         {/* Results count */}
         <div className="mb-6">
-          <p className="text-gray-500">Showing {filteredProducts.length} products</p>
+          <p className="text-gray-500">
+            Showing {filteredProducts.length} products
+          </p>
         </div>
 
         {/* Product grid */}
-        <div className={viewMode === 'grid' 
-          ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-          : "flex flex-col gap-4"
-        }>
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              : "flex flex-col gap-4"
+          }
+        >
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <Card key={product.id} data={product} viewMode={viewMode} />
             ))
           ) : (
             <div className="col-span-full py-16 text-center">
-              <h3 className="text-xl font-medium text-gray-700 mb-2">No products found</h3>
-              <p className="text-gray-500">Try adjusting your filters to find what you're looking for.</p>
+              <h3 className="text-xl font-medium text-gray-700 mb-2">
+                No products found
+              </h3>
+              <p className="text-gray-500">
+                Try adjusting your filters to find what you're looking for.
+              </p>
             </div>
           )}
         </div>

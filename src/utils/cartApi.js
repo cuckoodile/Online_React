@@ -3,11 +3,15 @@ import { BASE_URL } from "./api_config";
 
 const api = axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 export const fetchCartItems = async () => {
   try {
-    const response = await api.get("/api/cart");
+    const response = await api.get("/api/carts");
     console.log("API Response (fetchCartItems):", response.data);
     return response.data;
   } catch (error) {
@@ -18,7 +22,7 @@ export const fetchCartItems = async () => {
 
 export const fetchCartItemById = async (id) => {
   try {
-    const response = await api.get(`/api/cart/${id}`);
+    const response = await api.get(`/api/carts/${id}`);
     console.log("API Response (fetchCartItemById):", response.data);
     return response.data;
   } catch (error) {
@@ -29,7 +33,7 @@ export const fetchCartItemById = async (id) => {
 
 export const createCartItem = async (cartItemData) => {
   try {
-    const response = await api.post("/api/cart", cartItemData);
+    const response = await api.post("/api/carts", cartItemData);
     console.log("Cart item created:", response.data);
     return response.data;
   } catch (error) {
@@ -40,7 +44,7 @@ export const createCartItem = async (cartItemData) => {
 
 export const updateCartItem = async (id, updatedData) => {
   try {
-    const response = await api.put(`/api/cart/${id}`, updatedData);
+    const response = await api.patch(`/api/carts/${id}`, updatedData);
     console.log("Cart item updated:", response.data);
     return response.data;
   } catch (error) {
@@ -51,7 +55,7 @@ export const updateCartItem = async (id, updatedData) => {
 
 export const deleteCartItem = async (id) => {
   try {
-    await api.delete(`/api/cart/${id}`);
+    await api.delete(`/api/carts/${id}`);
     console.log("Cart item deleted with ID:", id);
     return id;
   } catch (error) {
