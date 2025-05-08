@@ -42,3 +42,10 @@ export const useDeleteUser = () => {
     },
   });
 };
+
+export const useUserById = (id) => {
+  return useQuery({
+    queryKey: ["users", id],
+    queryFn: () => fetchUsers(id),
+  });
+};

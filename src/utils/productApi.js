@@ -14,7 +14,7 @@ const api = axios.create({
 export const fetchProducts = async () => {
   try {
     const response = await api.get("/api/products");
-    console.log("API Response:", response.data);
+    console.log("API Response:", response.data.data);
     return await response.data;
   } catch (error) {
     console.error("API Error (fetchProducts):", error);
@@ -49,7 +49,7 @@ export const createProduct = async (productData) => {
 
 export const updateProduct = async (id, updatedData) => {
   try {
-    const response = await api.put(`/api/products/${id}`, updatedData);
+    const response = await api.patch(`/api/products/${id}`, updatedData);
     console.log("Product updated:", response.data);
     return response.data;
   } catch (error) {

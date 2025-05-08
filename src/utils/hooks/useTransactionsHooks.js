@@ -34,3 +34,10 @@ export const useDeleteTransaction = () => {
     },
   });
 };
+
+export const useTransactionById = (id) => {
+  return useQuery({
+    queryKey: ["transactions", id],
+    queryFn: () => fetchTransactions(id),
+  });
+};

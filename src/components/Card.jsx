@@ -6,7 +6,7 @@ export default function Card({ data: product }) {
   const navigate = useNavigate();
 
   const handleNavigate = (path) => {
-    navigate(path);
+    navigate(`${path}?id=${product.id}`);
   };
 
   console.log("Product Data:", product);
@@ -27,7 +27,8 @@ export default function Card({ data: product }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02 }}
-      className="bg-white rounded-lg shadow-sm overflow-hidden"
+      onClick={() => handleNavigate("/product")}
+      className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer"
     >
       <div className="relative group">
         <img

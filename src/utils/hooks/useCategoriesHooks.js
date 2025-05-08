@@ -8,6 +8,13 @@ export const useCategory = () => {
   });
 };
 
+export const useCategoryById = (id) => {
+  return useQuery({
+    queryKey: ["categories", id],
+    queryFn: () => fetchCategory(id),
+  });
+};
+
 export const useCreateCategory = () => {
     const queryClient = useQueryClient();
     return useMutation({

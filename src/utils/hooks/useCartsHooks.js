@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchCartItems,
+  fetchCartItemById,
   createCartItem,
   updateCartItem,
   deleteCartItem,
@@ -10,6 +11,13 @@ export const useCartItems = () => {
   return useQuery({
     queryKey: ["carts"],
     queryFn: fetchCartItems,
+  });
+};
+
+export const useCartItemsById = (id) => {
+  return useQuery({
+    queryKey: ["carts", id],
+    queryFn: () => fetchCartItemById(id),
   });
 };
 
