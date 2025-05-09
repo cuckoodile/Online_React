@@ -13,7 +13,7 @@ const api = axios.create({
 
 export const fetchCategory = async () => {
   try {
-    const response = await api.get("/api/cotegories");
+    const response = await api.get("/api/categories");
     console.log("API Response:", response.data);
     return await response.data;
   } catch (error) {

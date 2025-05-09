@@ -29,8 +29,16 @@ const sortOptions = [
 ];
 
 export default function Allproducts() {
-  const { data: products, error: productsError, isLoading: productLoading } = useProducts();
-  const { data: categories, error: categoriesError, isLoading: categoriesLoading } = useCategory();
+  const {
+    data: products,
+    error: productsError,
+    isLoading: productLoading,
+  } = useProducts();
+  const {
+    data: categories,
+    error: categoriesError,
+    isLoading: categoriesLoading,
+  } = useCategory();
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [priceRange, setPriceRange] = useState("all");
@@ -46,7 +54,7 @@ export default function Allproducts() {
   }, [products, selectedCategory, priceRange, sortBy]);
 
   const filterAndSortProducts = () => {
-    let result = products.filter((product) => {
+    let result = products.data.filter((product) => {
       const categoryMatch =
         selectedCategory === "All" || product.category === selectedCategory;
 
@@ -92,142 +100,155 @@ export default function Allproducts() {
     return <div className="text-center py-16">Error loading products</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero banner */}
-      <div className="bg-gradient-to-r from-emerald-950 to-emerald-800 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-light mb-4 bg-gradient-to-r from-emerald-100 via-white to-emerald-100 text-transparent bg-clip-text">
-            COLLECTION
-          </h1>
-          <div className="w-24 h-0.5 bg-emerald-400 mx-auto mb-6"></div>
-          <p className="text-emerald-100 max-w-2xl mx-auto">
-            Explore our curated selection of premium sustainable fashion pieces
-            designed for the eco-conscious individual.
-          </p>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-12">
-        {/* Filter and sort controls */}
-        <div className="mb-8">
-          <div className="flex flex-wrap justify-between items-center mb-4">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              <FiFilter />
-              Filters
-              {showFilters ? <FiChevronUp /> : <FiChevronDown />}
-            </button>
+  console.log("Products:", products.data);
+  if (!productLoading && !categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero banner */}
+        <div className="bg-gradient-to-r from-emerald-950 to-emerald-800 text-white py-16 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-4xl md:text-5xl font-light mb-4 bg-gradient-to-r from-emerald-100 via-white to-emerald-100 text-transparent bg-clip-text">
+              COLLECTION
+            </h1>
+            <div className="w-24 h-0.5 bg-emerald-400 mx-auto mb-6"></div>
+            <p className="text-emerald-100 max-w-2xl mx-auto">
+              Explore our curated selection of premium sustainable fashion
+              pieces designed for the eco-conscious individual.
+            </p>
           </div>
+        </div>
 
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
+        <div className="container mx-auto px-4 py-12">
+          {/* Filter and sort controls */}
+          <div className="mb-8">
+            <div className="flex flex-wrap justify-between items-center mb-4">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <div className="bg-gray-100 p-6 rounded-lg mb-6">
-                  <div className="mb-4">
-                    <h3 className="font-medium mb-3 text-gray-700">
-                      Categories
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => setSelectedCategory("All")}>
-                        All
-                      </button>
-                      {categories.map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => setSelectedCategory(category)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                <FiFilter />
+                Filters
+                {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-gray-100 p-6 rounded-lg mb-6">
+                    <div className="mb-4">
+                      <h3 className="font-medium mb-3 text-gray-700">
+                        Categories
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => setSelectedCategory("All")}>
+                          All
+                        </button>
+                        {categories.map((category) => (
+                          <button
+                            key={category}
+                            onClick={() => setSelectedCategory(category)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                             ${
                               selectedCategory === category
                                 ? "bg-gray-900 text-white"
                                 : "bg-white text-gray-700 hover:bg-gray-200"
                             }`}
-                        >
-                          {category}
-                        </button>
-                      ))}
+                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <h3 className="font-medium mb-3 text-gray-700">
+                        Price Range
+                      </h3>
+                      <select
+                        value={priceRange}
+                        onChange={(e) => setPriceRange(e.target.value)}
+                        className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
+                      >
+                        {priceRanges.map((range) => (
+                          <option key={range.value} value={range.value}>
+                            {range.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <h3 className="font-medium mb-3 text-gray-700">
+                        Sort By
+                      </h3>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
+                      >
+                        {sortOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-                  <div className="mb-4">
-                    <h3 className="font-medium mb-3 text-gray-700">
-                      Price Range
-                    </h3>
-                    <select
-                      value={priceRange}
-                      onChange={(e) => setPriceRange(e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
-                    >
-                      {priceRanges.map((range) => (
-                        <option key={range.value} value={range.value}>
-                          {range.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+          {/* Results count */}
+          <div className="mb-6">
+            <p className="text-gray-500">
+              Showing {filteredProducts.length} products
+            </p>
+          </div>
 
-                  <div>
-                    <h3 className="font-medium mb-3 text-gray-700">Sort By</h3>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full md:w-auto"
-                    >
-                      {sortOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </motion.div>
+          {/* Product grid */}
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                : "flex flex-col gap-4"
+            }
+          >
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <Card
+                 
+              key={product.id}
+                data={{
+                  id: product.id,
+                  name: product.name,
+                  image: product.product_image,
+                  price: product.price,
+                }}/>
+              ))
+            ) : (
+              <div className="col-span-full py-16 text-center">
+                <h3 className="text-xl font-medium text-gray-700 mb-2">
+                  No products found
+                </h3>
+                <p className="text-gray-500">
+                  Try adjusting your filters to find what you're looking for.
+                </p>
+              </div>
             )}
-          </AnimatePresence>
-        </div>
-
-        {/* Results count */}
-        <div className="mb-6">
-          <p className="text-gray-500">
-            Showing {filteredProducts.length} products
-          </p>
-        </div>
-
-        {/* Product grid */}
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-              : "flex flex-col gap-4"
-          }
-        >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <Card key={product.id} data={product} viewMode={viewMode} />
-            ))
-          ) : (
-            <div className="col-span-full py-16 text-center">
-              <h3 className="text-xl font-medium text-gray-700 mb-2">
-                No products found
-              </h3>
-              <p className="text-gray-500">
-                Try adjusting your filters to find what you're looking for.
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }

@@ -9,7 +9,7 @@ export default function Card({ data: product }) {
     navigate(`${path}?id=${product.id}`);
   };
 
-  console.log("Product Data:", product);
+  console.log("Product Data:", product.image);
   
   const imageHandler = () => {
     try {
@@ -20,7 +20,7 @@ export default function Card({ data: product }) {
     } catch (error) {
       console.error("Error parsing product.image:", error);
     }
-    return parsedImages = JSON.parse(product.image);
+    return parsedImages = JSON.parse(product.product_image);
   }
   return (
     <motion.div

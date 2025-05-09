@@ -15,20 +15,20 @@ export const useProductsById = (id) => {
   });
 };
 
-export const useCreateProduct = () => {
+export const useCreateProduct = (data) => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: createProduct,
+      mutationFn: () => createProduct(data),
       onSuccess: () => {
         queryClient.invalidateQueries(["products"]);
       },
     });
   };
 
-  export const useUpdateProduct = () => {
+  export const useUpdateProduct = (id,updatedData) => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: ({ id, updatedData }) => updateProduct(id, updatedData),
+      mutationFn: () => updateProduct(id, updatedData),
       onSuccess: () => {
         queryClient.invalidateQueries(["products"]);
       },
