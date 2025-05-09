@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMinus, FiPlus, FiHeart, FiShare2, FiStar, FiShoppingCart, FiX, FiMessageSquare } from 'react-icons/fi';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/utils/hooks/useProductsHooks';
+import { useProductsById, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/utils/hooks/useProductsHooks';
 import { useLocation } from 'react-router-dom';
 
 export default function Productpage() {
@@ -9,7 +9,7 @@ export default function Productpage() {
   const searchParams = new URLSearchParams(location.search);
   const productId = searchParams.get('id');
 
-  const { data: product, error, isLoading } = useProducts(productId);
+  const { data: product, error, isLoading } = useProductsById(productId);
   const createReview = useCreateProduct();
   const updateReview = useUpdateProduct();
   const deleteReview = useDeleteProduct();
