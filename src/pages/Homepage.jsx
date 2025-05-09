@@ -16,7 +16,7 @@ import { useProducts } from "@/utils/hooks/useProductsHooks";
 export default function Homepage() {
   // Carousel slides data with fashion-specific images
   const { data: products, error, isLoading } = useProducts();
-  const newArrivals = products?.data?.slice(0, 8) || [];
+  const newArrivals = products?.slice(0, 8) || [];
 
  
 

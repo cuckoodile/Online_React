@@ -10,7 +10,7 @@ import {
 export const useCartItems = () => {
   return useQuery({
     queryKey: ["carts"],
-    queryFn: fetchCartItems,
+    queryFn: () => fetchCartItems(),
   });
 };
 

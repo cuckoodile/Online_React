@@ -33,15 +33,13 @@ export default function Controller() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
     id: null,
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    stock: "",
-    size: "",
-    color: "",
+    name: null,
+    description: null,
+    price: null,
+    category: null,
+    stock: null,
+    size: null,
     image: null,
-    imagePreview: null,
   });
 
   // Categories for fashion products
@@ -55,10 +53,11 @@ export default function Controller() {
   //   "Activewear",
   //   "Swimwear",
   // ];
-  const {data: categories, error: categoriesError, isLoading: categoriesLoading} = useCategory()
-
-  // Available sizes
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+  const {
+    data: categories,
+    error: categoriesError,
+    isLoading: categoriesLoading,
+  } = useCategory();
 
   // Available colors
   const colors = [
@@ -78,12 +77,9 @@ export default function Controller() {
   useEffect(() => {
     if (!productLoading && products) {
       const results = products.filter((product) => {
-      const categoryName = product.category?.name || "";
-      return (
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.color?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+        console.log("fitered product:", product);
+        const categoryName = product.category?.name || "All";
+        return product.name || categoryName;
       });
       setFilteredProducts(results);
     } else {
@@ -154,8 +150,7 @@ export default function Controller() {
       !currentProduct.name ||
       !currentProduct.price ||
       !currentProduct.category ||
-      !currentProduct.size ||
-      !currentProduct.color
+      !currentProduct.size
     ) {
       alert("Please fill in all required fields");
       return;
@@ -163,29 +158,10 @@ export default function Controller() {
 
     if (isEditing) {
       // Update existing product
-      setProducts(
-        products.map((product) =>
-          product.id === currentProduct.id
-            ? {
-                ...currentProduct,
-                price: Number(currentProduct.price),
-                stock: Number(currentProduct.stock),
-              }
-            : product
-        )
-      );
+      useUpdateProduct(products.id, currentProduct);
     } else {
       // Create new product
-      const newProduct = {
-        ...currentProduct,
-        id: Date.now(),
-        price: Number(currentProduct.price),
-        stock: Number(currentProduct.stock),
-        image:
-          currentProduct.imagePreview ||
-          "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg",
-      };
-      setProducts([...products, newProduct]);
+      useCreateProduct(currentProduct);
     }
 
     setIsModalOpen(false);
@@ -200,9 +176,7 @@ export default function Controller() {
   if (categoriesError) {
     return <div className="text-center py-16">Error loading categories</div>;
   }
-  console.log("Products:", products);
-console.log("Loading:", productLoading);
-console.log("Error:", productsError);
+
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
       <div className="container mx-auto px-4">
@@ -254,7 +228,7 @@ console.log("Error:", productsError);
                     Category
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                    Size/Color
+                    Specifications
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Price
@@ -269,81 +243,69 @@ console.log("Error:", productsError);
               </thead>
               <tbody className="bg-white divide-y divide-emerald-100">
                 {filteredProducts && filteredProducts.length > 0 ? (
-                    filteredProducts.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="hover:bg-emerald-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-emerald-900">
-                              {product.name}
+                  filteredProducts.map((product) => (
+                    <>
+                      {console.log("Product: ", product)}
+                      <tr 
+                        key={product.id}
+                        className="hover:bg-emerald-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
+                              <img
+                                src={product.product_image}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                              />
                             </div>
-                            <div className="text-sm text-emerald-600 truncate max-w-xs">
-                              {product.description}
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-emerald-900">
+                                {product.name}
+                              </div>
+                              <div className="text-sm text-emerald-600 truncate max-w-xs">
+                                {product.description}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
-                          {product.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-sm text-emerald-900">
-                            Size: {product.size}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
+                            {product.category.name}
                           </span>
-                          <div className="flex items-center mt-1">
-                            <span className="text-sm text-emerald-900 mr-2">
-                              Color:
-                            </span>
-                            <span
-                              className="w-4 h-4 rounded-full border border-gray-300"
-                              style={{
-                                backgroundColor: product.color.toLowerCase(),
-                                boxShadow:
-                                  product.color.toLowerCase() === "white"
-                                    ? "inset 0 0 0 1px #e5e7eb"
-                                    : "none",
-                              }}
-                            ></span>
-                            <span className="text-sm text-emerald-900 ml-1">
-                              {product.color}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-emerald-900">
+                              Size: {product.specification}
                             </span>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
-                        ₱{product.price.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
-                        {product.stock}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => editProduct(product)}
-                          className="text-emerald-600 hover:text-emerald-900 mr-4"
-                        >
-                          <FiEdit2 className="inline" />
-                        </button>
-                        <button
-                          onClick={() => deleteProduct(product.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <FiTrash2 className="inline" />
-                        </button>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
+                          ₱{product.price.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
+                          {product.stock}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button
+                            onClick={() => editProduct(product)}
+                            className="text-emerald-600 hover:text-emerald-900 mr-4"
+                          >
+                            <FiEdit2 className="inline" />
+                          </button>
+                          <button
+                            onClick={() => deleteProduct(product.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <FiTrash2 className="inline" />
+                          </button>
+                        </td>
+                      </tr>
+                      {/* <p className="text-black">product: {product.name}</p>
+                      <p className="text-black">category: {product.category.name}</p> */}
+
+                    </>
                   ))
                 ) : (
                   <tr>
@@ -483,29 +445,13 @@ console.log("Error:", productsError);
                       required
                     >
                       <option value="">Select a category</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-emerald-800 mb-2">Size*</label>
-                    <select
-                      name="size"
-                      value={currentProduct.size}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      required
-                    >
-                      <option value="">Select a size</option>
-                      {sizes.map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      ))}
+                      {categories.length > 0 &&
+                        categories.map((category) =>
+                          // <option key={category} value={category}>
+                          //   {category}
+                          // </option>
+                          console.log(category)
+                        )}
                     </select>
                   </div>
 
@@ -513,20 +459,6 @@ console.log("Error:", productsError);
                     <label className="block text-emerald-800 mb-2">
                       Color*
                     </label>
-                    <select
-                      name="color"
-                      value={currentProduct.color}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      required
-                    >
-                      <option value="">Select a color</option>
-                      {colors.map((color) => (
-                        <option key={color} value={color}>
-                          {color}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 

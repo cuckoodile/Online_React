@@ -54,7 +54,7 @@ export default function Allproducts() {
   }, [products, selectedCategory, priceRange, sortBy]);
 
   const filterAndSortProducts = () => {
-    let result = products.data.filter((product) => {
+    let result = products.filter((product) => {
       const categoryMatch =
         selectedCategory === "All" || product.category === selectedCategory;
 
