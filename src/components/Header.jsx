@@ -6,7 +6,7 @@ import { DoorOpen, DoorClosed } from "lucide-react";
 
 export default function Header({ isSideBarOpen, setIsSideBarOpen }) {
   return (
-    <div className="bg-background flex items-center justify-between px-5 py-2 h-[10vh] border-b sticky top-0 left-0 z-10">
+    <div className="bg-background flex items-center justify-between px-5 py-2 h-[10vh] border-b sticky top-0 left-0 z-50">
       <div className="flex gap-5 items-center">
         {isSideBarOpen ? (
           <DoorOpen onClick={() => setIsSideBarOpen(!isSideBarOpen)}
