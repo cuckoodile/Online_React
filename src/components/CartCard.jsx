@@ -4,7 +4,7 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import { useUpdateCartItem } from "@/utils/hooks/useCartsHooks";
 import debounce from "lodash.debounce";
 
-export default function CartCard({ item }) {
+export default function CartCard({ item, onUpdateQuantity }) {
   const [localQuantity, setLocalQuantity] = useState(0);
   const updateCartItemMutation = useUpdateCartItem();
 
@@ -14,19 +14,20 @@ export default function CartCard({ item }) {
         id,
         updatedData: { quantity },
       });
+      onUpdateQuantity(id, quantity); // Notify parent component
     }, 800),
-    []
+    [onUpdateQuantity]
   );
 
   const updateQuantity = (id, change) => {
-      const newQuantity = Math.max(1, localQuantity + change);
-      setLocalQuantity(newQuantity);
-      debouncedUpdate(id, newQuantity);
+    const newQuantity = Math.max(1, localQuantity + change);
+    setLocalQuantity(newQuantity);
+    debouncedUpdate(id, newQuantity);
   };
 
   useEffect(() => {
     setLocalQuantity(item.quantity);
-  }, []);
+  }, [item.quantity]);
 
   const removeItem = (id) => {
     console.log(`Remove item with id: ${id}`);

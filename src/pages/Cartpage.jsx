@@ -14,10 +14,26 @@ import CartCard from "@/components/CartCard";
 
 export default function Cartpage() {
   const {
-    data: cartItems = [],
+    data: initialCartItems = [],
     error: cartError,
     isLoading: cartLoading,
   } = useCartItems();
+
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    if (initialCartItems.data) {
+      setCartItems(initialCartItems.data);
+    }
+  }, [initialCartItems]);
+
+  const updateItemQuantity = (id, newQuantity) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
 
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -60,7 +76,7 @@ export default function Cartpage() {
   ];
 
   const subtotal =
-    cartItems.data?.reduce(
+    cartItems.reduce(
       (total, item) => total + item.product.price * item.quantity,
       0
     ) || 0;
@@ -150,9 +166,13 @@ export default function Cartpage() {
                 </div>
 
                 <AnimatePresence>
-                  {cartItems.data.length > 0 &&
-                    cartItems.data.map((item) => (
-                      <CartCard key={item.id} item={item} />
+                  {cartItems.length > 0 &&
+                    cartItems.map((item) => (
+                      <CartCard
+                        key={item.id}
+                        item={item}
+                        onUpdateQuantity={updateItemQuantity}
+                      />
                     ))}
                 </AnimatePresence>
               </div>
