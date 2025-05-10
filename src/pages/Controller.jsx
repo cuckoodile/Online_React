@@ -34,22 +34,6 @@ export default function Controller() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
-<<<<<<< HEAD
-    id: null,
-    name: "",
-    description: "",
-    price: "",
-    category_id: "",
-    product_image: null,
-    additional_images: [],
-    specifications: [],
-    stock: "",
-    imagePreview: null,
-    newSpecification: "",
-  });
-
-  // Categories
-=======
     name: "",
     description: "",
     price: 0,
@@ -57,67 +41,22 @@ export default function Controller() {
     product_image: [],
     specifications: ["hehe", "ngii?"],
   });
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
   const {
     data: categories,
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useCategory();
 
-<<<<<<< HEAD
-  // Mutations for CRUD operations
-  const createProductMutation = useMutation({
-    mutationFn: useCreateProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
-      setIsModalOpen(false);
-    },
-    onError: (error) => {
-      alert("Failed to create product: " + error.message);
-    },
-  });
-
-  const updateProductMutation = useMutation({
-    mutationFn: ({ id, data }) => useUpdateProduct(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
-      setIsModalOpen(false);
-    },
-    onError: (error) => {
-      alert("Failed to update product: " + error.message);
-    },
-  });
-
-  const deleteProductMutation = useMutation({
-    mutationFn: useDeleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
-    },
-    onError: (error) => {
-      alert("Failed to delete product: " + error.message);
-    },
-  });
-=======
   const createProduct = useCreateProduct(); // Move the hook call here
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
 
   // Filter products based on search term
   useEffect(() => {
     if (!productLoading && products) {
-<<<<<<< HEAD
-      const results = products.filter((product) =>
-        [product.name, product.category?.name]
-          .join(" ")
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      );
-=======
       const results = products.filter((product) => {
         console.log("fitered product:", product);
         const categoryName = product.category?.name || "All";
         return product.name || categoryName ;
       });
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
       setFilteredProducts(results);
     } else {
       setFilteredProducts([]);
@@ -175,43 +114,6 @@ export default function Controller() {
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
-<<<<<<< HEAD
-      id: null,
-      name: "",
-      description: "",
-      price: "",
-      category_id: "",
-      product_image: null,
-      additional_images: [],
-      specifications: [],
-      stock: "",
-      imagePreview: null,
-      newSpecification: "",
-    });
-    setIsModalOpen(true);
-  };
-
-  // Open modal for editing product
-  const editProduct = (product) => {
-    setIsEditing(true);
-    setCurrentProduct({
-      id: product.id,
-      name: product.name || "",
-      description: product.description || "",
-      price: product.price || "",
-      category_id: product.category_id || "",
-      product_image: null,
-      additional_images: product.additional_images?.map((img) => ({
-        file: null,
-        preview: img.url,
-      })) || [],
-      specifications: product.specifications || [],
-      stock: product.stock || "",
-      imagePreview: product.product_image || null,
-      newSpecification: "",
-    });
-    setIsModalOpen(true);
-=======
       admin_id: 1,
       name: "",
       description: "",
@@ -258,7 +160,6 @@ export default function Controller() {
     if (window.confirm("Are you sure you want to delete this product?")) {
       useDeleteProduct(id);
     }
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
   };
 
   // Save product (create or update)
@@ -296,13 +197,6 @@ export default function Controller() {
       updateProductMutation.mutate({ id: currentProduct.id, data: formData });
     } else {
       createProductMutation.mutate(formData);
-    }
-  };
-
-  // Delete product
-  const deleteProduct = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      deleteProductMutation.mutate(id);
     }
   };
 
@@ -381,14 +275,7 @@ export default function Controller() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
                     Price
                   </th>
-<<<<<<< HEAD
-                  <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-emerald-700 uppercase tracking-wider">
-=======
                   <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                     Actions
                   </th>
                 </tr>
@@ -422,15 +309,6 @@ export default function Controller() {
                           {product.category?.name || "N/A"}
                         </span>
                       </td>
-<<<<<<< HEAD
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
-                          {product.specifications?.map((spec, index) => (
-                            <span key={index} className="text-sm text-emerald-900">
-                              {spec}
-                            </span>
-                          ))}
-=======
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           {product.product_specifications[0]?.details &&
@@ -441,18 +319,12 @@ export default function Controller() {
                                 </span>
                               )
                             )}
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-emerald-900">
                         ₱{Number(product.price).toLocaleString()}
                       </td>
-<<<<<<< HEAD
-                      <td className="px-6 py-4 text-sm text-emerald-900">{product.stock}</td>
-                      <td className="px-6 py-4 text-right text-sm font-medium">
-=======
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
->>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                         <button
                           onClick={() => editProduct(product)}
                           className="text-emerald-600 hover:text-emerald-900 mr-4 transition-colors duration-200"
