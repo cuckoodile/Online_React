@@ -115,55 +115,9 @@ export default function LoginPage() {
         ))}
       </div>
 
-      <div className="max-w-4xl w-full flex overflow-hidden bg-emerald-950/50 backdrop-blur-sm rounded-xl shadow-lg border border-emerald-800/50 relative z-10">
-        {/* Image Section */}
-        <div className="w-1/2 relative hidden md:block">
-          <img
-            src="https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg"
-            alt="Login visual"
-            className="object-cover w-full h-full"
-          />
-          {/* Enhanced overlay with brand elements */}
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/70 to-transparent flex flex-col justify-between p-8">
-            <div className="text-3xl font-bold text-white">
-              <span className="text-emerald-300">Dev</span>SixTech
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-white">Welcome Back</h3>
-              <p className="text-emerald-100/80 mt-2 max-w-xs">Sign in to continue your sustainable fashion journey with us</p>
-              
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-emerald-100">Eco-friendly fashion choices</p>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-emerald-100">Sustainable materials</p>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-emerald-100">Ethical production</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div className="max-w-md w-full bg-emerald-950/50 backdrop-blur-sm rounded-xl shadow-lg border border-emerald-800/50 relative z-10">
         {/* Form Section */}
-        <div className="w-full md:w-1/2 p-8 space-y-6">
+        <div className="w-full p-8 space-y-6">
           <div>
             <h2 className="mt-6 text-center text-3xl font-bold bg-gradient-to-r from-emerald-300 via-emerald-200 to-teal-200 text-transparent bg-clip-text">
               {isLogin ? 'Sign in to your account' : 'Create new account'}
