@@ -31,15 +31,14 @@ export default function Controller() {
   // Form state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
-    id: null,
     name: null,
     description: null,
     price: null,
-    category: null,
-    stock: null,
-    size: null,
-    image: null,
+    category_id: null,
+    product_image: null,
+    specifications: ["hehe", "ngii?"],
   });
 
   // Categories for fashion products
@@ -59,20 +58,6 @@ export default function Controller() {
     isLoading: categoriesLoading,
   } = useCategory();
 
-  // Available colors
-  const colors = [
-    "Black",
-    "White",
-    "Red",
-    "Blue",
-    "Green",
-    "Yellow",
-    "Purple",
-    "Pink",
-    "Brown",
-    "Gray",
-    "Multicolor",
-  ];
   // Filter products based on search term
   useEffect(() => {
     if (!productLoading && products) {
@@ -92,7 +77,7 @@ export default function Controller() {
     const { name, value } = e.target;
     setCurrentProduct({
       ...currentProduct,
-      [name]: value,
+      [name]: name === "newSpecification" ? value : currentProduct[name],
     });
   };
 
@@ -102,7 +87,7 @@ export default function Controller() {
       const file = e.target.files[0];
       setCurrentProduct({
         ...currentProduct,
-        image: file,
+        product_image: file,
         imagePreview: URL.createObjectURL(file),
       });
     }
@@ -112,13 +97,12 @@ export default function Controller() {
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
-      id: null,
-      user_id: 1,
+      admin_id: 1,
       name: null,
       description: null,
       price: null,
       category_id: null,
-      stock: 10,
+      specifications:null,
       product_image: null,
     });
     setIsModalOpen(true);
@@ -145,12 +129,16 @@ export default function Controller() {
   const saveProduct = (e) => {
     e.preventDefault();
 
+    console.log("Attempt add prod. ", currentProduct);
     // Form validation
     if (
       !currentProduct.name ||
       !currentProduct.price ||
       !currentProduct.category ||
-      !currentProduct.size
+      !currentProduct.specifications ||
+      !currentProduct.stock ||
+      !currentProduct.image || 
+      !currentProduct
     ) {
       alert("Please fill in all required fields");
       return;
@@ -165,6 +153,18 @@ export default function Controller() {
     }
 
     setIsModalOpen(false);
+  };
+
+  // Add a function to save a new specification
+  const saveSpecification = () => {
+    if (currentProduct.newSpecification) {
+      setCurrentProduct({
+        ...currentProduct,
+        specifications: [...(currentProduct.specifications || []), currentProduct.newSpecification],
+        newSpecification: "", // Clear the input field
+      });
+      setIsAddingSpec(false); // Close the input field
+    }
   };
 
   if (productLoading || categoriesLoading) {
@@ -244,68 +244,62 @@ export default function Controller() {
               <tbody className="bg-white divide-y divide-emerald-100">
                 {filteredProducts && filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
-                    <>
-                      {console.log("Product: ", product)}
-                      <tr 
-                        key={product.id}
-                        className="hover:bg-emerald-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
-                              <img
-                                src={product.product_image}
-                                alt={product.name}
-                                className="h-full w-full object-cover"
-                              />
+                    <tr
+                      key={product.id}
+                      className="hover:bg-emerald-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
+                            <img
+                              src={product.product_image}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-emerald-900">
+                              {product.name}
                             </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-emerald-900">
-                                {product.name}
-                              </div>
-                              <div className="text-sm text-emerald-600 truncate max-w-xs">
-                                {product.description}
-                              </div>
+                            <div className="text-sm text-emerald-600 truncate max-w-xs">
+                              {product.description}
                             </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
-                            {product.category.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
+                          {product.category.name}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-sm text-emerald-900">
+                            Size: {product.specification}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="text-sm text-emerald-900">
-                              Size: {product.specification}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
-                          ₱{product.price.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
-                          {product.stock}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => editProduct(product)}
-                            className="text-emerald-600 hover:text-emerald-900 mr-4"
-                          >
-                            <FiEdit2 className="inline" />
-                          </button>
-                          <button
-                            onClick={() => deleteProduct(product.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <FiTrash2 className="inline" />
-                          </button>
-                        </td>
-                      </tr>
-                      {/* <p className="text-black">product: {product.name}</p>
-                      <p className="text-black">category: {product.category.name}</p> */}
-
-                    </>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
+                        ₱{product.price.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
+                        {product.stock}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => editProduct(product)}
+                          className="text-emerald-600 hover:text-emerald-900 mr-4"
+                        >
+                          <FiEdit2 className="inline" />
+                        </button>
+                        <button
+                          onClick={() => deleteProduct(product.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <FiTrash2 className="inline" />
+                        </button>
+                      </td>
+                    </tr>
                   ))
                 ) : (
                   <tr>
@@ -402,6 +396,55 @@ export default function Controller() {
                     ></textarea>
                   </div>
 
+                  <div className="md:col-span-2 col">
+                    <label className="block text-emerald-800 mb-2">
+                      Specifications
+                    </label>
+
+                    {/* Map the currentProduct.specification here */}
+                    {currentProduct.specifications?.map((spec, index) => (
+                      <div
+                        key={index}
+                        className="text-sm text-emerald-900 mb-2"
+                      >
+                        {spec}
+                      </div>
+                    ))}
+
+                    {isAddingSpec ? (
+                      <>
+                        <input
+                          type="text"
+                          name="newSpecification"
+                          value={currentProduct.newSpecification || ""}
+                          onChange={handleInputChange}
+                          className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <div className="flex space-x-2 mt-2">
+                          <button
+                            onClick={saveSpecification}
+                            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setIsAddingSpec(false)}
+                            className="px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setIsAddingSpec(true)}
+                        className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      >
+                        Add Specification
+                      </button>
+                    )}
+                  </div>
+
                   <div>
                     <label className="block text-emerald-800 mb-2">
                       Price (₱)*
@@ -420,45 +463,23 @@ export default function Controller() {
 
                   <div>
                     <label className="block text-emerald-800 mb-2">
-                      Stock Quantity*
-                    </label>
-                    <input
-                      type="number"
-                      name="stock"
-                      value={currentProduct.stock}
-                      onChange={handleInputChange}
-                      min="0"
-                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-emerald-800 mb-2">
                       Category*
                     </label>
                     <select
-                      name="category"
-                      value={currentProduct.category}
+                      name="category_id"
+                      value={currentProduct.category_id}
                       onChange={handleInputChange}
                       className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       required
                     >
                       <option value="">Select a category</option>
                       {categories.length > 0 &&
-                        categories.map((category) =>
-                          // <option key={category} value={category}>
-                          //   {category}
-                          // </option>
-                          console.log(category)
-                        )}
+                        categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
                     </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-emerald-800 mb-2">
-                      Color*
-                    </label>
                   </div>
                 </div>
 

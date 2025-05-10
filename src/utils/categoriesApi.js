@@ -14,8 +14,8 @@ const api = axios.create({
 export const fetchCategory = async () => {
   try {
     const response = await api.get("/api/categories");
-    console.log("API Response:", response.data);
-    return await response.data;
+    console.log("API Response:", response.data.data);
+    return await response.data.data;
   } catch (error) {
     console.error("API Error (fetchCategories):", error);
     throw new Error("Failed to fetch categories");
@@ -26,8 +26,8 @@ export const fetchCategory = async () => {
 export const fetchCategoryById = async (id) => {
   try {
     const response = await api.get(`/api/categories/${id}`);
-    console.log("API Response (fetchCategoriesById):", response.data);
-    return response.data;
+    console.log("API Response (fetchCategoriesById):", response.data.data);
+    return response.data.data;
   } catch (error) {
     console.error("API Error (fetchCategoriesById):", error);
     throw new Error("Failed to fetch categories");

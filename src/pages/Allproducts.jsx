@@ -40,7 +40,7 @@ export default function Allproducts() {
     isLoading: categoriesLoading,
   } = useCategory();
 
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState([]);
   const [priceRange, setPriceRange] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");
@@ -56,7 +56,7 @@ export default function Allproducts() {
   const filterAndSortProducts = () => {
     let result = products.filter((product) => {
       const categoryMatch =
-        selectedCategory === "All" || product.category === selectedCategory;
+        selectedCategory === "All" || product.category.name === selectedCategory;
 
       let priceMatch = true;
       if (priceRange !== "all") {
@@ -100,7 +100,8 @@ export default function Allproducts() {
     return <div className="text-center py-16">Error loading products</div>;
   }
 
-  console.log("Products:", products.data);
+  console.log("Category", categories)
+  console.log("Products:", products);
   if (!productLoading && !categoriesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -154,17 +155,19 @@ export default function Allproducts() {
                           All
                         </button>
                         {categories.map((category) => (
+                          // console.log("CATEEGORIIES", category)
+                          // <p>{category.name}</p>
                           <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                            key={category.id}
+                            onClick={() => setSelectedCategory(category.name)}
+                            className={`px-4 text-black py-2 rounded-lg text-sm font-medium transition-colors
                             ${
-                              selectedCategory === category
+                              selectedCategory === category.name
                                 ? "bg-gray-900 text-white"
                                 : "bg-white text-gray-700 hover:bg-gray-200"
                             }`}
                           >
-                            {category}
+                            {category.name}
                           </button>
                         ))}
                       </div>
