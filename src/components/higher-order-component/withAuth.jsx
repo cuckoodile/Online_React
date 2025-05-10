@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { checkToken } from '../api/auth';
-import { AuthContext } from '../contexts/AuthContext';
+import { checkUserAPI } from '../../utils/APIs/userApi';
+import { AuthContext } from '../../utils/contexts/AuthContext';
 
 // Authentication HOC
 const withAuth = (WrappedComponent) => {
@@ -19,7 +19,7 @@ const withAuth = (WrappedComponent) => {
         }
         else {
             if (!user)
-                checkToken(token).then(res => {
+                checkUserAPI(token).then(res => {
                     if (res?.ok) {
                         login(res?.data)
                         console.log("!!!")

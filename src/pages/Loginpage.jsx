@@ -1,85 +1,53 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FiMail, FiLock, FiUser, FiEye, FiEyeOff } from 'react-icons/fi'
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff } from "react-icons/fi";
+import { AuthContext } from "../utils/contexts/AuthContext";
+import { useLogin } from "@/utils/hooks/useAuth";
+import withoutAuth from "@/components/higher-order-component/withoutAuth";
 
-export default function LoginPage() {
+function LoginPage() {
+  const navigate = useNavigate();
+  const loginMutation = useLogin();
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: '',
-    confirmPassword: ''
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
     // Clear error when user types
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
-        [e.target.name]: ''
+        [e.target.name]: "",
       });
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    // Email validation
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    // Password validation
-    if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    
-    // Registration specific validations
-    if (!isLogin) {
-      if (formData.name.trim() === '') {
-        newErrors.name = 'Name is required';
-      }
-      
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      // For demo purposes - in a real app you would call an API
-      if (isLogin) {
-        // Demo admin login
-        if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
-          navigate('/admin');
-          return;
-        }
-        // Demo user login
-        navigate('/');
-      } else {
-        // Registration success
-        setIsLogin(true);
-        setFormData({
-          ...formData,
-          confirmPassword: ''
-        });
-        // Show success message or redirect
-      }
-    }
+
+    loginMutation.mutate(formData, {
+      onSuccess: (userData) => {
+        login(userData.token);
+        navigate("/");
+      },
+      onError: (error) => {
+        console.error("Login failed:", error);
+      },
+    });
   };
 
   const togglePasswordVisibility = () => {
@@ -96,11 +64,11 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
-      
+
       {/* Animated particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
-          <div 
+          <div
             key={i}
             className="absolute rounded-full bg-emerald-400/10"
             style={{
@@ -109,7 +77,7 @@ export default function LoginPage() {
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
               animation: `float ${Math.random() * 10 + 10}s linear infinite`,
-              animationDelay: `${Math.random() * 5}s`
+              animationDelay: `${Math.random() * 5}s`,
             }}
           ></div>
         ))}
@@ -120,17 +88,17 @@ export default function LoginPage() {
         <div className="w-full p-8 space-y-6">
           <div>
             <h2 className="mt-6 text-center text-3xl font-bold bg-gradient-to-r from-emerald-300 via-emerald-200 to-teal-200 text-transparent bg-clip-text">
-              {isLogin ? 'Sign in to your account' : 'Create new account'}
+              {isLogin ? "Sign in to your account" : "Create new account"}
             </h2>
-            
+
             {/* Toggle Buttons */}
             <div className="mt-4 flex justify-center space-x-4">
               <button
                 onClick={() => setIsLogin(true)}
                 className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                  isLogin 
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30' 
-                    : 'bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50'
+                  isLogin
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30"
+                    : "bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50"
                 }`}
               >
                 Login
@@ -138,9 +106,9 @@ export default function LoginPage() {
               <button
                 onClick={() => setIsLogin(false)}
                 className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                  !isLogin 
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30' 
-                    : 'bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50'
+                  !isLogin
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30"
+                    : "bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50"
                 }`}
               >
                 Register
@@ -160,34 +128,40 @@ export default function LoginPage() {
                       id="name"
                       name="name"
                       type="text"
-                      className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border ${errors.name ? 'border-red-500' : 'border-emerald-800/50'} placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                      className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border ${
+                        errors.name ? "border-red-500" : "border-emerald-800/50"
+                      } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                       placeholder="Full Name"
                       value={formData.name}
                       onChange={handleChange}
                     />
                   </div>
-                  {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+                  {errors.name && (
+                    <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+                  )}
                 </div>
               )}
-              
+
               <div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-emerald-400">
                     <FiMail />
                   </div>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border ${errors.email ? 'border-red-500' : 'border-emerald-800/50'} placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                    id="username"
+                    name="username"
+                    type="text"
+                    className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                     placeholder="Email address"
-                    value={formData.email}
+                    value={formData.username}
                     onChange={handleChange}
                   />
                 </div>
-                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+                )}
               </div>
-              
+
               <div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-emerald-400">
@@ -197,7 +171,11 @@ export default function LoginPage() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${errors.password ? 'border-red-500' : 'border-emerald-800/50'} placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                    className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${
+                      errors.password
+                        ? "border-red-500"
+                        : "border-emerald-800/50"
+                    } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
@@ -210,7 +188,9 @@ export default function LoginPage() {
                     {showPassword ? <FiEyeOff /> : <FiEye />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+                {errors.password && (
+                  <p className="text-red-400 text-xs mt-1">{errors.password}</p>
+                )}
               </div>
 
               {!isLogin && (
@@ -223,7 +203,11 @@ export default function LoginPage() {
                       id="confirmPassword"
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${errors.confirmPassword ? 'border-red-500' : 'border-emerald-800/50'} placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                      className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${
+                        errors.confirmPassword
+                          ? "border-red-500"
+                          : "border-emerald-800/50"
+                      } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                       placeholder="Confirm Password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
@@ -236,7 +220,11 @@ export default function LoginPage() {
                       {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -250,13 +238,19 @@ export default function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-emerald-300 rounded"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-emerald-300">
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-2 block text-sm text-emerald-300"
+                  >
                     Remember me
                   </label>
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200">
+                  <a
+                    href="#"
+                    className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200"
+                  >
                     Forgot your password?
                   </a>
                 </div>
@@ -269,11 +263,21 @@ export default function LoginPage() {
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-300 shadow-lg shadow-emerald-900/30"
               >
                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <svg className="h-5 w-5 text-emerald-300 group-hover:text-emerald-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5 text-emerald-300 group-hover:text-emerald-200"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </span>
-                {isLogin ? 'Sign in' : 'Create Account'}
+                {isLogin ? "Sign in" : "Create Account"}
               </button>
             </div>
           </form>
@@ -282,32 +286,50 @@ export default function LoginPage() {
           {isLogin && (
             <div className="mt-4 p-3 bg-emerald-900/50 rounded-lg border border-emerald-800/50">
               <p className="text-xs text-emerald-300 mb-1">Demo Credentials:</p>
-              <p className="text-xs text-emerald-400">Admin: admin@example.com / admin123</p>
-              <p className="text-xs text-emerald-400">User: user@example.com / user123</p>
+              <p className="text-xs text-emerald-400">
+                Admin: admin@example.com / admin123
+              </p>
+              <p className="text-xs text-emerald-400">
+                User: user@example.com / user123
+              </p>
             </div>
           )}
 
           <div className="text-center text-sm text-emerald-300/80">
-            By continuing, you agree to our{' '}
-            <a href="#" className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200">
+            By continuing, you agree to our{" "}
+            <a
+              href="#"
+              className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200"
+            >
               Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="#" className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200">
+            </a>{" "}
+            and{" "}
+            <a
+              href="#"
+              className="font-medium text-teal-300 hover:text-teal-200 transition-colors duration-200"
+            >
               Privacy Policy
             </a>
           </div>
         </div>
       </div>
-      
+
       {/* Add floating animation keyframes */}
       <style jsx>{`
         @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
         }
       `}</style>
     </div>
-  )
+  );
 }
+
+export default withoutAuth(LoginPage);

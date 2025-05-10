@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Router, RouterProvider } from "react-router-dom";
+import { CookiesProvider } from "react-cookie";
 
 import "./index.css";
 import App from "./App.jsx";
@@ -15,7 +16,11 @@ import Admin from "./pages/Admin";
 import Controller from "./pages/Controller";
 import Checkout from "./pages/Checkout";
 import Shipping from "./pages/Shipping";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./utils/contexts/AuthContext";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -71,14 +76,17 @@ const router = createBrowserRouter([
       {
         path: "/shipping",
         element: <Shipping />,
-      }
+      },
     ],
   },
 ]);
-const queryClient = new QueryClient();
-createRoot(document.getElementById("root")).render(
 
+createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
+    <CookiesProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </CookiesProvider>
   </QueryClientProvider>
 );

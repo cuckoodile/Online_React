@@ -155,12 +155,6 @@ export default function Controller() {
       }
     );
   };
-  // Delete product
-  const deleteProduct = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      useDeleteProduct(id);
-    }
-  };
 
   // Save product (create or update)
   const saveProduct = (e) => {
