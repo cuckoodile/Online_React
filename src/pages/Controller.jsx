@@ -33,11 +33,11 @@ export default function Controller() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
-    name: null,
-    description: null,
-    price: null,
-    category_id: null,
-    product_image: null,
+    name: "",
+    description: "",
+    price: 0,
+    category_id: 0,
+    product_image: [],
     specifications: ["hehe", "ngii?"],
   });
 
@@ -64,7 +64,7 @@ export default function Controller() {
       const results = products.filter((product) => {
         console.log("fitered product:", product);
         const categoryName = product.category?.name || "All";
-        return product.name || categoryName;
+        return product.name || categoryName ;
       });
       setFilteredProducts(results);
     } else {
@@ -98,26 +98,38 @@ export default function Controller() {
     setIsEditing(false);
     setCurrentProduct({
       admin_id: 1,
-      name: null,
-      description: null,
-      price: null,
-      category_id: null,
-      specifications:null,
-      product_image: null,
+      name: "",
+      description: "",
+      price: 0,
+      category_id: 0,
+      specifications:[],
+      product_image: [],
     });
     setIsModalOpen(true);
     useCreateProduct(currentProduct);
   };
 
   // Open modal for editing product
-  const editProduct = async (product) => {
-    setIsEditing(true);
-    useUpdateProduct(product.id, currentProduct).then((data) => {
-      console.log("Product updated:", data);
-      setIsModalOpen(true);
-    });
-  };
+  const updateProduct = useUpdateProduct();
 
+  // Open modal for editing product
+  const editProduct = (product) => {
+    setIsEditing(true);
+    setCurrentProduct(product); // Set the product to be edited
+    setIsModalOpen(true);
+
+    updateProduct.mutate(
+      { id: product.id, data: currentProduct },
+      {
+        onSuccess: (data) => {
+          console.log("Product updated:", data);
+        },
+        onError: (error) => {
+          console.error("Error updating product:", error);
+        },
+      }
+    );
+  };
   // Delete product
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -233,9 +245,6 @@ export default function Controller() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                    Stock
-                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Actions
                   </th>
@@ -275,15 +284,12 @@ export default function Controller() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="text-sm text-emerald-900">
-                            Size: {product.specification}
+                             {product.product_specifications.map((specification) => specification.details)}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
                         ₱{product.price.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
-                        {product.stock}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button

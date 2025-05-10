@@ -35,11 +35,11 @@ export const useCreateProduct = (data) => {
     });
   };
 
-  export const useDeleteProduct = () => {
+  export const useDeleteProduct = (id) => {
     const queryClient = useQueryClient();
   
     return useMutation({
-      mutationFn: deleteProduct,
+      mutationFn:()=> deleteProduct(id),
       onSuccess: () => {
         queryClient.invalidateQueries(["products"]);
       },
