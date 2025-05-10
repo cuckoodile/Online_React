@@ -40,23 +40,13 @@ export default function Controller() {
     product_image: [],
     specifications: ["hehe", "ngii?"],
   });
-
-  // Categories for fashion products
-  // const categories = [
-  //   "Tops",
-  //   "Bottoms",
-  //   "Dresses",
-  //   "Outerwear",
-  //   "Footwear",
-  //   "Accessories",
-  //   "Activewear",
-  //   "Swimwear",
-  // ];
   const {
     data: categories,
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useCategory();
+
+  const createProduct = useCreateProduct(); // Move the hook call here
 
   // Filter products based on search term
   useEffect(() => {
@@ -106,7 +96,15 @@ export default function Controller() {
       product_image: [],
     });
     setIsModalOpen(true);
-    useCreateProduct(currentProduct);
+
+    createProduct.mutate(currentProduct, {
+      onSuccess: (data) => {
+        console.log("Product created:", data);
+      },
+      onError: (error) => {
+        console.error("Error creating product:", error);
+      },
+    });
   };
 
   // Open modal for editing product
@@ -283,9 +281,14 @@ export default function Controller() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-sm text-emerald-900">
-                             {product.product_specifications.map((specification) => specification.details)}
-                          </span>
+                          {product.product_specifications[0]?.details &&
+                            Object.entries(JSON.parse(product.product_specifications[0].details)).map(
+                              ([key, value], index) => (
+                                <span key={index} className="text-sm text-emerald-900">
+                                  <strong>{key}:</strong> {value}
+                                </span>
+                              )
+                            )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
