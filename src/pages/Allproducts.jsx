@@ -40,7 +40,7 @@ export default function Allproducts() {
     isLoading: categoriesLoading,
   } = useCategory();
 
-  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [priceRange, setPriceRange] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");

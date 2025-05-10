@@ -34,6 +34,7 @@ export default function Controller() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
+<<<<<<< HEAD
     id: null,
     name: "",
     description: "",
@@ -48,12 +49,22 @@ export default function Controller() {
   });
 
   // Categories
+=======
+    name: "",
+    description: "",
+    price: 0,
+    category_id: 0,
+    product_image: [],
+    specifications: ["hehe", "ngii?"],
+  });
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
   const {
     data: categories,
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useCategory();
 
+<<<<<<< HEAD
   // Mutations for CRUD operations
   const createProductMutation = useMutation({
     mutationFn: useCreateProduct,
@@ -86,16 +97,27 @@ export default function Controller() {
       alert("Failed to delete product: " + error.message);
     },
   });
+=======
+  const createProduct = useCreateProduct(); // Move the hook call here
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
 
   // Filter products based on search term
   useEffect(() => {
     if (!productLoading && products) {
+<<<<<<< HEAD
       const results = products.filter((product) =>
         [product.name, product.category?.name]
           .join(" ")
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
       );
+=======
+      const results = products.filter((product) => {
+        console.log("fitered product:", product);
+        const categoryName = product.category?.name || "All";
+        return product.name || categoryName ;
+      });
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
       setFilteredProducts(results);
     } else {
       setFilteredProducts([]);
@@ -153,6 +175,7 @@ export default function Controller() {
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
+<<<<<<< HEAD
       id: null,
       name: "",
       description: "",
@@ -188,6 +211,54 @@ export default function Controller() {
       newSpecification: "",
     });
     setIsModalOpen(true);
+=======
+      admin_id: 1,
+      name: "",
+      description: "",
+      price: 0,
+      category_id: 0,
+      specifications:[],
+      product_image: [],
+    });
+    setIsModalOpen(true);
+
+    createProduct.mutate(currentProduct, {
+      onSuccess: (data) => {
+        console.log("Product created:", data);
+      },
+      onError: (error) => {
+        console.error("Error creating product:", error);
+      },
+    });
+  };
+
+  // Open modal for editing product
+  const updateProduct = useUpdateProduct();
+
+  // Open modal for editing product
+  const editProduct = (product) => {
+    setIsEditing(true);
+    setCurrentProduct(product); // Set the product to be edited
+    setIsModalOpen(true);
+
+    updateProduct.mutate(
+      { id: product.id, data: currentProduct },
+      {
+        onSuccess: (data) => {
+          console.log("Product updated:", data);
+        },
+        onError: (error) => {
+          console.error("Error updating product:", error);
+        },
+      }
+    );
+  };
+  // Delete product
+  const deleteProduct = (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      useDeleteProduct(id);
+    }
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
   };
 
   // Save product (create or update)
@@ -310,10 +381,14 @@ export default function Controller() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
                     Price
                   </th>
+<<<<<<< HEAD
                   <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
                     Stock
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-medium text-emerald-700 uppercase tracking-wider">
+=======
+                  <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                     Actions
                   </th>
                 </tr>
@@ -347,6 +422,7 @@ export default function Controller() {
                           {product.category?.name || "N/A"}
                         </span>
                       </td>
+<<<<<<< HEAD
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
                           {product.specifications?.map((spec, index) => (
@@ -354,13 +430,29 @@ export default function Controller() {
                               {spec}
                             </span>
                           ))}
+=======
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col">
+                          {product.product_specifications[0]?.details &&
+                            Object.entries(JSON.parse(product.product_specifications[0].details)).map(
+                              ([key, value], index) => (
+                                <span key={index} className="text-sm text-emerald-900">
+                                  <strong>{key}:</strong> {value}
+                                </span>
+                              )
+                            )}
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-emerald-900">
                         ₱{Number(product.price).toLocaleString()}
                       </td>
+<<<<<<< HEAD
                       <td className="px-6 py-4 text-sm text-emerald-900">{product.stock}</td>
                       <td className="px-6 py-4 text-right text-sm font-medium">
+=======
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+>>>>>>> ccdb0dc5ff7c88c3e078631504824b7bdf63c4cb
                         <button
                           onClick={() => editProduct(product)}
                           className="text-emerald-600 hover:text-emerald-900 mr-4 transition-colors duration-200"
