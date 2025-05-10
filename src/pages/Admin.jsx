@@ -22,10 +22,6 @@ export default function Admin() {
       expenses: 556750.00, 
       balance: 2406750.00 
     },
-    salesTargets: {
-      daily: 32500, 
-      monthly: 725000 
-    },
     topProducts: [
       { id: 1, name: 'Air Jordan 8', sales: 752, image: 'https://via.placeholder.com/100' },
       { id: 2, name: 'Air Jordan 5', sales: 752, image: 'https://via.placeholder.com/100' },
@@ -84,7 +80,7 @@ export default function Admin() {
           </div>
           
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <StatCard 
               title="Total Revenue" 
               value={`₱${dashboardData.totalRevenue.toLocaleString()}`} 
@@ -112,115 +108,56 @@ export default function Admin() {
               color="bg-green-50"
               iconColor="bg-green-100"
             />
-            <StatCard 
-              title="Pending Orders" 
-              value="11" 
-              period="Last 30 days"
-              change={0}
-              icon="⏳"
-              color="bg-amber-50"
-              iconColor="bg-amber-100"
-            />
           </div>
           
-          {/* Analytics and Targets */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Sales Analytics</h2>
-                <div className="flex items-center">
-                  <span className="mr-2 text-gray-500">Sort by</span>
-                  <select className="border rounded px-3 py-1.5 text-black focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    <option>{currentMonth}</option>
-                    <option>Jun 2025</option>
-                    <option>May 2025</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="p-4 rounded-lg bg-blue-50">
-                  <p className="text-gray-500 mb-1">Income</p>
-                  <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.income.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">+20%</span>
-                </div>
-                <div className="p-4 rounded-lg bg-orange-50">
-                  <p className="text-gray-500 mb-1">Expenses</p>
-                  <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.expenses.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full">+15%</span>
-                </div>
-                <div className="p-4 rounded-lg bg-green-50">
-                  <p className="text-gray-500 mb-1">Balance</p>
-                  <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">+30%</span>
-                </div>
-              </div>
-              
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} />
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="value" stroke="#10B981" fillOpacity={1} fill="url(#colorValue)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+          {/* Analytics */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-800">Sales Analytics</h2>
+              <div className="flex items-center">
+                <span className="mr-2 text-gray-500">Sort by</span>
+                <select className="border rounded px-3 py-1.5 text-black focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <option>{currentMonth}</option>
+                  <option>Jun 2025</option>
+                  <option>May 2025</option>
+                </select>
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <h2 className="text-xl font-bold text-gray-800 mb-6">Sales Target</h2>
-              
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-gray-500 flex items-center">
-                    <span className="w-3 h-3 bg-gray-300 rounded-full inline-block mr-2"></span>
-                    Daily Target
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-gray-800">{dashboardData.salesTargets.daily}</p>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                  <div className="bg-gray-500 h-2.5 rounded-full" style={{ width: '65%' }}></div>
-                </div>
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="p-4 rounded-lg bg-blue-50">
+                <p className="text-gray-500 mb-1">Income</p>
+                <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.income.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">+20%</span>
               </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-gray-500 flex items-center">
-                    <span className="w-3 h-3 bg-teal-500 rounded-full inline-block mr-2"></span>
-                    Monthly Target
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesTargets.monthly.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                <div className="w-full bg-teal-100 rounded-full h-2.5 mt-2">
-                  <div className="bg-teal-500 h-2.5 rounded-full" style={{ width: '75%' }}></div>
-                </div>
+              <div className="p-4 rounded-lg bg-orange-50">
+                <p className="text-gray-500 mb-1">Expenses</p>
+                <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.expenses.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full">+15%</span>
               </div>
-
-              <div className="mt-8 pt-6 border-t">
-                <h3 className="font-medium text-gray-800 mb-4">Current Offers</h3>
-                <div className="bg-gray-100 p-3 rounded-lg mb-3 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">40% Discount</p>
-                    <p className="text-sm text-gray-500">Ends in 2 days</p>
-                  </div>
-                  <button className="text-teal-600 hover:text-teal-800">View</button>
-                </div>
-                <div className="bg-gray-100 p-3 rounded-lg flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Summer Sale</p>
-                    <p className="text-sm text-gray-500">Ends in 5 days</p>
-                  </div>
-                  <button className="text-teal-600 hover:text-teal-800">View</button>
-                </div>
+              <div className="p-4 rounded-lg bg-green-50">
+                <p className="text-gray-500 mb-1">Balance</p>
+                <p className="text-2xl font-bold text-gray-800">₱{dashboardData.salesAnalytics.balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">+30%</span>
               </div>
+            </div>
+            
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                  <YAxis axisLine={false} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="value" stroke="#10B981" fillOpacity={1} fill="url(#colorValue)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
           
@@ -292,180 +229,6 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </div>
-          </div>
-          
-          {/* New Section: Business Insights and Customer Analytics */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Customer Demographics */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <h2 className="text-xl font-bold text-gray-800 mb-6">Customer Demographics</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">Age 18-24</span>
-                    <span className="text-gray-600">35%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '35%' }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">Age 25-34</span>
-                    <span className="text-gray-600">45%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '45%' }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">Age 35-44</span>
-                    <span className="text-gray-600">15%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '15%' }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">Age 45+</span>
-                    <span className="text-gray-600">5%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '5%' }}></div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6 pt-6 border-t">
-                <h3 className="font-medium text-gray-800 mb-4">Gender Distribution</h3>
-                <div className="flex items-center">
-                  <div className="w-1/2">
-                    <div className="flex items-center mb-2">
-                      <span className="w-3 h-3 bg-blue-500 rounded-full inline-block mr-2"></span>
-                      <span className="text-gray-600">Male</span>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-800">42%</div>
-                  </div>
-                  <div className="w-1/2">
-                    <div className="flex items-center mb-2">
-                      <span className="w-3 h-3 bg-pink-500 rounded-full inline-block mr-2"></span>
-                      <span className="text-gray-600">Female</span>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-800">58%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Inventory Status */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Inventory Status</h2>
-                <button className="text-teal-600 hover:text-teal-800 font-medium">Manage</button>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center p-3 bg-red-50 rounded-lg">
-                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">
-                    <FaWarehouse />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">Low Stock Alert</p>
-                    <p className="text-sm text-gray-500">5 products below threshold</p>
-                  </div>
-                  <button className="ml-auto text-red-600 hover:text-red-800">View</button>
-                </div>
-                
-                <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-3">
-                    <FaBox />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">Well Stocked</p>
-                    <p className="text-sm text-gray-500">42 products at optimal levels</p>
-                  </div>
-                  <button className="ml-auto text-green-600 hover:text-green-800">View</button>
-                </div>
-                
-                <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
-                  <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-3">
-                    <FaTag />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">Pending Restocks</p>
-                    <p className="text-sm text-gray-500">8 orders awaiting delivery</p>
-                  </div>
-                  <button className="ml-auto text-yellow-600 hover:text-yellow-800">View</button>
-                </div>
-              </div>
-              
-              <div className="mt-6 pt-6 border-t">
-                <h3 className="font-medium text-gray-800 mb-4">Storage Capacity</h3>
-                <div className="mb-2 flex justify-between">
-                  <span className="text-gray-600">Current Usage</span>
-                  <span className="text-gray-600">68%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-teal-500 h-2.5 rounded-full" style={{ width: '68%' }}></div>
-                </div>
-                <p className="text-sm text-gray-500 mt-2">32% storage space available</p>
-              </div>
-            </div>
-            
-            {/* Recent Activities */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <h2 className="text-xl font-bold text-gray-800 mb-6">Recent Activities</h2>
-              
-              <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                
-                <div className="relative pl-10 pb-6">
-                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
-                    <FaUser className="w-4 h-4" />
-                  </div>
-                  <p className="font-medium text-gray-800">New Customer Registration</p>
-                  <p className="text-sm text-gray-500">Maria Santos created an account</p>
-                  <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
-                </div>
-                
-                <div className="relative pl-10 pb-6">
-                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500">
-                    <FaShoppingCart className="w-4 h-4" />
-                  </div>
-                  <p className="font-medium text-gray-800">New Order Placed</p>
-                  <p className="text-sm text-gray-500">Order #ORD-005 for ₱4,250.00</p>
-                  <p className="text-xs text-gray-400 mt-1">3 hours ago</p>
-                </div>
-                
-                <div className="relative pl-10 pb-6">
-                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500">
-                    <FaTag className="w-4 h-4" />
-                  </div>
-                  <p className="font-medium text-gray-800">Price Update</p>
-                  <p className="text-sm text-gray-500">Air Jordan 8 price updated to ₱8,995.00</p>
-                  <p className="text-xs text-gray-400 mt-1">5 hours ago</p>
-                </div>
-                
-                <div className="relative pl-10">
-                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-500">
-                    <FaNewspaper className="w-4 h-4" />
-                  </div>
-                  <p className="font-medium text-gray-800">New Review</p>
-                  <p className="text-sm text-gray-500">Ryan Delos Santos left a 5-star review</p>
-                  <p className="text-xs text-gray-400 mt-1">8 hours ago</p>
-                </div>
-              </div>
-              
-              <div className="mt-4 text-center">
-                <button className="text-teal-600 hover:text-teal-800 font-medium">View All Activities</button>
               </div>
             </div>
           </div>
