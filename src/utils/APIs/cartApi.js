@@ -6,13 +6,18 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: "Bearer 1|W6noOftMowcteA9Pb4dZ9yJyQfL5wygcpqVTkxZ7b2496ec2"
   },
 });
 
-export const fetchCartItems = async () => {
+export const fetchCartItems = async (data) => {
+  console.log("Attempt to fetch cart data: ", data);
+
   try {
-    const response = await api.get("/api/carts");
+    const response = await api.get("/api/carts", {
+      headers: {
+        Authorization: `Bearer ${data.token}`,
+      },
+    });
     console.log("API Response (fetchCartItems):", response.data);
     return response.data;
   } catch (error) {
@@ -23,7 +28,11 @@ export const fetchCartItems = async () => {
 
 export const fetchCartItemById = async (id) => {
   try {
-    const response = await api.get(`/api/carts/${id}`);
+    const response = await api.get(`/api/carts/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     console.log("API Response (fetchCartItemById):", response.data);
     return response.data;
   } catch (error) {

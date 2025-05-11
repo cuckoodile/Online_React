@@ -13,7 +13,7 @@ export const logInAPI = async (data) => {
   try {
     const response = await api.post("/api/login", data);
     console.log("User logged in: ", response.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("Login Error: ", error);
     throw new Error("Failed to login");
@@ -22,22 +22,28 @@ export const logInAPI = async (data) => {
 
 export const checkUserAPI = async (token) => {
   try {
-    const response = await api.get("/user", {
+    const response = await api.get("/api/user", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     console.log("Checked user logged in: ", response.data.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("Login Error: ", error);
     throw new Error("Failed to login");
   }
 };
 
-export const fetchUsers = async () => {
+export const fetchUsers = async (data) => {
+  console.log("Attempt to fetch user data: ", data);
+
   try {
-    const response = await api.get("/api/users");
+    const response = await api.get("/api/users", {
+      headers: {
+        Authorization: `Bearer ${data.token}`,
+      },
+    });
     console.log("API Response (fetchUsers):", response.data);
     return response.data;
   } catch (error) {

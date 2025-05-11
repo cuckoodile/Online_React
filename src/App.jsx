@@ -42,7 +42,6 @@ function App() {
                       Shop
                     </Link>
 
-                    {/* kayo na mag ayos ng privacy nito hayop ka */}
                     <Link
                       to="/admin"
                       className="hover:text-emerald-300 transition-colors"
@@ -67,15 +66,6 @@ function App() {
 
                 {/* Right Side Icons */}
                 <div className="flex items-center gap-4">
-                  {/* <button className="p-2 hover:bg-emerald-800 rounded-full transition-colors relative">
-                    <Link to="/wishlist">
-                      <Heart className="h-5 w-5" />
-                    </Link>
-                    <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      0
-                    </span>
-                  </button> */}
-
                   <button className="p-2 hover:bg-emerald-800 rounded-full transition-colors relative">
                     <Link to="/cart">
                       <ShoppingCart className="h-5 w-5" />
@@ -97,15 +87,9 @@ function App() {
 
           {/* Main Content */}
           <div className="flex flex-col">
-            {/* <div className="flex-1 flex flex-col"> */}
-              {/* Content Outlet */}
-              {/* <div className="bg-red-500 flex-1 flex flex-col"> */}
-                <Outlet />
-              {/* </div> */}
-            {/* </div> */}
-          </div> 
+            <Outlet />
+          </div>
 
-          {/* Footer Content */}
           <Footer />
         </ThemeProvider>
       </div>

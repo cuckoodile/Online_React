@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FiEdit2,
@@ -13,14 +13,19 @@ import {
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { useUsers } from "@/utils/hooks/userUsersHooks";
+import withAuth from "@/components/higher-order-component/withAuth";
+import { AuthContext } from "../utils/contexts/AuthContext";
 
-export default function Profilepage() {
+function Profilepage() {
+  const { user } = useContext(AuthContext);
+
   // Profile state
   const {
     data: profile,
     error: userError,
     isLoading: userLoading,
-  } = useUsers();
+  } = useUsers(user);
+
   const [showAllPrev, setShowAllPrev] = useState(false);
   const [showAllRec, setShowAllRec] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -392,12 +397,25 @@ export default function Profilepage() {
               <div className="space-y-4">
                 {profile.data.length > 0 && profile.data[0].address && (
                   <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                    <p className="text-sm text-emerald-600 mb-1">Shipping Address</p>
+                    <p className="text-sm text-emerald-600 mb-1">
+                      Shipping Address
+                    </p>
                     {Object.entries(profile.data[0].address)
-                      .filter(([key]) => !["id", "user_id", "name", "created_at", "updated_at"].includes(key))
+                      .filter(
+                        ([key]) =>
+                          ![
+                            "id",
+                            "user_id",
+                            "name",
+                            "created_at",
+                            "updated_at",
+                          ].includes(key)
+                      )
                       .map(([key, value]) => (
                         <div key={key} className="text-emerald-900 font-medium">
-                          <span className="text-emerald-600 capitalize">{key}: </span>
+                          <span className="text-emerald-600 capitalize">
+                            {key}:{" "}
+                          </span>
                           {value}
                         </div>
                       ))}
@@ -498,3 +516,5 @@ export default function Profilepage() {
     </div>
   );
 }
+
+export default withAuth(Profilepage);

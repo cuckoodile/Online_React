@@ -41,7 +41,7 @@ function LoginPage() {
 
     loginMutation.mutate(formData, {
       onSuccess: (userData) => {
-        login(userData.token);
+        login(userData);
         navigate("/");
       },
       onError: (error) => {

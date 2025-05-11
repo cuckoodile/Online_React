@@ -8,8 +8,6 @@ export default function Card({ data: product }) {
   const handleNavigate = (path) => {
     navigate(`${path}?id=${product.id}`);
   };
-
-  console.log("Product Data:", product.image);
   
   const imageHandler = () => {
     try {

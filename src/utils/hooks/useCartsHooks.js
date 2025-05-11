@@ -5,12 +5,12 @@ import {
   createCartItem,
   updateCartItem,
   deleteCartItem,
-} from "../cartApi";
+} from "../APIs/cartApi";
 
-export const useCartItems = () => {
+export const useCartItems = (data) => {
   return useQuery({
     queryKey: ["carts"],
-    queryFn: () => fetchCartItems(),
+    queryFn: () => fetchCartItems(data),
   });
 };
 

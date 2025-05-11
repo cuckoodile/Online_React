@@ -4,12 +4,12 @@ import {
   createUser,
   updateUser,
   deleteUser,
-} from '../userApi';
+} from '../APIs/userApi';
 
-export const useUsers = () => {
+export const useUsers = (data) => {
   return useQuery({
     queryKey: ['users'],
-    queryFn: fetchUsers,
+    queryFn: () => fetchUsers(data),
   });
 };
 

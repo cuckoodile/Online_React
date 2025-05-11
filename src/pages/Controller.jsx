@@ -5,8 +5,8 @@ import {
   useProducts,
   useUpdateProduct,
 } from "@/utils/hooks/useProductsHooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect, use } from "react";
 import {
   FiPlus,
   FiEdit2,
@@ -18,15 +18,14 @@ import {
 } from "react-icons/fi";
 
 export default function Controller() {
-  const queryClient = useQueryClient();
-
   // Product state
   const {
     data: products,
     error: productsError,
     isLoading: productLoading,
   } = useProducts();
-  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const [filteredProducts, setFilteredProducts] = useState();
   const [searchTerm, setSearchTerm] = useState("");
 
   // Form state
@@ -47,8 +46,6 @@ export default function Controller() {
     isLoading: categoriesLoading,
   } = useCategory();
 
-  const createProduct = useCreateProduct(); // Move the hook call here
-
   // Filter products based on search term
   useEffect(() => {
     if (!productLoading && products) {
@@ -66,48 +63,22 @@ export default function Controller() {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setCurrentProduct({
+      ...currentProduct,
+      [name]: name === "newSpecification" ? value : currentProduct[name],
+    });
   };
 
-  // Handle main image upload
+  // Handle image upload
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setCurrentProduct((prev) => ({
-        ...prev,
+      setCurrentProduct({
+        ...currentProduct,
         product_image: file,
         imagePreview: URL.createObjectURL(file),
-      }));
+      });
     }
-  };
-
-  // Handle additional images upload
-  const handleAdditionalImagesChange = (e) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      const newImages = filesArray.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      const updatedImages = [...currentProduct.additional_images, ...newImages].slice(0, 10);
-      setCurrentProduct((prev) => ({
-        ...prev,
-        additional_images: updatedImages,
-      }));
-    }
-  };
-
-  // Remove an additional image
-  const removeAdditionalImage = (index) => {
-    const updatedImages = [...currentProduct.additional_images];
-    updatedImages.splice(index, 1);
-    setCurrentProduct((prev) => ({
-      ...prev,
-      additional_images: updatedImages,
-    }));
   };
 
   // Open modal for adding new product
@@ -123,15 +94,7 @@ export default function Controller() {
       product_image: [],
     });
     setIsModalOpen(true);
-
-    createProduct.mutate(currentProduct, {
-      onSuccess: (data) => {
-        console.log("Product created:", data);
-      },
-      onError: (error) => {
-        console.error("Error creating product:", error);
-      },
-    });
+    useCreateProduct(currentProduct);
   };
 
   // Open modal for editing product
@@ -155,78 +118,80 @@ export default function Controller() {
       }
     );
   };
+  // Delete product
+  const deleteProduct = (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      useDeleteProduct(id);
+    }
+  };
 
   // Save product (create or update)
   const saveProduct = (e) => {
     e.preventDefault();
+
+    console.log("Attempt add prod. ", currentProduct);
+    // Form validation
     if (
       !currentProduct.name ||
       !currentProduct.price ||
-      !currentProduct.category_id ||
+      !currentProduct.category ||
+      !currentProduct.specifications ||
       !currentProduct.stock ||
-      (!isEditing && !currentProduct.product_image) ||
-      currentProduct.additional_images.length < 4
+      !currentProduct.image || 
+      !currentProduct
     ) {
-      alert("Please fill in all required fields and add at least 4 additional images.");
+      alert("Please fill in all required fields");
       return;
     }
-    const formData = new FormData();
-    formData.append("name", currentProduct.name);
-    formData.append("description", currentProduct.description || "");
-    formData.append("price", currentProduct.price);
-    formData.append("category_id", currentProduct.category_id);
-    formData.append("stock", currentProduct.stock);
-    if (currentProduct.product_image) {
-      formData.append("product_image", currentProduct.product_image);
-    }
-    currentProduct.specifications.forEach((spec, index) => {
-      formData.append(`specifications[${index}]`, spec);
-    });
-    currentProduct.additional_images.forEach((img, index) => {
-      if (img.file) {
-        formData.append(`additional_images[${index}]`, img.file);
-      }
-    });
+
     if (isEditing) {
-      updateProductMutation.mutate({ id: currentProduct.id, data: formData });
+      // Update existing product
+      useUpdateProduct(products.id, currentProduct);
     } else {
-      createProductMutation.mutate(formData);
+      // Create new product
+      useCreateProduct(currentProduct);
     }
+
+    setIsModalOpen(false);
   };
 
-  // Save new specification
+  // Add a function to save a new specification
   const saveSpecification = () => {
-    if (currentProduct.newSpecification.trim()) {
-      setCurrentProduct((prev) => ({
-        ...prev,
-        specifications: [...prev.specifications, prev.newSpecification.trim()],
-        newSpecification: "",
-      }));
-      setIsAddingSpec(false);
+    if (currentProduct.newSpecification) {
+      setCurrentProduct({
+        ...currentProduct,
+        specifications: [...(currentProduct.specifications || []), currentProduct.newSpecification],
+        newSpecification: "", // Clear the input field
+      });
+      setIsAddingSpec(false); // Close the input field
     }
   };
 
-  // Loading and error states
   if (productLoading || categoriesLoading) {
-    return <div className="text-center py-16 text-emerald-700">Loading...</div>;
+    return <div className="text-center py-16">Loading...</div>;
   }
-  if (productsError || categoriesError) {
-    return <div className="text-center py-16 text-red-600">Error loading data</div>;
+  if (productsError) {
+    return <div className="text-center py-16">Error loading products</div>;
+  }
+  if (categoriesError) {
+    return <div className="text-center py-16">Error loading categories</div>;
   }
 
   return (
-    <div className="min-h-screen bg-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-            <h1 className="text-3xl font-semibold text-emerald-900">Product Management</h1>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+    <div className="min-h-screen bg-emerald-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <h1 className="text-3xl font-bold text-emerald-900 mb-4 md:mb-0">
+              Product Management
+            </h1>
+
+            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
               <div className="relative flex-grow">
                 <input
                   type="text"
-                  placeholder="Search by name or category..."
-                  className="w-full pl-10 pr-12 py-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-300"
+                  placeholder="Search by name, category, color..."
+                  className="w-full pl-10 pr-4 py-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -240,33 +205,32 @@ export default function Controller() {
                   </button>
                 )}
               </div>
+
               <button
                 onClick={addProduct}
-                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-300 flex items-center gap-2"
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
               >
                 <FiPlus />
                 Add Product
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Product Table */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* Product Table */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-emerald-200">
               <thead className="bg-emerald-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Item
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Specifications
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-emerald-700 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                     Price
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
@@ -275,15 +239,15 @@ export default function Controller() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-emerald-100">
-                {filteredProducts.length > 0 ? (
+                {filteredProducts && filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
                     <tr
                       key={product.id}
-                      className="hover:bg-emerald-50 transition-colors duration-200"
+                      className="hover:bg-emerald-50 transition-colors"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="h-14 w-14 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
+                          <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
                             <img
                               src={product.product_image}
                               alt={product.name}
@@ -291,43 +255,40 @@ export default function Controller() {
                             />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-emerald-900">{product.name}</div>
-                            <div className="text-sm text-emerald-600 line-clamp-2">
+                            <div className="text-sm font-medium text-emerald-900">
+                              {product.name}
+                            </div>
+                            <div className="text-sm text-emerald-600 truncate max-w-xs">
                               {product.description}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
-                          {product.category?.name || "N/A"}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
+                          {product.category.name}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          {product.product_specifications[0]?.details &&
-                            Object.entries(JSON.parse(product.product_specifications[0].details)).map(
-                              ([key, value], index) => (
-                                <span key={index} className="text-sm text-emerald-900">
-                                  <strong>{key}:</strong> {value}
-                                </span>
-                              )
-                            )}
+                          <span className="text-sm text-emerald-900">
+                             {product.product_specifications.map((specification) => specification.details)}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-emerald-900">
-                        ₱{Number(product.price).toLocaleString()}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
+                        ₱{product.price.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
                           onClick={() => editProduct(product)}
-                          className="text-emerald-600 hover:text-emerald-900 mr-4 transition-colors duration-200"
+                          className="text-emerald-600 hover:text-emerald-900 mr-4"
                         >
                           <FiEdit2 className="inline" />
                         </button>
                         <button
                           onClick={() => deleteProduct(product.id)}
-                          className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                          className="text-red-600 hover:text-red-900"
                         >
                           <FiTrash2 className="inline" />
                         </button>
@@ -338,9 +299,9 @@ export default function Controller() {
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-6 py-4 text-center text-emerald-600 text-sm"
+                      className="px-6 py-4 text-center text-emerald-600"
                     >
-                      No items found. Try a different search or add a new item.
+                      No item/s found. Try a different search or add a new item.
                     </td>
                   </tr>
                 )}
@@ -352,30 +313,29 @@ export default function Controller() {
 
       {/* Product Form Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-emerald-950 bg-opacity-75 flex items-center justify-center z-50 p-4 transition-all duration-300">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto transform scale-95 animate-modal-open">
-            <div className="p-8">
+        <div className="fixed inset-0 bg-emerald-950 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-emerald-900">
+                <h2 className="text-2xl font-bold text-emerald-900">
                   {isEditing ? "Edit Fashion Item" : "Add New Fashion Item"}
                 </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                  className="text-gray-500 hover:text-gray-700"
                 >
                   <FiX className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={saveProduct}>
-                <div className="space-y-6">
-                  {/* Main Product Image */}
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
-                      Main Product Image <span className="text-red-500">*</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-emerald-800 mb-2">
+                      Product Image
                     </label>
-                    <div className="flex items-center gap-6">
-                      <div className="w-32 h-32 border-2 border-dashed border-emerald-300 rounded-lg overflow-hidden bg-emerald-50 flex items-center justify-center relative">
+                    <div className="flex items-center space-x-6">
+                      <div className="w-40 h-40 border-2 border-dashed border-emerald-300 rounded-lg overflow-hidden bg-emerald-50 flex items-center justify-center relative">
                         {currentProduct.imagePreview ? (
                           <img
                             src={currentProduct.imagePreview}
@@ -383,7 +343,7 @@ export default function Controller() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <FiUpload className="w-6 h-6 text-emerald-400" />
+                          <FiUpload className="w-8 h-8 text-emerald-400" />
                         )}
                         <input
                           type="file"
@@ -392,225 +352,145 @@ export default function Controller() {
                           className="absolute inset-0 opacity-0 cursor-pointer"
                         />
                       </div>
-                      <div className="text-xs text-emerald-600">
-                        <p>Drag & drop or click to browse</p>
+                      <div className="text-sm text-emerald-600">
+                        <p>Drag & drop an image or click to browse</p>
                         <p>Recommended: 800x1000px, max 2MB</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Additional Product Images */}
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
-                      Additional Product Images <span className="text-red-500">*</span> (Min: 4, Max: 10)
-                    </label>
-                    <div className="border-2 border-dashed border-emerald-300 rounded-lg p-6 bg-emerald-50 flex items-center justify-center relative">
-                      <div className="text-center">
-                        <FiUpload className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                        <p className="text-sm text-emerald-600">Upload multiple images</p>
-                        <p className="text-xs text-emerald-500 mt-1">Click to browse or drag & drop</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleAdditionalImagesChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                    </div>
-                    {currentProduct.additional_images.length > 0 && (
-                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
-                        {currentProduct.additional_images.map((img, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={img.preview}
-                              alt={`Additional image ${index + 1}`}
-                              className="w-full h-20 object-cover rounded-lg border border-emerald-200"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeAdditionalImage(index)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            >
-                              <FiX className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex justify-between mt-3 text-sm">
-                      <p className="text-emerald-600">
-                        {currentProduct.additional_images.length}/10 images uploaded
-                      </p>
-                      {currentProduct.additional_images.length < 4 && (
-                        <p className="text-red-500">
-                          Add at least {4 - currentProduct.additional_images.length} more images
+                        <p className="mt-2 text-xs">
+                          High-quality images increase sales!
                         </p>
-                      )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Product Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
-                      Product Name <span className="text-red-500">*</span>
+                  <div className="md:col-span-2">
+                    <label className="block text-emerald-800 mb-2">
+                      Product Name*
                     </label>
                     <input
                       type="text"
                       name="name"
                       value={currentProduct.name}
                       onChange={handleInputChange}
-                      className="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       required
                     />
                   </div>
 
-                  {/* Price and Stock */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-emerald-800 mb-2">
-                        Price (₱) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="price"
-                        value={currentProduct.price}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-                        required
-                        min="0"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-emerald-800 mb-2">
-                        Stock <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="stock"
-                        value={currentProduct.stock}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-                        required
-                        min="0"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Category */}
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="category_id"
-                      value={currentProduct.category_id}
-                      onChange={handleInputChange}
-                      className="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-                      required
-                    >
-                      <option value="">Select a category</option>
-                      {categories?.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
+                  <div className="md:col-span-2">
+                    <label className="block text-emerald-800 mb-2">
                       Description
                     </label>
                     <textarea
                       name="description"
                       value={currentProduct.description}
                       onChange={handleInputChange}
-                      rows="4"
-                      className="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+                      rows="3"
+                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      placeholder="Describe fabric, fit, style, and sustainability features..."
+                    ></textarea>
+                  </div>
+
+                  <div className="md:col-span-2 col">
+                    <label className="block text-emerald-800 mb-2">
+                      Specifications
+                    </label>
+
+                    {/* Map the currentProduct.specification here */}
+                    {currentProduct.specifications?.map((spec, index) => (
+                      <div
+                        key={index}
+                        className="text-sm text-emerald-900 mb-2"
+                      >
+                        {spec}
+                      </div>
+                    ))}
+
+                    {isAddingSpec ? (
+                      <>
+                        <input
+                          type="text"
+                          name="newSpecification"
+                          value={currentProduct.newSpecification || ""}
+                          onChange={handleInputChange}
+                          className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <div className="flex space-x-2 mt-2">
+                          <button
+                            onClick={saveSpecification}
+                            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setIsAddingSpec(false)}
+                            className="px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setIsAddingSpec(true)}
+                        className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      >
+                        Add Specification
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-emerald-800 mb-2">
+                      Price (₱)*
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={currentProduct.price}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      required
                     />
                   </div>
 
-                  {/* Specifications */}
                   <div>
-                    <label className="block text-sm font-medium text-emerald-800 mb-2">
-                      Specifications
+                    <label className="block text-emerald-800 mb-2">
+                      Category*
                     </label>
-                    <div className="space-y-3">
-                      {currentProduct.specifications.map((spec, index) => (
-                        <div key={index} className="flex items-center">
-                          <span className="flex-grow p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-sm text-emerald-900">
-                            {spec}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updatedSpecs = [...currentProduct.specifications];
-                              updatedSpecs.splice(index, 1);
-                              setCurrentProduct((prev) => ({
-                                ...prev,
-                                specifications: updatedSpecs,
-                              }));
-                            }}
-                            className="ml-3 text-red-500 hover:text-red-700 transition-colors duration-200"
-                          >
-                            <FiX className="w-5 h-5" />
-                          </button>
-                        </div>
-                      ))}
-                      {isAddingSpec ? (
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="text"
-                            name="newSpecification"
-                            value={currentProduct.newSpecification}
-                            onChange={handleInputChange}
-                            className="flex-grow p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-                            placeholder="Enter specification"
-                          />
-                          <button
-                            type="button"
-                            onClick={saveSpecification}
-                            className="p-2 text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
-                          >
-                            <FiSave className="w-5 h-5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setIsAddingSpec(false)}
-                            className="p-2 text-red-500 hover:text-red-700 transition-colors duration-200"
-                          >
-                            <FiX className="w-5 h-5" />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingSpec(true)}
-                          className="flex items-center text-emerald-600 hover:text-emerald-800 transition-colors duration-200 text-sm"
-                        >
-                          <FiPlus className="mr-1 w-4 h-4" /> Add Specification
-                        </button>
-                      )}
-                    </div>
+                    <select
+                      name="category_id"
+                      value={currentProduct.category_id}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      required
+                    >
+                      <option value="">Select a category</option>
+                      {categories.length > 0 &&
+                        categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
                   </div>
                 </div>
 
-                {/* Form Actions */}
-                <div className="flex justify-end gap-4 mt-8">
+                <div className="flex justify-end space-x-4">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all duration-200"
+                    className="px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200"
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2"
                   >
-                    {isEditing ? "Update Product" : "Add Product"}
+                    <FiSave />
+                    {isEditing ? "Update Item" : "Save Item"}
                   </button>
                 </div>
               </form>

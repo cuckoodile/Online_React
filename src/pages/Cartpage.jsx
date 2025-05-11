@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trash2,
@@ -11,13 +11,17 @@ import {
 import { Link } from "react-router-dom";
 import { useCartItems } from "@/utils/hooks/useCartsHooks";
 import CartCard from "@/components/CartCard";
+import withAuth from "@/components/higher-order-component/withAuth";
+import { AuthContext } from "../utils/contexts/AuthContext";
 
-export default function Cartpage() {
+function Cartpage() {
+  const { user } = useContext(AuthContext);
+
   const {
     data: initialCartItems = [],
     error: cartError,
     isLoading: cartLoading,
-  } = useCartItems();
+  } = useCartItems(user);
 
   const [cartItems, setCartItems] = useState([]);
 
@@ -25,7 +29,7 @@ export default function Cartpage() {
     if (initialCartItems.data) {
       setCartItems(initialCartItems.data);
     }
-  }, [initialCartItems]);
+  }, []);
 
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>
@@ -112,7 +116,7 @@ export default function Cartpage() {
     return <div className="text-center py-16">Error loading cart items</div>;
   }
 
-  console.log("cart data: ", cartItems.data[0]);
+  console.log("cart data: ", cartItems.data);
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
       <div className="container mx-auto px-4">
@@ -346,3 +350,5 @@ export default function Cartpage() {
     </div>
   );
 }
+
+export default withAuth(Cartpage);

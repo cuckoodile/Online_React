@@ -7,15 +7,15 @@ export const AuthContext = createContext();
 
 // Create the AuthProvider component
 export const AuthProvider = ({ children }) => {
-
   // State to hold authentication info
   const [user, setUser] = useState(null); // Store user data if needed
   const [cookies, setCookie, removeCookie] = useCookies();
 
   // Login method
-  const login = (token) => {
-    console.log("Setting token in cookies: ", token);
-    setCookie("token", token);
+  const login = async (userData) => {
+    console.log("Login Data: ", userData.data);
+    setCookie("token", userData.data.token);
+    setUser(userData.data);
   };
 
   // Logout method
