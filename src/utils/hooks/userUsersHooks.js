@@ -49,7 +49,7 @@ export const useUserById = (id) => {
     queryKey: ["users", id],
     queryFn: async () => {
       const user = await fetchUserById(id);
-      console.log("Fetched user data:", user); // Debugging log
+      console.log("Fetched user data:", user);
       return user;
     },
   });

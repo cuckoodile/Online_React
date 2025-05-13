@@ -10,7 +10,7 @@ const api = axios.create({
 });
 
 export const fetchCartItems = async (data) => {
-  console.log("Fetching cart items for user_id:", data?.user_id); // Debugging log
+  console.log("Fetching cart items for user_id:", data?.user_id);
   try {
     const response = await api.get("/api/carts", {
       params: { user_id: data?.user_id },

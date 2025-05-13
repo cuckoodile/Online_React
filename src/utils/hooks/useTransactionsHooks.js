@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {fetchTransactions,createTransaction,updateTransaction,deleteTransaction} from "../APIs/transactions_api";
+import {fetchTransactions,createTransaction,updateTransaction,deleteTransaction} from "../APIs/transactionsApi";
 
 export const useTransactions = () => {
   return useQuery(["transactions"], fetchTransactions);
@@ -7,7 +7,8 @@ export const useTransactions = () => {
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
-  return useMutation(createTransaction, {
+  return useMutation({
+    mutationFn: createTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries(["transactions"]);
     },

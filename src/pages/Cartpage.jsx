@@ -17,7 +17,7 @@ import { AuthContext } from "../utils/contexts/AuthContext";
 function Cartpage() {
   const { user } = useContext(AuthContext);
 
-  console.log("User from AuthContext:", user); // Debugging log
+  console.log("User from AuthContext:", user);
 
   const {
     data: initialCartItems = [],
@@ -25,20 +25,17 @@ function Cartpage() {
     isLoading: cartLoading,
   } = useCartItems({ user_id: user?.id, token: user?.token });
 
-  console.log("user_id:", user?.id); // Debugging log
-  console.log("Initial Cart Items:", initialCartItems); // Debugging log
-
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     if (initialCartItems?.length > 0) {
       const filteredItems = initialCartItems.filter(
-        (item) => item.user_id === user?.id // Filter items by user_id
+        (item) => item.user_id === user?.id
       );
-      setCartItems(filteredItems); // Update cartItems state with filtered items
+      setCartItems(filteredItems);
     } else {
-      console.warn("Cart data is undefined or empty."); // Log warning
-      setCartItems([]); // Fallback to an empty array
+      console.warn("Cart data is undefined or empty.");
+      setCartItems([]);
     }
   }, [initialCartItems, user?.id]);
 

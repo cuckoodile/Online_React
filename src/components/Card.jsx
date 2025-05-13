@@ -9,6 +9,7 @@ import { AuthContext } from "@/utils/contexts/AuthContext";
 export default function Card({ data: product }) {
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
+  
   const { user } = useContext(AuthContext);
   const {
     data: userData,

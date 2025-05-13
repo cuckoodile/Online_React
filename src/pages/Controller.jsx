@@ -36,13 +36,11 @@ export default function Controller() {
 
   const [filteredProducts, setFilteredProducts] = useState();
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Form state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
-    id: null, // Ensure `id` is initialized
+    id: null,
     name: "",
     description: "",
     price: 0,
@@ -56,7 +54,6 @@ export default function Controller() {
     isLoading: categoriesLoading,
   } = useCategory();
 
-  // Filter products based on search term
   useEffect(() => {
     if (!productLoading && products) {
       const results = products.filter((product) => {
@@ -69,8 +66,6 @@ export default function Controller() {
       setFilteredProducts([]);
     }
   }, [searchTerm, products, productLoading]);
-
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCurrentProduct({
@@ -78,8 +73,6 @@ export default function Controller() {
       [name]: name === "newSpecification" ? value : currentProduct[name],
     });
   };
-
-  // Handle image upload
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -91,7 +84,6 @@ export default function Controller() {
     }
   };
 
-  // Open modal for adding new product
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
@@ -107,29 +99,24 @@ export default function Controller() {
     useCreateProduct(currentProduct);
   };
 
-  // Open modal for editing product
   const updateProduct = useUpdateProduct();
 
-  // Open modal for editing product
   const editProduct = (product) => {
     setIsEditing(true);
-    setCurrentProduct(product); // Set the product to be edited
+    setCurrentProduct(product);
     setIsModalOpen(true);
   };
 
-  // Delete product
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       useDeleteProduct(id);
     }
   };
 
-  // Save product (create or update)
   const saveProduct = (e) => {
     e.preventDefault();
 
     console.log("Attempt add prod. ", currentProduct);
-    // Form validation
     if (
       !currentProduct.name ||
       !currentProduct.price ||
@@ -141,15 +128,14 @@ export default function Controller() {
       return;
     }
 
-    const token = user?.token; // Get the user's token from AuthContext
+    const token = user?.token;
 
     if (isEditing) {
-      // Update existing product
       updateProduct.mutate(
         {
-          id: currentProduct.id, // Ensure `id` is passed correctly
+          id: currentProduct.id,
           data: currentProduct,
-          headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+          headers: { Authorization: `Bearer ${token}` },
         },
         {
           onSuccess: (data) => {
@@ -161,25 +147,23 @@ export default function Controller() {
         }
       );
     } else {
-      // Create new product
       useCreateProduct({
         data: currentProduct,
-        headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+        headers: { Authorization: `Bearer ${token}` },
       });
     }
 
     setIsModalOpen(false);
   };
 
-  // Add a function to save a new specification
   const saveSpecification = () => {
     if (currentProduct.newSpecification) {
       setCurrentProduct({
         ...currentProduct,
         specifications: [...(currentProduct.specifications || []), currentProduct.newSpecification],
-        newSpecification: "", // Clear the input field
+        newSpecification: "",
       });
-      setIsAddingSpec(false); // Close the input field
+      setIsAddingSpec(false);
     }
   };
 

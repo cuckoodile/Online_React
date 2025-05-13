@@ -17,7 +17,7 @@ import withAuth from "@/components/higher-order-component/withAuth";
 import { AuthContext } from "../utils/contexts/AuthContext";
 
 function Profilepage() {
-  const { user } = useContext(AuthContext);
+  const { user, setUser, logout } = useContext(AuthContext);
 
   // Profile state
   const {
@@ -274,9 +274,9 @@ function Profilepage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    // Add logout functionality here`
-                    console.log("Logging out");
-                    // You can add navigation to login page or clear auth state
+                    logout();
+                    // Navigate to the login page
+                    window.location.href = "/login";
                   }}
                   className="px-6 py-3 border-2 border-red-500 text-red-500 
                                     rounded-lg font-medium hover:bg-red-50

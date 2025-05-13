@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiCreditCard, FiTruck, FiCheck, FiChevronRight, FiDollarSign, FiSmartphone } from 'react-icons/fi';
+import { AuthContext } from '@/utils/contexts/AuthContext';
+import { useUsers } from '@/utils/hooks/userUsersHooks';
+import { useCreateTransaction } from '@/utils/hooks/useTransactionsHooks';
 
 export default function Checkout() {
-  const [step, setStep] = useState(1); // Now starting with shipping as step 1
+  const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [formData, setFormData] = useState({
     // Shipping information
@@ -43,7 +46,6 @@ export default function Checkout() {
     }
   ];
   
-  // Calculate order summary
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = 150;
   const total = subtotal + shipping;
@@ -55,15 +57,55 @@ export default function Checkout() {
       [name]: value
     });
   };
+
+  const { user } = useContext(AuthContext);
+  const { data: userData, error: userError, isLoading: userLoading } = useUsers(user);
+  const createTransaction = useCreateTransaction();
   
-  const handleSubmit = (e) => {
+  console.log('User Data:', userData);
+  useEffect(() => {
+    if (userData && userData.profile) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        firstName: userData.profile.first_name || '',
+        lastName: userData.profile.last_name || '',
+        email: userData.email || '',
+        phone: userData.profile.contact_number || '',
+        address: userData.profile.address || '',
+        city: userData.profile.address.city || '',
+        postalCode: userData.profile.address.postalCode || '',
+      }));
+    }
+  }, [userData]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Move to next step or submit order
     if (step < 2) {
       setStep(step + 1);
     } else {
-      // Submit order logic would go here
-      alert('Order placed successfully!');
+      const transactionData = {
+        userId: user?.id,
+        items: cartItems,
+        shippingAddress: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+        },
+        paymentMethod,
+        total,
+      };
+  
+      try {
+        await createTransaction.mutateAsync(transactionData);
+        alert('Order placed successfully!');
+      } catch (error) {
+        console.error('Error placing order:', error);
+        alert('Failed to place order. Please try again.');
+      }
     }
   };
   
