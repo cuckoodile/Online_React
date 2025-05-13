@@ -270,10 +270,15 @@ export default function Controller() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-sm text-emerald-900">
-                             {product.product_specifications.map((specification) => specification.details)}
-                          </span>
+                      <div className="flex flex-col">
+                          {product.product_specifications[0]?.details &&
+                            Object.entries(JSON.parse(product.product_specifications[0].details)).map(
+                              ([key, value], index) => (
+                                <span key={index} className="text-sm text-emerald-900">
+                                  <strong>{key}:</strong> {value}
+                                </span>
+                              )
+                            )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
