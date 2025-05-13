@@ -8,9 +8,10 @@ import {
 } from "../APIs/cartApi";
 
 export const useCartItems = (data) => {
+  console.log("Fetching cart items for user:", data); // Debugging log
   return useQuery({
-    queryKey: ["carts"],
-    queryFn: () => fetchCartItems(data),
+    queryKey: ["carts", data?.user_id],
+    queryFn: () => fetchCartItems(data), // Pass user data to the API function
   });
 };
 

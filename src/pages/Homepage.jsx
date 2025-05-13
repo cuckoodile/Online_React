@@ -14,11 +14,8 @@ import Carousel from "@/components/Carousel";
 import { useProducts } from "@/utils/hooks/useProductsHooks";
 
 export default function Homepage() {
-  // Carousel slides data with fashion-specific images
   const { data: products, error, isLoading } = useProducts();
   const newArrivals = products?.slice(0, 8) || [];
-
- 
 
   if (isLoading) return <div className="text-center">Loading...</div>;
 

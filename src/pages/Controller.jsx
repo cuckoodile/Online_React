@@ -16,8 +16,17 @@ import {
   FiUpload,
   FiSave,
 } from "react-icons/fi";
-
+import { useContext } from "react";
+import { AuthContext } from "@/utils/contexts/AuthContext";
+import { useUsers } from "@/utils/hooks/userUsersHooks";
 export default function Controller() {
+  const { user } = useContext(AuthContext);
+  const {
+    data: userData,
+    error: userError,
+    isLoading,
+  } = useUsers(user);
+
   // Product state
   const {
     data: products,
@@ -33,6 +42,7 @@ export default function Controller() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingSpec, setIsAddingSpec] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
+    id: null, // Ensure `id` is initialized
     name: "",
     description: "",
     price: 0,
@@ -105,19 +115,8 @@ export default function Controller() {
     setIsEditing(true);
     setCurrentProduct(product); // Set the product to be edited
     setIsModalOpen(true);
-
-    updateProduct.mutate(
-      { id: product.id, data: currentProduct },
-      {
-        onSuccess: (data) => {
-          console.log("Product updated:", data);
-        },
-        onError: (error) => {
-          console.error("Error updating product:", error);
-        },
-      }
-    );
   };
+
   // Delete product
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -134,22 +133,39 @@ export default function Controller() {
     if (
       !currentProduct.name ||
       !currentProduct.price ||
-      !currentProduct.category ||
+      !currentProduct.category_id ||
       !currentProduct.specifications ||
-      !currentProduct.stock ||
-      !currentProduct.image || 
-      !currentProduct
+      !currentProduct.product_image
     ) {
       alert("Please fill in all required fields");
       return;
     }
 
+    const token = user?.token; // Get the user's token from AuthContext
+
     if (isEditing) {
       // Update existing product
-      useUpdateProduct(products.id, currentProduct);
+      updateProduct.mutate(
+        {
+          id: currentProduct.id, // Ensure `id` is passed correctly
+          data: currentProduct,
+          headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+        },
+        {
+          onSuccess: (data) => {
+            console.log("Product updated:", data);
+          },
+          onError: (error) => {
+            console.error("Error updating product:", error);
+          },
+        }
+      );
     } else {
       // Create new product
-      useCreateProduct(currentProduct);
+      useCreateProduct({
+        data: currentProduct,
+        headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+      });
     }
 
     setIsModalOpen(false);

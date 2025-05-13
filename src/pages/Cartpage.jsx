@@ -17,19 +17,30 @@ import { AuthContext } from "../utils/contexts/AuthContext";
 function Cartpage() {
   const { user } = useContext(AuthContext);
 
+  console.log("User from AuthContext:", user); // Debugging log
+
   const {
     data: initialCartItems = [],
     error: cartError,
     isLoading: cartLoading,
-  } = useCartItems(user);
+  } = useCartItems({ user_id: user?.id, token: user?.token });
+
+  console.log("user_id:", user?.id); // Debugging log
+  console.log("Initial Cart Items:", initialCartItems); // Debugging log
 
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    if (initialCartItems.data) {
-      setCartItems(initialCartItems.data);
+    if (initialCartItems?.length > 0) {
+      const filteredItems = initialCartItems.filter(
+        (item) => item.user_id === user?.id // Filter items by user_id
+      );
+      setCartItems(filteredItems); // Update cartItems state with filtered items
+    } else {
+      console.warn("Cart data is undefined or empty."); // Log warning
+      setCartItems([]); // Fallback to an empty array
     }
-  }, []);
+  }, [initialCartItems, user?.id]);
 
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>
@@ -100,11 +111,16 @@ function Cartpage() {
     }
   };
 
+  if (!user) {
+    return <div className="text-center py-16">Please log in to view your cart.</div>;
+  }
+
   if (cartLoading) {
     return <div className="text-center py-16">Loading...</div>;
   }
 
   if (cartError) {
+    console.error("Error fetching cart items:", cartError);
     return <div className="text-center py-16">Error loading cart items</div>;
   }
 
@@ -112,11 +128,8 @@ function Cartpage() {
     return <div className="text-center py-16">No items in the cart</div>;
   }
 
-  if (cartError) {
-    return <div className="text-center py-16">Error loading cart items</div>;
-  }
+  console.log("Filtered Cart Items:", cartItems); // Debugging log
 
-  console.log("cart data: ", cartItems.data);
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
       <div className="container mx-auto px-4">

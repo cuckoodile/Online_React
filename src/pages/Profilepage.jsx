@@ -190,7 +190,7 @@ function Profilepage() {
 
   console.log("Profile Data:", profile);
   console.log("Profile Data:", profile.data[0].address);
-  console.log("Profile Address:", profile.data.address);
+  console.log("Profile Address:", profile.data[0].address);
 
   return (
     <div className="min-h-screen bg-emerald-50 py-8">

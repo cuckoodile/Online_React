@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchUsers,
+  fetchUserById,
   createUser,
   updateUser,
   deleteUser,
@@ -46,6 +47,10 @@ export const useDeleteUser = () => {
 export const useUserById = (id) => {
   return useQuery({
     queryKey: ["users", id],
-    queryFn: () => fetchUsers(id),
+    queryFn: async () => {
+      const user = await fetchUserById(id);
+      console.log("Fetched user data:", user); // Debugging log
+      return user;
+    },
   });
 };

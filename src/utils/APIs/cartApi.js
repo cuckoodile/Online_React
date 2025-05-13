@@ -10,16 +10,16 @@ const api = axios.create({
 });
 
 export const fetchCartItems = async (data) => {
-  console.log("Attempt to fetch cart data: ", data);
-
+  console.log("Fetching cart items for user_id:", data?.user_id); // Debugging log
   try {
     const response = await api.get("/api/carts", {
+      params: { user_id: data?.user_id },
       headers: {
         Authorization: `Bearer ${data.token}`,
       },
     });
     console.log("API Response (fetchCartItems):", response.data);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("API Error (fetchCartItems):", error);
     throw new Error("Failed to fetch cart items");
