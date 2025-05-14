@@ -8,10 +8,10 @@ import {
 } from "../APIs/cartApi";
 
 export const useCartItems = (data) => {
-  console.log("Fetching cart items for user:", data); // Debugging log
+  console.log("Fetching cart items for user:", data);
   return useQuery({
     queryKey: ["carts", data?.user_id],
-    queryFn: () => fetchCartItems(data), // Pass user data to the API function
+    queryFn: () => fetchCartItems(data),
   });
 };
 
@@ -25,7 +25,7 @@ export const useCartItemsById = (id) => {
 export const useAddCartItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createCartItem,
+    mutationFn: ({ data, token }) => createCartItem({ ...data, token }),
     onSuccess: () => {
       queryClient.invalidateQueries(["carts"]);
     },
@@ -35,7 +35,7 @@ export const useAddCartItem = () => {
 export const useUpdateCartItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, updatedData }) => updateCartItem(id, updatedData),
+    mutationFn: ({ id, updatedData, token }) => updateCartItem(id, { ...updatedData, token }),
     onSuccess: () => {
       queryClient.invalidateQueries(["carts"]);
     },
@@ -45,7 +45,7 @@ export const useUpdateCartItem = () => {
 export const useDeleteCartItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteCartItem,
+    mutationFn: ({ id, token }) => deleteCartItem(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries(["carts"]);
     },

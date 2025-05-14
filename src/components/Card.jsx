@@ -45,14 +45,22 @@ export default function Card({ data: product }) {
 
   const imageHandler = () => {
     try {
-      const parsedImages = JSON.parse(product.image);
-      if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-        return parsedImages[0];
+      if (product.image) {
+        const parsedImages = JSON.parse(product.image);
+        if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+          return parsedImages[0];
+        }
+      }
+      if (product.product_image) {
+        const parsedProductImages = JSON.parse(product.product_image);
+        if (Array.isArray(parsedProductImages) && parsedProductImages.length > 0) {
+          return parsedProductImages[0];
+        }
       }
     } catch (error) {
-      console.error("Error parsing product.image:", error);
+      console.error("Error parsing product images:", error);
     }
-    return parsedImages = JSON.parse(product.product_image);
+    return "default-image.jpg"; // Fallback to a default image
   };
 
   return (

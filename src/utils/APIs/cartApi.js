@@ -63,9 +63,13 @@ export const updateCartItem = async (id, updatedData) => {
   }
 };
 
-export const deleteCartItem = async (id) => {
+export const deleteCartItem = async (id,token) => {
   try {
-    await api.delete(`/api/carts/${id}`);
+    await api.delete(`/api/carts/${id}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     console.log("Cart item deleted with ID:", id);
     return id;
   } catch (error) {

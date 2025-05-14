@@ -69,9 +69,14 @@ export const updateProduct = async (id, updatedData,token) => {
 };
 
 
-export const deleteProduct = async (id) => {
+export const deleteProduct = async (id,token) => {
   try {
-    await api.delete(`/api/products/${id}`);
+    await api.delete(`/api/products/${id}`,{
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     console.log("Product deleted with ID:", id);
     return id;
   } catch (error) {

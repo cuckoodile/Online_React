@@ -15,36 +15,35 @@ export const useProductsById = (id) => {
   });
 };
 
-export const useCreateProduct = (data,token) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-      mutationFn: () => createProduct(data,token),
-      onSuccess: () => {
-        queryClient.invalidateQueries(["products"]);
-      },
-    });
-  };
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ data, token }) => createProduct(data, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
 
-  export const useUpdateProduct = (id,updatedData,token) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-      mutationFn: () => updateProduct(id, updatedData,token),
-      onSuccess: () => {
-        queryClient.invalidateQueries(["products"]);
-      },
-    });
-  };
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, updatedData, token }) => updateProduct(id, updatedData, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
 
-  export const useDeleteProduct = (id) => {
-    const queryClient = useQueryClient();
-  
-    return useMutation({
-      mutationFn:()=> deleteProduct(id),
-      onSuccess: () => {
-        queryClient.invalidateQueries(["products"]);
-      },
-    });
-  };
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, token }) => deleteProduct(id, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
 
 export const useCreateReview = () => {
   const queryClient = useQueryClient();

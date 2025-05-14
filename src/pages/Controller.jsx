@@ -56,6 +56,7 @@ export default function Controller() {
   } = useCategory();
   
   const createProduct = useCreateProduct();
+  const deleteProductMutation = useDeleteProduct();
 
   useEffect(() => {
     if (!productLoading && products) {
@@ -115,7 +116,7 @@ export default function Controller() {
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
-      admin_id: 1,
+      admin_id: userData.data[0].id,
       name: "",
       description: "",
       price: 0,
@@ -144,7 +145,10 @@ export default function Controller() {
 
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      useDeleteProduct(id);
+      deleteProductMutation.mutate({
+        id: id,
+        token: token,
+      });
     }
   };
 
@@ -184,27 +188,24 @@ export default function Controller() {
       }
 
       const transformedProduct = {
-        ...currentProduct,
-        product_specifications: [
-          {
-            details: JSON.stringify(
-              currentProduct.specifications.reduce((acc, spec) => {
-                acc[spec.key] = spec.value;
-                return acc;
-              }, {})
-            ),
-          },
-        ],
+        admin_id: currentProduct.admin_id,
+        name: currentProduct.name,
+        description: currentProduct.description,
+        price: currentProduct.price.toString(),
+        category_id: currentProduct.category_id,
+        product_image: [currentProduct.product_image.name],
+        product_specifications: currentProduct.specifications.map((spec) => ({
+          details: JSON.stringify({ [spec.key]: spec.value }),
+        })),
       };
 
-      console.log("Updating product with ID:", currentProduct.id);
-      console.log("Authorization token:", token);
+      console.log("Transformed product data:", transformedProduct);
 
       updateProduct.mutate(
         {
           id: currentProduct.id,
           data: transformedProduct,
-          headers: { Authorization: `Bearer ${token}` },
+          token: token,
         },
         {
           onSuccess: (data) => {
@@ -223,26 +224,25 @@ export default function Controller() {
       }
 
       const transformedProduct = {
-        ...currentProduct,
-        product_specifications: [
-          {
-            details: JSON.stringify(
-              currentProduct.specifications.reduce((acc, spec) => {
-                acc[spec.key] = spec.value;
-                return acc;
-              }, {})
-            ),
-          },
-        ],
+        admin_id: currentProduct.admin_id,
+        name: currentProduct.name,
+        description: currentProduct.description,
+        price: currentProduct.price.toString(),
+        category_id: currentProduct.category_id,
+        product_image: [currentProduct.product_image.name],
+        product_specifications: currentProduct.specifications.map((spec) => ({
+          details: JSON.stringify({ [spec.key]: spec.value }),
+        })),
       };
 
       console.log("Creating product with data:", transformedProduct);
       console.log("Authorization token:", token);
+      console.log("Payload being sent to the server:", JSON.stringify(transformedProduct, null, 2));
 
       createProduct.mutate(
         {
           data: transformedProduct,
-          headers: { Authorization: `Bearer ${token}` },
+          token:token,
         },
         {
           onSuccess: (data) => {
