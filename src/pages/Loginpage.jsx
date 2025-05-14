@@ -130,7 +130,7 @@ function LoginPage() {
                       type="text"
                       className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border ${
                         errors.name ? "border-red-500" : "border-emerald-800/50"
-                      } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                      } placeholder-emerald-400/60 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                       placeholder="Full Name"
                       value={formData.name}
                       onChange={handleChange}
@@ -151,7 +151,7 @@ function LoginPage() {
                     id="username"
                     name="username"
                     type="text"
-                    className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                    className={`appearance-none rounded-lg relative block w-full pl-10 px-3 py-2.5 bg-emerald-950/50 border placeholder-emerald-400/60 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                     placeholder="Email address"
                     value={formData.username}
                     onChange={handleChange}
@@ -172,10 +172,8 @@ function LoginPage() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${
-                      errors.password
-                        ? "border-red-500"
-                        : "border-emerald-800/50"
-                    } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                      errors.password ? "border-red-500" : "border-emerald-800/50"
+                    } placeholder-emerald-400/60 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
@@ -204,10 +202,8 @@ function LoginPage() {
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2.5 bg-emerald-950/50 border ${
-                        errors.confirmPassword
-                          ? "border-red-500"
-                          : "border-emerald-800/50"
-                      } placeholder-emerald-400/60 text-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
+                        errors.confirmPassword ? "border-red-500" : "border-emerald-800/50"
+                      } placeholder-emerald-400/60 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:z-10 sm:text-sm backdrop-blur-sm`}
                       placeholder="Confirm Password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
@@ -281,19 +277,6 @@ function LoginPage() {
               </button>
             </div>
           </form>
-
-          {/* Demo credentials for easy testing */}
-          {isLogin && (
-            <div className="mt-4 p-3 bg-emerald-900/50 rounded-lg border border-emerald-800/50">
-              <p className="text-xs text-emerald-300 mb-1">Demo Credentials:</p>
-              <p className="text-xs text-emerald-400">
-                Admin: admin@example.com / admin123
-              </p>
-              <p className="text-xs text-emerald-400">
-                User: user@example.com / user123
-              </p>
-            </div>
-          )}
 
           <div className="text-center text-sm text-emerald-300/80">
             By continuing, you agree to our{" "}

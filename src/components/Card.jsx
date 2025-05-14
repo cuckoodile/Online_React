@@ -92,7 +92,7 @@ export default function Card({ data: product }) {
         </div>
       </div>
       <div className="p-4">
-        <p>{imageHandler() ?? "errrorr"}</p>
+        {/* <p>{imageHandler() ?? "errrorr"}</p> */}
         <p className="text-sm text-emerald-600 mb-1">{product.category}</p>
         <h3 className="font-semibold text-emerald-900 mb-2">{product.name}</h3>
         <p className="text-emerald-700 font-medium">
