@@ -17,9 +17,10 @@ export const AuthProvider = ({ children }) => {
     setCookie("token", userData.data.token);
     setUser(userData.data);
   };
-
+  
   // Logout method
   const logout = () => {
+    console.log("Envoked logout:");
     removeCookie("token");
     setUser(null);
   };

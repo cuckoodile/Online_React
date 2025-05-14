@@ -26,6 +26,7 @@ export default function Controller() {
     error: userError,
     isLoading,
   } = useUsers(user);
+  const token = user?.token;
 
   // Product state
   const {
@@ -53,6 +54,8 @@ export default function Controller() {
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useCategory();
+  
+  const createProduct = useCreateProduct();
 
   useEffect(() => {
     if (!productLoading && products) {
@@ -66,13 +69,38 @@ export default function Controller() {
       setFilteredProducts([]);
     }
   }, [searchTerm, products, productLoading]);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentProduct({
-      ...currentProduct,
-      [name]: name === "newSpecification" ? value : currentProduct[name],
-    });
+
+    if (name.startsWith("specificationKey") || name.startsWith("specificationValue")) {
+      const index = parseInt(name.split("_")[1], 10);
+      const updatedSpecifications = [...currentProduct.specifications];
+
+      if (name.startsWith("specificationKey")) {
+        updatedSpecifications[index] = {
+          ...updatedSpecifications[index],
+          key: value,
+        };
+      } else if (name.startsWith("specificationValue")) {
+        updatedSpecifications[index] = {
+          ...updatedSpecifications[index],
+          value: value,
+        };
+      }
+
+      setCurrentProduct({
+        ...currentProduct,
+        specifications: updatedSpecifications,
+      });
+    } else {
+      setCurrentProduct({
+        ...currentProduct,
+        [name]: value,
+      });
+    }
   };
+
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -92,18 +120,25 @@ export default function Controller() {
       description: "",
       price: 0,
       category_id: 0,
-      specifications:[],
+      specifications: [],
       product_image: [],
     });
     setIsModalOpen(true);
-    useCreateProduct(currentProduct);
   };
 
   const updateProduct = useUpdateProduct();
 
   const editProduct = (product) => {
     setIsEditing(true);
-    setCurrentProduct(product);
+    const mappedSpecifications = product.product_specifications?.map((spec) => {
+      const details = JSON.parse(spec.details || "{}");
+      return Object.entries(details).map(([key, value]) => ({ key, value }));
+    }).flat() || [];
+
+    setCurrentProduct({
+      ...product,
+      specifications: mappedSpecifications,
+    });
     setIsModalOpen(true);
   };
 
@@ -116,7 +151,8 @@ export default function Controller() {
   const saveProduct = (e) => {
     e.preventDefault();
 
-    console.log("Attempt add prod. ", currentProduct);
+    console.log("Attempting to save product:", currentProduct);
+
     if (
       !currentProduct.name ||
       !currentProduct.price ||
@@ -128,18 +164,51 @@ export default function Controller() {
       return;
     }
 
-    const token = user?.token;
+
+    if (!token) {
+      alert("Unauthorized: Please log in again.");
+      return;
+    }
 
     if (isEditing) {
+      if (!currentProduct.id) {
+        console.error("Error: Product ID is undefined.");
+        alert("Error: Unable to update product. Product ID is missing.");
+        return;
+      }
+
+      if (!token) {
+        console.error("Error: Authorization token is missing.");
+        alert("Unauthorized: Please log in again.");
+        return;
+      }
+
+      const transformedProduct = {
+        ...currentProduct,
+        product_specifications: [
+          {
+            details: JSON.stringify(
+              currentProduct.specifications.reduce((acc, spec) => {
+                acc[spec.key] = spec.value;
+                return acc;
+              }, {})
+            ),
+          },
+        ],
+      };
+
+      console.log("Updating product with ID:", currentProduct.id);
+      console.log("Authorization token:", token);
+
       updateProduct.mutate(
         {
           id: currentProduct.id,
-          data: currentProduct,
+          data: transformedProduct,
           headers: { Authorization: `Bearer ${token}` },
         },
         {
           onSuccess: (data) => {
-            console.log("Product updated:", data);
+            console.log("Product updated successfully:", data);
           },
           onError: (error) => {
             console.error("Error updating product:", error);
@@ -147,24 +216,54 @@ export default function Controller() {
         }
       );
     } else {
-      useCreateProduct({
-        data: currentProduct,
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (!token) {
+        console.error("Error: Authorization token is missing.");
+        alert("Unauthorized: Please log in again.");
+        return;
+      }
+
+      const transformedProduct = {
+        ...currentProduct,
+        product_specifications: [
+          {
+            details: JSON.stringify(
+              currentProduct.specifications.reduce((acc, spec) => {
+                acc[spec.key] = spec.value;
+                return acc;
+              }, {})
+            ),
+          },
+        ],
+      };
+
+      console.log("Creating product with data:", transformedProduct);
+      console.log("Authorization token:", token);
+
+      createProduct.mutate(
+        {
+          data: transformedProduct,
+          headers: { Authorization: `Bearer ${token}` },
+        },
+        {
+          onSuccess: (data) => {
+            console.log("Product created successfully:", data);
+          },
+          onError: (error) => {
+            console.error("Error creating product:", error);
+          },
+        }
+      );
     }
 
     setIsModalOpen(false);
   };
 
   const saveSpecification = () => {
-    if (currentProduct.newSpecification) {
-      setCurrentProduct({
-        ...currentProduct,
-        specifications: [...(currentProduct.specifications || []), currentProduct.newSpecification],
-        newSpecification: "",
-      });
-      setIsAddingSpec(false);
-    }
+    setCurrentProduct({
+      ...currentProduct,
+      specifications: [...currentProduct.specifications, { key: "", value: "" }],
+    });
+    setIsAddingSpec(true);
   };
 
   if (productLoading || categoriesLoading) {
@@ -400,48 +499,36 @@ export default function Controller() {
                       Specifications
                     </label>
 
-                    {/* Map the currentProduct.specification here */}
                     {currentProduct.specifications?.map((spec, index) => (
-                      <div
-                        key={index}
-                        className="text-sm text-emerald-900 mb-2"
-                      >
-                        {spec}
+                      <div key={index} className="flex items-center space-x-2 mb-2">
+                        <input
+                          type="text"
+                          name={`specificationKey_${index}`}
+                          value={spec.key || ""}
+                          onChange={handleInputChange}
+                          placeholder="Key"
+                          className="w-1/2 p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <input
+                          type="text"
+                          name={`specificationValue_${index}`}
+                          value={spec.value || ""}
+                          onChange={handleInputChange}
+                          placeholder="Value"
+                          className="w-1/2 p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
                       </div>
                     ))}
 
-                    {isAddingSpec ? (
-                      <>
-                        <input
-                          type="text"
-                          name="newSpecification"
-                          value={currentProduct.newSpecification || ""}
-                          onChange={handleInputChange}
-                          className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        />
-                        <div className="flex space-x-2 mt-2">
-                          <button
-                            onClick={saveSpecification}
-                            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setIsAddingSpec(false)}
-                            className="px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => setIsAddingSpec(true)}
-                        className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      >
-                        Add Specification
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        saveSpecification();
+                      }}
+                      className="w-full p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      Add Specification
+                    </button>
                   </div>
 
                   <div>

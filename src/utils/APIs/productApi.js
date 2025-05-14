@@ -35,9 +35,14 @@ export const fetchProductById = async (id) => {
 };
 
 
-export const createProduct = async (productData) => {
+export const createProduct = async (productData,token) => {
   try {
-    const response = await api.post("/api/products", productData);
+    const response = await api.post("/api/products", productData,{
+      headers:{
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      }
+    });
     console.log("Product created:", response.data);
     return response.data.data;
   } catch (error) {
@@ -47,9 +52,14 @@ export const createProduct = async (productData) => {
 };
 
 
-export const updateProduct = async (id, updatedData) => {
+export const updateProduct = async (id, updatedData,token) => {
   try {
-    const response = await api.patch(`/api/products/${id}`, updatedData);
+    const response = await api.patch(`/api/products/${id}`, updatedData, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     console.log("Product updated:", response.data);
     return response.data;
   } catch (error) {

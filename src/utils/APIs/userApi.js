@@ -20,6 +20,21 @@ export const logInAPI = async (data) => {
   }
 };
 
+export const logOutAPI = async (token) => {
+  try{
+    const response = await api.post("/api/logout", null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("User logged out: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Logout Error: ", error);
+    throw new Error("Failed to logout");
+  }
+  }
+
 export const checkUserAPI = async (token) => {
   try {
     const response = await api.get("/api/user", {

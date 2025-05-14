@@ -15,9 +15,11 @@ import { Link } from "react-router-dom";
 import { useUsers } from "@/utils/hooks/userUsersHooks";
 import withAuth from "@/components/higher-order-component/withAuth";
 import { AuthContext } from "../utils/contexts/AuthContext";
+import { useLogout } from "@/utils/hooks/useAuth";
 
 function Profilepage() {
   const { user, setUser, logout } = useContext(AuthContext);
+  const logoutMutation = useLogout();
 
   // Profile state
   const {
@@ -274,9 +276,13 @@ function Profilepage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    logout();
-                    // Navigate to the login page
-                    window.location.href = "/login";
+                    logoutMutation.mutate(user.token, {
+                      OnSuccess: () => {
+                        console.log("Logout successful");
+                        logout();
+                        // window.location.href = "/login";
+                      }
+                    });
                   }}
                   className="px-6 py-3 border-2 border-red-500 text-red-500 
                                     rounded-lg font-medium hover:bg-red-50

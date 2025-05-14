@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trash2,
@@ -27,17 +27,16 @@ function Cartpage() {
 
   const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
+  const filteredCartItems = useMemo(() => {
     if (initialCartItems?.length > 0) {
-      const filteredItems = initialCartItems.filter(
-        (item) => item.user_id === user?.id
-      );
-      setCartItems(filteredItems);
-    } else {
-      console.warn("Cart data is undefined or empty.");
-      setCartItems([]);
+      return initialCartItems.filter((item) => item.user_id === user?.id);
     }
-  }, [initialCartItems, user?.id]);
+    return [];
+  }, [initialCartItems, user]);
+
+  useEffect(() => {
+    setCartItems(filteredCartItems);
+  }, [filteredCartItems]);
 
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>

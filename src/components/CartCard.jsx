@@ -14,7 +14,7 @@ export default function CartCard({ item, onUpdateQuantity }) {
         id,
         updatedData: { quantity },
       });
-      onUpdateQuantity(id, quantity); // Notify parent component
+      onUpdateQuantity(id, quantity);
     }, 800),
     [onUpdateQuantity]
   );
