@@ -191,8 +191,7 @@ function Profilepage() {
   );
 
   console.log("Profile Data:", profile);
-  console.log("Profile Data:", profile.data[0].address);
-  console.log("Profile Address:", profile.data[0].address);
+  console.log("Profile Address:", profile.data[user?.id + 1].address);
 
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
@@ -276,13 +275,8 @@ function Profilepage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    logoutMutation.mutate(user.token, {
-                      OnSuccess: () => {
-                        console.log("Logout successful");
-                        logout();
-                        // window.location.href = "/login";
-                      }
-                    });
+                    logout(); 
+                    window.location.href = "/login";
                   }}
                   className="px-6 py-3 border-2 border-red-500 text-red-500 
                                     rounded-lg font-medium hover:bg-red-50
