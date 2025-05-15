@@ -41,9 +41,13 @@ export const fetchCartItemById = async (id) => {
   }
 };
 
-export const createCartItem = async (cartItemData) => {
+export const createCartItem = async (cartItemData,token) => {
   try {
-    const response = await api.post("/api/carts", cartItemData);
+    const response = await api.post("/api/carts", cartItemData,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     console.log("Cart item created:", response.data);
     return response.data;
   } catch (error) {
@@ -52,9 +56,13 @@ export const createCartItem = async (cartItemData) => {
   }
 };
 
-export const updateCartItem = async (id, updatedData) => {
+export const updateCartItem = async (id, updatedData, token) => {
   try {
-    const response = await api.patch(`/api/carts/${id}`, updatedData);
+    const response = await api.patch(`/api/carts/${id}`, updatedData,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     console.log("Cart item updated:", response.data);
     return response.data;
   } catch (error) {

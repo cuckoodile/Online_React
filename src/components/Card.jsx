@@ -11,6 +11,7 @@ export default function Card({ data: product }) {
   const addCartItem = useAddCartItem();
   
   const { user } = useContext(AuthContext);
+  const token = user?.token;
   const {
     data: userData,
     error: userError,
@@ -33,7 +34,11 @@ export default function Card({ data: product }) {
       const user_id = userData.data[0].id; 
       const payload = { product_id: product.id, quantity: 1, user_id };
       console.log("Payload being sent to backend:", payload);
-      addCartItem.mutate(payload, {
+      console.log("Token being sent to backend:", token);
+      addCartItem.mutate({
+        data:payload,
+        token: token,
+      },{
         onError: (error) => {
           console.error("Error adding item to cart:", error.response?.data || error.message);
         },

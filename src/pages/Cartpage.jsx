@@ -185,6 +185,7 @@ function Cartpage() {
                         key={item.id}
                         item={item}
                         onUpdateQuantity={updateItemQuantity}
+                        token={user?.token}
                       />
                     ))}
                 </AnimatePresence>

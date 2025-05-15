@@ -8,7 +8,7 @@ export const useTransactions = () => {
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createTransaction,
+    mutationFn:({data,token})=> createTransaction ({ ...data, token }),
     onSuccess: () => {
       queryClient.invalidateQueries(["transactions"]);
     },

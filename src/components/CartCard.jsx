@@ -1,22 +1,24 @@
 import React, { use, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
-import { useUpdateCartItem } from "@/utils/hooks/useCartsHooks";
+import { useUpdateCartItem, useDeleteCartItem } from "@/utils/hooks/useCartsHooks";
 import debounce from "lodash.debounce";
 
-export default function CartCard({ item, onUpdateQuantity }) {
+export default function CartCard({ item, onUpdateQuantity, token }) {
   const [localQuantity, setLocalQuantity] = useState(0);
   const updateCartItemMutation = useUpdateCartItem();
+  const deleteCartItemMutation = useDeleteCartItem();
 
   const debouncedUpdate = useCallback(
     debounce((id, quantity) => {
       updateCartItemMutation.mutate({
         id,
-        updatedData: { quantity },
+        data: {quantity},
+        token,
       });
-      onUpdateQuantity(id, quantity);
+      onUpdateQuantity(id, quantity,token);
     }, 800),
-    [onUpdateQuantity]
+    [onUpdateQuantity, token]
   );
 
   const updateQuantity = (id, change) => {
@@ -30,7 +32,10 @@ export default function CartCard({ item, onUpdateQuantity }) {
   }, [item.quantity]);
 
   const removeItem = (id) => {
-    console.log(`Remove item with id: ${id}`);
+    deleteCartItemMutation.mutate({
+      id,
+      token,
+    });
   };
 
   return (

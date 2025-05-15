@@ -25,7 +25,7 @@ export const useCartItemsById = (id) => {
 export const useAddCartItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ data, token }) => createCartItem({ ...data, token }),
+    mutationFn: ({ data, token }) => createCartItem(data, token),
     onSuccess: () => {
       queryClient.invalidateQueries(["carts"]);
     },
@@ -35,7 +35,7 @@ export const useAddCartItem = () => {
 export const useUpdateCartItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, updatedData, token }) => updateCartItem(id, { ...updatedData, token }),
+    mutationFn: ({ id, data, token }) => updateCartItem(id, data , token),
     onSuccess: () => {
       queryClient.invalidateQueries(["carts"]);
     },
