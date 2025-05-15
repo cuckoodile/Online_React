@@ -180,153 +180,159 @@ export default function Shipping() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {orders.filter(order => filterStatus === 'all' || order.status === filterStatus).length === 0 ? (
-              <div className="col-span-full p-8 text-center bg-white rounded-xl shadow-sm">
-                <Package className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-emerald-900 mb-2">No orders found</h3>
-                <p className="text-gray-500">No orders match the selected filter.</p>
-                <button
-                  onClick={() => setFilterStatus('all')}
-                  className="mt-4 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-200 transition-colors"
-                  aria-label="View all orders"
-                >
-                  View all orders
-                </button>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8">
+            {/* Order List */}
+            <div className="space-y-4">
+              {orders.filter(order => filterStatus === 'all' || order.status === filterStatus).length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-xl shadow-sm">
+                  <Package className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-emerald-900 mb-2">No orders found</h3>
+                  <p className="text-gray-500">No orders match the selected filter.</p>
+                  <button
+                    onClick={() => setFilterStatus('all')}
+                    className="mt-4 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-200 transition-colors"
+                    aria-label="View all orders"
+                  >
+                    View all orders
+                  </button>
+                </div>
+              ) : (
+                orders.filter(order => filterStatus === 'all' || order.status === filterStatus).map((order) => (
+                  <motion.button
+                    key={order.id}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedOrder(orders.findIndex(o => o.id === order.id))}
+                    className={`p-5 rounded-xl border-2 transition-all flex flex-col gap-3 w-full ${
+                      selectedOrder === orders.findIndex(o => o.id === order.id) 
+                        ? 'border-emerald-500 bg-emerald-50 shadow-md' 
+                        : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'
+                    }`}
+                    aria-label={`Select order ${order.id}`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-lg text-emerald-900">Order #{order.id}</p>
+                        <p className="text-sm text-gray-500">{order.date}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusOptions.find(opt => opt.value === order.status)?.color}`}>
+                        {statusOptions.find(opt => opt.value === order.status)?.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <img src={order.items[0].image} alt={order.items[0].name} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-emerald-900 truncate">{order.items[0].name}</h4>
+                        {order.items.length > 1 && <p className="text-xs text-gray-500">+{order.items.length - 1} more items</p>}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                      <div className="text-sm">
+                        <p className="text-gray-600">{order.paymentMethod}</p>
+                        <p className="text-gray-500">{order.shippingAddress.city}</p>
+                      </div>
+                      <p className="text-lg font-bold text-emerald-900">₱{order.total.toLocaleString()}</p>
+                    </div>
+                  </motion.button>
+                ))
+              )}
+            </div>
+
+            {/* Order Details */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden h-fit sticky top-8"
+              role="region"
+              aria-labelledby="order-details"
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-emerald-900 mb-4">Order Details</h2>
+                <div className="space-y-6">
+                  {/* Order Status Timeline */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-emerald-900">Order Status</h3>
+                    <div className="relative">
+                      <div className="absolute h-1 bg-gray-200 rounded-full w-full top-1/2 transform -translate-y-1/2"></div>
+                      <div className="relative grid grid-cols-4 gap-4">
+                        {['pending', 'confirmed', 'shipped', 'delivered'].map((step, index) => {
+                          const isComplete = isStepComplete(step);
+                          const isCurrent = orders[selectedOrder].status === step;
+                          return (
+                            <div key={step} className="flex flex-col items-center gap-2 z-10">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                isComplete ? 'bg-emerald-500' : 'bg-gray-200'
+                              }`}>
+                                {getStatusIcon(step)}
+                              </div>
+                              <span className={`text-sm font-medium text-center ${
+                                isComplete ? 'text-emerald-900' : 'text-gray-500'
+                              }`}>
+                                {statusOptions.find(opt => opt.value === step)?.label}
+                              </span>
+                              {isCurrent && (
+                                <div className="absolute -bottom-6 text-xs font-medium text-emerald-700">
+                                  Current Status
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shipping Information */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-emerald-900">Shipping Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-emerald-500" />
+                        <p>{orders[selectedOrder].shippingAddress.street}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-emerald-500" />
+                        <p>{orders[selectedOrder].shippingAddress.city}, {orders[selectedOrder].shippingAddress.postalCode}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-emerald-500" />
+                        <p>{orders[selectedOrder].shippingAddress.country}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Information */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-emerald-900">Payment Information</h3>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CreditCard className="w-4 h-4 text-emerald-500" />
+                      <p>{orders[selectedOrder].paymentMethod}</p>
+                    </div>
+                  </div>
+
+                  {/* Order Summary */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-emerald-900">Order Summary</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <p>Subtotal</p>
+                        <p>₱{orders[selectedOrder].subtotal.toLocaleString()}</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Shipping</p>
+                        <p>₱{orders[selectedOrder].shipping.toLocaleString()}</p>
+                      </div>
+                      <div className="flex justify-between font-medium">
+                        <p>Total</p>
+                        <p>₱{orders[selectedOrder].total.toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              orders.filter(order => filterStatus === 'all' || order.status === filterStatus).map((order) => (
-                <motion.button
-                  key={order.id}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedOrder(orders.findIndex(o => o.id === order.id))}
-                  className={`p-5 rounded-xl border-2 transition-all flex flex-col gap-3 ${selectedOrder === orders.findIndex(o => o.id === order.id) ? 'border-emerald-500 bg-emerald-50 shadow-md' : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'}`}
-                  aria-label={`Select order ${order.id}`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold text-lg text-emerald-900">Order #{order.id}</p>
-                      <p className="text-sm text-gray-500">{order.date}</p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusOptions.find(opt => opt.value === order.status)?.color}`}>
-                      {statusOptions.find(opt => opt.value === order.status)?.label}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <img src={order.items[0].image} alt={order.items[0].name} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-emerald-900 truncate">{order.items[0].name}</h4>
-                      {order.items.length > 1 && <p className="text-xs text-gray-500">+{order.items.length - 1} more items</p>}
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                    <div className="text-sm">
-                      <p className="text-gray-600">{order.paymentMethod}</p>
-                      <p className="text-gray-500">{order.shippingAddress.city}</p>
-                    </div>
-                    <p className="text-lg font-bold text-emerald-900">₱{order.total.toLocaleString()}</p>
-                  </div>
-                </motion.button>
-              ))
-            )}
+            </motion.div>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden"
-            role="region"
-            aria-labelledby="order-details"
-          >
-            <div className="bg-gradient-to-r from-emerald-700 to-teal-700 px-6 py-5">
-              <div className="flex flex-col md:flex-row justify-between items-center">
-                <div className="text-white">
-                  <h2 id="order-details" className="text-xl md:text-2xl font-semibold mb-2">Order #{orders[selectedOrder].id}</h2>
-                  <div className="flex items-center">
-                    <Calendar size={18} className="mr-2" />
-                    <p className="text-emerald-100">Placed on {orders[selectedOrder].date}</p>
-                  </div>
-                </div>
-                <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${statusOptions.find(opt => opt.value === orders[selectedOrder].status)?.color}`}>
-                  {statusOptions.find(opt => opt.value === orders[selectedOrder].status)?.label}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-emerald-100">
-              {[
-                { icon: <Package className="h-6 w-6 text-emerald-600" />, label: "Items", value: `${orders[selectedOrder].items.length} Products` },
-                { icon: <MapPin className="h-6 w-6 text-emerald-600" />, label: "Shipping To", value: orders[selectedOrder].shippingAddress.city },
-                { icon: <CreditCard className="h-6 w-6 text-emerald-600" />, label: "Payment", value: `₱${orders[selectedOrder].total.toLocaleString()}` }
-              ].map((item, i) => (
-                <div key={i} className="p-5 flex items-start">
-                  <div className="bg-emerald-100 p-2 rounded-full mr-4">{item.icon}</div>
-                  <div>
-                    <p className="text-sm font-medium text-emerald-600">{item.label}</p>
-                    <p className="text-lg font-semibold text-emerald-900">{item.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-6 border-t border-emerald-100">
-              <h3 className="text-xl font-semibold text-emerald-900 mb-6">Order Progress</h3>
-              <div className="relative">
-                <div className="absolute left-4 top-0 h-full w-1 bg-emerald-100 rounded-full"></div>
-                {statusOptions.slice(0, 4).map((status) => (
-                  <div key={status.value} className="relative pl-14 pb-8" role="listitem">
-                    <div className={`absolute left-0 top-0 w-8 h-8 rounded-full flex items-center justify-center ${isStepComplete(status.value) ? 'bg-emerald-100 border-2 border-emerald-500' : 'bg-white border-2 border-emerald-100'}`}>
-                      {getStatusIcon(status.value)}
-                    </div>
-                    <div>
-                      <span className={`text-base font-medium ${isStepComplete(status.value) ? 'text-emerald-700' : 'text-gray-400'}`}>{status.label}</span>
-                      <p className="text-sm text-gray-500 mt-1">{status.sample}</p>
-                      {status.value === orders[selectedOrder].status && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          {orders[selectedOrder].status === 'shipped' && orders[selectedOrder].trackingNumber && `Tracking #: ${orders[selectedOrder].trackingNumber}`}
-                          {orders[selectedOrder].status === 'delivered' && orders[selectedOrder].estimatedDelivery && ` | Delivered on ${orders[selectedOrder].estimatedDelivery}`}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-emerald-100">
-              <h3 className="text-xl font-semibold text-emerald-900 mb-6">Order Items</h3>
-              <div className="space-y-4">
-                {orders[selectedOrder].items.map((item) => (
-                  <div key={item.id} className="flex items-center p-4 bg-white rounded-lg border border-emerald-100 hover:shadow-sm transition-shadow">
-                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg mr-5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="text-lg font-medium text-emerald-900">{item.name}</h4>
-                      <p className="text-sm text-emerald-600">₱{item.price.toLocaleString()} × {item.quantity}</p>
-                    </div>
-                    <div className="text-lg font-bold text-emerald-900">₱{(item.price * item.quantity).toLocaleString()}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-emerald-100 bg-emerald-50">
-              <h3 className="text-xl font-semibold text-emerald-900 mb-6">Order Summary</h3>
-              <div className="space-y-3">
-                {[
-                  { label: "Subtotal", value: `₱${orders[selectedOrder].subtotal.toLocaleString()}` },
-                  { label: "Shipping", value: `₱${orders[selectedOrder].shipping.toLocaleString()}` },
-                  { label: "Total", value: `₱${orders[selectedOrder].total.toLocaleString()}`, bold: true }
-                ].map((item, i) => (
-                  <div key={i} className={`flex justify-between ${i === 2 ? 'pt-3 border-t borderecção-emerald-100' : ''}`}>
-                    <span className={`text-emerald-600 ${item.bold ? 'font-medium' : ''}`}>{item.label}</span>
-                    <span className={`text-emerald-900 ${item.bold ? 'font-bold text-lg' : ''}`}>{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
     </div>
