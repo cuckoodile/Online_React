@@ -35,13 +35,12 @@ export const fetchProductById = async (id) => {
 };
 
 
-export const createProduct = async (productData,token) => {
+export const createProduct = async (productData, token) => {
   try {
-    const response = await api.post("/api/products", productData,{
-      headers:{
+    const response = await api.post("/api/products", productData, {
+      headers: {
         "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      }
+      },
     });
     console.log("Product created:", response.data);
     return response.data.data;
@@ -52,12 +51,12 @@ export const createProduct = async (productData,token) => {
 };
 
 
-export const updateProduct = async (id, updatedData,token) => {
+export const updateProduct = async (id, updatedData, token) => {
   try {
     const response = await api.patch(`/api/products/${id}`, updatedData, {
       headers: {
         "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
+        // Let axios set Content-Type for FormData
       },
     });
     console.log("Product updated:", response.data);

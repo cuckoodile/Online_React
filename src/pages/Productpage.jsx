@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiMinus, FiPlus, FiHeart, FiShare2, FiStar, FiShoppingCart, FiX, FiMessageSquare, FiImage } from 'react-icons/fi';
 import { useProductsById, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/utils/hooks/useProductsHooks';
 import { useLocation } from 'react-router-dom';
+import { useAddCartItem } from '@/utils/hooks/useCartsHooks';
+import { AuthContext } from '@/utils/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Productpage() {
   const location = useLocation();
@@ -13,6 +16,10 @@ export default function Productpage() {
   const createReview = useCreateProduct();
   const updateReview = useUpdateProduct();
   const deleteReview = useDeleteProduct();
+
+  const { user } = React.useContext(AuthContext);
+  const addCartItem = useAddCartItem();
+  const navigate = useNavigate();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -74,6 +81,40 @@ export default function Productpage() {
       await deleteReview.mutateAsync(reviewId);
     } catch (err) {
       console.error('Error deleting review:', err);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      alert('Please log in to add items to your cart.');
+      return;
+    }
+    try {
+      await addCartItem.mutateAsync({
+        data: { product_id: product.id, quantity, user_id: user.id },
+        token: user.token,
+      });
+      alert('Added to cart!');
+    } catch (err) {
+      alert('Failed to add to cart.');
+      console.error(err);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      alert('Please log in to buy products.');
+      return;
+    }
+    try {
+      await addCartItem.mutateAsync({
+        data: { product_id: product.id, quantity, user_id: user.id },
+        token: user.token,
+      });
+      navigate('/checkout', { state: { buyNow: true, product: { ...product, quantity } } });
+    } catch (err) {
+      alert('Failed to proceed to checkout.');
+      console.error(err);
     }
   };
 
@@ -189,12 +230,14 @@ export default function Productpage() {
                   <div className="flex gap-4">
                     <button
                       className="flex-1 flex items-center justify-center gap-2 p-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-lg transition-all duration-200 hover:shadow-lg"
+                      onClick={handleAddToCart}
                     >
                       <FiShoppingCart className="text-xl" />
                       Add to Cart
                     </button>
                     <button
                       className="flex-1 flex items-center justify-center gap-2 p-4 rounded-xl bg-white border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold text-lg transition-all duration-200 hover:shadow-lg"
+                      onClick={handleBuyNow}
                     >
                       Buy Now
                     </button>

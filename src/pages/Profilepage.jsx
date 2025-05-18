@@ -190,8 +190,8 @@ function Profilepage() {
     </div>
   );
 
-  console.log("Profile Data:", profile);
-  console.log("Profile Address:", profile.data[user?.id + 1].address);
+  console.log("Profile Data:", profile.data[user?.id - 1]);
+  console.log("Profile Address:", profile.data[user?.id + 1].profile.address);
 
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
@@ -336,7 +336,7 @@ function Profilepage() {
                 {profile.data.length > 0 && (
                   <div className="space-y-4">
                     {/* Personal Information */}
-                    {Object.entries(profile.data[0]).map(([key, value]) => {
+                    {Object.entries(profile.data[user?.id - 1]).map(([key, value]) => {
                       if (key === "address") {
                         return (
                           <div
@@ -395,12 +395,12 @@ function Profilepage() {
             {/* Shipping Address */}
             <ProfileSection title="Shipping Address">
               <div className="space-y-4">
-                {profile.data.length > 0 && profile.data[0].address && (
+                {profile.data.length > 0 && profile.data[user?.id - 1].address && (
                   <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                     <p className="text-sm text-emerald-600 mb-1">
                       Shipping Address
                     </p>
-                    {Object.entries(profile.data[0].address)
+                    {Object.entries(profile.data[user?.id - 1].address)
                       .filter(
                         ([key]) =>
                           ![
@@ -423,8 +423,6 @@ function Profilepage() {
                 )}
               </div>
             </ProfileSection>
-
-            {/* Recent Activity - Mobile Only */}
             <div className="lg:hidden">
               <ProfileSection title="Recent Activity">
                 <div className="space-y-4">

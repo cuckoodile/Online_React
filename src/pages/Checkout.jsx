@@ -4,8 +4,10 @@ import { FiCreditCard, FiTruck, FiCheck, FiChevronRight, FiDollarSign, FiSmartph
 import { AuthContext } from '@/utils/contexts/AuthContext';
 import { useUsers } from '@/utils/hooks/userUsersHooks';
 import { useCreateTransaction } from '@/utils/hooks/useTransactionsHooks';
+import { useLocation } from 'react-router-dom';
 
 export default function Checkout() {
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [formData, setFormData] = useState({
@@ -14,9 +16,17 @@ export default function Checkout() {
     lastName: '',
     email: '',
     phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
+    // Address fields required by backend
+    region: '',
+    province: '',
+    district: '',
+    city_municipality: '',
+    barangay: '',
+    subdivision_village: '',
+    street: '',
+    lot_number: '',
+    block_number: '',
+    zip_code: '',
     // Payment information
     cardName: '',
     cardNumber: '',
@@ -27,24 +37,32 @@ export default function Checkout() {
     // Cash on Delivery
     notes: '',
   });
-  
-  // Mock cart items
-  const cartItems = [
-    {
-      id: 1,
-      name: "Natural Face Serum",
-      price: 1299,
-      quantity: 1,
-      image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg"
-    },
-    {
-      id: 2,
-      name: "Organic Shampoo Bar",
-      price: 349,
-      quantity: 2,
-      image: "https://i.pinimg.com/736x/51/75/23/517523705c82707aff56cd8efd08a630.jpg"
+  const buyNowProduct = location.state?.buyNow && location.state?.product;
+
+  const cartItems = React.useMemo(() => {
+    if (location.state?.cartItems) {
+      return location.state.cartItems.map(item => ({
+        id: item.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: Array.isArray(item.product.product_image)
+          ? item.product.product_image[0]
+          : (item.product.product_image ? JSON.parse(item.product.product_image)[0] : ''),
+      }));
+    } else if (buyNowProduct) {
+      return [{
+        id: buyNowProduct.id,
+        name: buyNowProduct.name,
+        price: parseFloat(buyNowProduct.price),
+        quantity: buyNowProduct.quantity || 1,
+        image: Array.isArray(buyNowProduct.product_image)
+          ? buyNowProduct.product_image[0]
+          : (buyNowProduct.product_image ? JSON.parse(buyNowProduct.product_image)[0] : ''),
+      }];
     }
-  ];
+    return [];
+  }, [location.state, buyNowProduct]);
   
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = 150;
@@ -62,21 +80,36 @@ export default function Checkout() {
   const { data: userData, error: userError, isLoading: userLoading } = useUsers(user);
   const createTransaction = useCreateTransaction();
   
-  console.log('User Data:', userData);
+  console.log('User Data:', userData.data[user?.id - 1].profile);
   useEffect(() => {
     if (userData && userData.profile) {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        firstName: userData.profile.first_name || '',
-        lastName: userData.profile.last_name || '',
-        email: userData.email || '',
-        phone: userData.profile.contact_number || '',
-        address: userData.profile.address || '',
-        city: userData.profile.address.city || '',
-        postalCode: userData.profile.address.postalCode || '',
+        firstName: userData.data[user?.id -1 ].profile.first_name || '',
+        lastName: userData.data[user?.id -1 ].profile.last_name || '',
+        email: userData.data[user?.id -1 ].email || '',
+        phone: userData.data[user?.id -1 ].profile.contact_number || '',
+        region: userData.data[user?.id -1 ].profile.address?.region || '',
+        province: userData.data[user?.id -1 ].profile.address?.province || '',
+        district: userData.data[user?.id -1 ].profile.address?.district || '',
+        city_municipality: userData.data[user?.id -1 ].profile.address?.city_municipality || '',
+        barangay: userData.data[user?.id -1 ].profile.address?.barangay || '',
+        subdivision_village: userData.data[user?.id -1 ].profile.address?.subdivision_village || '',
+        street: userData.data[user?.id -1 ].profile.address?.street || '',
+        lot_number: userData.data[user?.id -1 ].profile.address?.lot_number || '',
+        block_number: userData.data[user?.id -1 ].profile.address?.block_number || '',
+        zip_code: userData.data[user?.id -1 ].profile.address?.zip_code || '',
       }));
     }
   }, [userData]);
+
+  const paymentMethodMap = {
+    'credit-card': 1,
+    'gcash': 2,
+    'cod': 3
+  };
+  const typeId = 1;
+  const statusId = 1;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,23 +117,22 @@ export default function Checkout() {
       setStep(step + 1);
     } else {
       const transactionData = {
-        userId: user?.id,
-        items: cartItems,
-        shippingAddress: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
-        },
-        paymentMethod,
-        total,
+        payment_method_id: paymentMethodMap[paymentMethod],
+        type_id: typeId,
+        status_id: statusId,
+        region: formData.region,
+        province: formData.province,
+        district: formData.district,
+        city_municipality: formData.city_municipality,
+        barangay: formData.barangay,
+        subdivision_village: formData.subdivision_village || null,
+        street: formData.street || null,
+        lot_number: formData.lot_number || null,
+        block_number: formData.block_number || null,
+        zip_code: formData.zip_code,
       };
-  
       try {
-        await createTransaction.mutateAsync(transactionData);
+        await createTransaction.mutateAsync({data:transactionData,token:user?.token});
         alert('Order placed successfully!');
       } catch (error) {
         console.error('Error placing order:', error);
@@ -190,38 +222,45 @@ export default function Checkout() {
                         required
                       />
                     </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-emerald-800 mb-2 text-sm">Address*</label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Region*</label>
+                      <input type="text" name="region" value={formData.region} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                     </div>
                     <div>
-                      <label className="block text-emerald-800 mb-2 text-sm">City*</label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
+                      <label className="block text-emerald-800 mb-2 text-sm">Province*</label>
+                      <input type="text" name="province" value={formData.province} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                     </div>
                     <div>
-                      <label className="block text-emerald-800 mb-2 text-sm">Postal Code*</label>
-                      <input
-                        type="text"
-                        name="postalCode"
-                        value={formData.postalCode}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
+                      <label className="block text-emerald-800 mb-2 text-sm">District*</label>
+                      <input type="text" name="district" value={formData.district} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">City/Municipality*</label>
+                      <input type="text" name="city_municipality" value={formData.city_municipality} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Barangay*</label>
+                      <input type="text" name="barangay" value={formData.barangay} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Subdivision/Village</label>
+                      <input type="text" name="subdivision_village" value={formData.subdivision_village} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Street</label>
+                      <input type="text" name="street" value={formData.street} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Lot Number</label>
+                      <input type="text" name="lot_number" value={formData.lot_number} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Block Number</label>
+                      <input type="text" name="block_number" value={formData.block_number} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    </div>
+                    <div>
+                      <label className="block text-emerald-800 mb-2 text-sm">Zip Code*</label>
+                      <input type="text" name="zip_code" value={formData.zip_code} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                     </div>
                   </div>
                   

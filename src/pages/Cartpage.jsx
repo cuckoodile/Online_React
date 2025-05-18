@@ -277,7 +277,7 @@ function Cartpage() {
                   )}
                 </div>
 
-                <Link to="/checkout">
+                <Link to="/checkout" state={{ cartItems }}>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

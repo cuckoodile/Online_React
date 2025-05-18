@@ -26,9 +26,10 @@ export const fetchTransactionById = async (id) => {
     throw new Error("Failed to fetch transaction");
   }
 };
-export const createTransaction = async (transactionData,token) => {
+
+export const createTransaction = async ({data, token}) => {
   try {
-    const response = await api.post("/api/transactions", transactionData ,{
+    const response = await api.post("/api/transactions", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -40,6 +41,7 @@ export const createTransaction = async (transactionData,token) => {
     throw new Error("Failed to create transaction");
   }
 };
+
 export const updateTransaction = async (id, updatedData) => {
   try {
     const response = await api.put(`/api/transactions/${id}`, updatedData);
@@ -50,6 +52,7 @@ export const updateTransaction = async (id, updatedData) => {
     throw new Error("Failed to update transaction");
   }
 };
+
 export const deleteTransaction = async (id) => {
   try {
     await api.delete(`/api/transactions/${id}`);

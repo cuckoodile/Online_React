@@ -47,7 +47,9 @@ export default function Controller() {
     price: 0,
     category_id: 0,
     product_image: [],
-    specifications: ["hehe", "ngii?"],
+    specifications: [],
+    admin_id: user?.id || null,
+    stock: 1,
   });
   const {
     data: categories,
@@ -73,23 +75,20 @@ export default function Controller() {
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     if (name.startsWith("specificationKey") || name.startsWith("specificationValue")) {
-      const index = parseInt(name.split("_")[1], 10);
       const updatedSpecifications = [...currentProduct.specifications];
-
+      const index = parseInt(name.replace(/\D/g, ""), 10);
       if (name.startsWith("specificationKey")) {
         updatedSpecifications[index] = {
           ...updatedSpecifications[index],
           key: value,
         };
-      } else if (name.startsWith("specificationValue")) {
+      } else {
         updatedSpecifications[index] = {
           ...updatedSpecifications[index],
           value: value,
         };
       }
-
       setCurrentProduct({
         ...currentProduct,
         specifications: updatedSpecifications,
@@ -101,48 +100,57 @@ export default function Controller() {
       });
     }
   };
-
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+      const files = Array.from(e.target.files);
       setCurrentProduct({
         ...currentProduct,
-        product_image: file,
-        imagePreview: URL.createObjectURL(file),
+        product_image: files,
+        imagePreview: URL.createObjectURL(files[0]),
       });
     }
   };
-
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
-      admin_id: userData.data[0].id,
+      admin_id: userData?.data?.[0]?.id || null,
       name: "",
       description: "",
       price: 0,
       category_id: 0,
       specifications: [],
       product_image: [],
+      stock: 1,
     });
     setIsModalOpen(true);
   };
-
   const updateProduct = useUpdateProduct();
-
   const editProduct = (product) => {
     setIsEditing(true);
     const mappedSpecifications = product.product_specifications?.map((spec) => {
       const details = JSON.parse(spec.details || "{}");
       return Object.entries(details).map(([key, value]) => ({ key, value }));
     }).flat() || [];
-
+    let productImages = [];
+    try {
+      productImages = JSON.parse(product.product_image);
+    } catch {
+      productImages = [];
+    }
     setCurrentProduct({
-      ...product,
+      id: product.id,
+      name: product.name || "",
+      description: product.description || "",
+      price: product.price || 0,
+      category_id: product.category_id || 0,
+      product_image: productImages,
       specifications: mappedSpecifications,
+      admin_id: product.admin_id || null,
+      stock: product.stock || 1,
+      imagePreview: productImages[0] ? (typeof productImages[0] === "string" ? `/path/to/images/${productImages[0]}` : "") : "",
     });
     setIsModalOpen(true);
   };
-
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       deleteProductMutation.mutate({
@@ -154,26 +162,48 @@ export default function Controller() {
 
   const saveProduct = (e) => {
     e.preventDefault();
-
     console.log("Attempting to save product:", currentProduct);
-
     if (
       !currentProduct.name ||
       !currentProduct.price ||
       !currentProduct.category_id ||
       !currentProduct.specifications ||
-      !currentProduct.product_image
+      !currentProduct.product_image.length
     ) {
       alert("Please fill in all required fields");
       return;
     }
-
-
     if (!token) {
       alert("Unauthorized: Please log in again.");
       return;
     }
-
+    const categoryIdInt = parseInt(currentProduct.category_id, 10);
+    const validSpecs = currentProduct.specifications.filter(
+      (spec) => spec.key && spec.value
+    );
+    if (validSpecs.length < 2) {
+      alert("Please provide at least 2 specifications.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append('name', currentProduct.name);
+    formData.append('price', currentProduct.price);
+    formData.append('description', currentProduct.description);
+    formData.append('stock', currentProduct.stock);
+    formData.append('category_id', categoryIdInt);
+    const hasNewImages = currentProduct.product_image.some((file) => file instanceof File);
+    if (!isEditing || hasNewImages) {
+      currentProduct.product_image.forEach((file) => {
+        if (file instanceof File) {
+          formData.append('product_image[]', file);
+        }
+      });
+    }
+    if (!isEditing || (validSpecs.length >= 2 && validSpecs.some(spec => spec.key && spec.value))) {
+      validSpecs.forEach((spec, i) => {
+        formData.append(`product_specifications[${i}][details][${spec.key}]`, spec.value);
+      });
+    }
     if (isEditing) {
       if (!currentProduct.id) {
         console.error("Error: Product ID is undefined.");
@@ -187,24 +217,10 @@ export default function Controller() {
         return;
       }
 
-      const transformedProduct = {
-        admin_id: currentProduct.admin_id,
-        name: currentProduct.name,
-        description: currentProduct.description,
-        price: currentProduct.price.toString(),
-        category_id: currentProduct.category_id,
-        product_image: [currentProduct.product_image.name],
-        product_specifications: currentProduct.specifications.map((spec) => ({
-          details: JSON.stringify({ [spec.key]: spec.value }),
-        })),
-      };
-
-      console.log("Transformed product data:", transformedProduct);
-
       updateProduct.mutate(
         {
           id: currentProduct.id,
-          data: transformedProduct,
+          data: formData,
           token: token,
         },
         {
@@ -223,26 +239,10 @@ export default function Controller() {
         return;
       }
 
-      const transformedProduct = {
-        admin_id: currentProduct.admin_id,
-        name: currentProduct.name,
-        description: currentProduct.description,
-        price: currentProduct.price.toString(),
-        category_id: currentProduct.category_id,
-        product_image: [currentProduct.product_image.name],
-        product_specifications: currentProduct.specifications.map((spec) => ({
-          details: JSON.stringify({ [spec.key]: spec.value }),
-        })),
-      };
-
-      console.log("Creating product with data:", transformedProduct);
-      console.log("Authorization token:", token);
-      console.log("Payload being sent to the server:", JSON.stringify(transformedProduct, null, 2));
-
       createProduct.mutate(
         {
-          data: transformedProduct,
-          token:token,
+          data: formData,
+          token: token,
         },
         {
           onSuccess: (data) => {
