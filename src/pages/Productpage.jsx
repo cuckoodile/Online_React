@@ -30,7 +30,7 @@ export default function Productpage() {
     rating: 5,
     comment: ''
   });
-  console.log('Product Data:', product);
+  console.log('Product Data:', JSON.parse(product.product_image)[0]);
   console.log('Product ID:', productId);
   const productImages = product?.product_image
     ? (() => {

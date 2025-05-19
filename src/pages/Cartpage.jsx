@@ -8,13 +8,14 @@ import {
   ArrowRight,
   Heart,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCartItems } from "@/utils/hooks/useCartsHooks";
 import CartCard from "@/components/CartCard";
 import withAuth from "@/components/higher-order-component/withAuth";
 import { AuthContext } from "../utils/contexts/AuthContext";
 
 function Cartpage() {
+  const location = useLocation();
   const { user } = useContext(AuthContext);
 
   console.log("User from AuthContext:", user);
@@ -36,7 +37,7 @@ function Cartpage() {
 
   useEffect(() => {
     setCartItems(filteredCartItems);
-  }, [filteredCartItems]);
+  }, [location.key, filteredCartItems]);
 
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>
@@ -44,6 +45,10 @@ function Cartpage() {
         item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
+  };
+
+  const handleDeleteItem = (id) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const [promoCode, setPromoCode] = useState("");
@@ -186,7 +191,7 @@ function Cartpage() {
                         item={item}
                         onUpdateQuantity={updateItemQuantity}
                         token={user?.token}
-                        onDelete={(id) => setCartItems((prev) => prev.filter((i) => i.id !== id))}
+                        onDelete={handleDeleteItem}
                       />
                     ))}
                 </AnimatePresence>

@@ -229,13 +229,11 @@ export default function Allproducts() {
           >
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <Card
-                 
-              key={product.id}
+                <Card key={product.id}
                 data={{
                   id: product.id,
                   name: product.name,
-                  image: product.product_image,
+                  image: JSON.parse(product.product_image)[0],
                   price: product.price,
                 }}/>
               ))

@@ -99,7 +99,7 @@ export default function Homepage() {
                 data={{
                   id: product.id,
                   name: product.name,
-                  image: product.product_image,
+                  image: JSON.parse(product.product_image)[0],
                   price: product.price,
                 }}
               />

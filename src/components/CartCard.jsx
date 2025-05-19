@@ -38,6 +38,7 @@ export default function CartCard({ item, onUpdateQuantity, token, onDelete }) {
       onSuccess: () => {
         if (typeof onDelete === 'function') {
           onDelete(id);
+          console.log("Item removed successfully");
         }
       }
     });

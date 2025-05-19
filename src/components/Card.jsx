@@ -48,26 +48,7 @@ export default function Card({ data: product }) {
     }
   };
 
-  const imageHandler = () => {
-    try {
-      if (product.image) {
-        const parsedImages = JSON.parse(product.image);
-        if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-          return parsedImages[0];
-        }
-      }
-      if (product.product_image) {
-        const parsedProductImages = JSON.parse(product.product_image);
-        if (Array.isArray(parsedProductImages) && parsedProductImages.length > 0) {
-          return parsedProductImages[0];
-        }
-      }
-    } catch (error) {
-      console.error("Error parsing product images:", error);
-    }
-    return "default-image.jpg"; // Fallback to a default image
-  };
-
+  console.log("Product Image Parsed:", product.image);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -78,7 +59,7 @@ export default function Card({ data: product }) {
     >
       <div className="relative group">
         <img
-          src={imageHandler()}
+          src={product.image}
           alt={product.name}
           className="w-full h-48 object-cover"
         />
