@@ -124,7 +124,7 @@ function Cartpage() {
     return <div className="text-center py-16">No items in the cart</div>;
   }
 
-  console.log("Filtered Cart Items:", cartItems); // Debugging log
+  console.log("Filtered Cart Items:", cartItems); 
 
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
@@ -186,6 +186,7 @@ function Cartpage() {
                         item={item}
                         onUpdateQuantity={updateItemQuantity}
                         token={user?.token}
+                        onDelete={(id) => setCartItems((prev) => prev.filter((i) => i.id !== id))}
                       />
                     ))}
                 </AnimatePresence>
@@ -220,43 +221,6 @@ function Cartpage() {
                       </span>
                     </div>
                   )}
-                </div>
-
-                {/* Promo code section */}
-                <div className="mb-6 pb-6 border-b border-emerald-100">
-                  <label
-                    htmlFor="promo"
-                    className="block text-emerald-800 mb-2"
-                  >
-                    Promo Code
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      id="promo"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Enter code"
-                      className="flex-1 p-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    <button
-                      onClick={applyPromoCode}
-                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {promoError && (
-                    <p className="mt-2 text-red-500 text-sm">{promoError}</p>
-                  )}
-                  {promoSuccess && (
-                    <p className="mt-2 text-emerald-600 text-sm">
-                      {promoSuccess}
-                    </p>
-                  )}
-                  <p className="mt-2 text-emerald-600 text-xs">
-                    Try code: ECO20 for 20% off
-                  </p>
                 </div>
 
                 <div className="mb-6">

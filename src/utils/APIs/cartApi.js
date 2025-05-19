@@ -21,6 +21,14 @@ export const fetchCartItems = async (data) => {
     console.log("API Response (fetchCartItems):", response.data);
     return response.data.data;
   } catch (error) {
+    if (
+      error.response &&
+      error.response.status === 404 &&
+      error.response.data &&
+      error.response.data.message === "No items in the cart"
+    ) {
+      return [];
+    }
     console.error("API Error (fetchCartItems):", error);
     throw new Error("Failed to fetch cart items");
   }

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiCreditCard, FiTruck, FiCheck, FiChevronRight, FiDollarSign, FiSmartphone } from 'react-icons/fi';
 import { AuthContext } from '@/utils/contexts/AuthContext';
 import { useUsers } from '@/utils/hooks/userUsersHooks';
-import { useCreateTransaction } from '@/utils/hooks/useTransactionsHooks';
+import { useTransactions,useCreateTransaction } from '@/utils/hooks/useTransactionsHooks';
 import { useLocation } from 'react-router-dom';
 
 export default function Checkout() {
@@ -75,7 +75,7 @@ export default function Checkout() {
       [name]: value
     });
   };
-
+  
   const { user } = useContext(AuthContext);
   const { data: userData, error: userError, isLoading: userLoading } = useUsers(user);
   const createTransaction = useCreateTransaction();
@@ -102,6 +102,7 @@ export default function Checkout() {
       }));
     }
   }, [userData]);
+
 
   const paymentMethodMap = {
     'credit-card': 1,
