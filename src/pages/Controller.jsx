@@ -19,14 +19,18 @@ import {
 import { useContext } from "react";
 import { AuthContext } from "@/utils/contexts/AuthContext";
 import { useUsers } from "@/utils/hooks/userUsersHooks";
+import { useCookies } from "react-cookie";
 export default function Controller() {
   const { user } = useContext(AuthContext);
+
+  const [cookies] = useCookies();
+
   const {
     data: userData,
     error: userError,
     isLoading,
   } = useUsers(user);
-  const token = user?.token;
+  const token = cookies.token;
 
   // Product state
   const {
@@ -51,6 +55,7 @@ export default function Controller() {
     admin_id: user?.id || null,
     stock: 1,
   });
+
   const {
     data: categories,
     error: categoriesError,
@@ -63,7 +68,7 @@ export default function Controller() {
   useEffect(() => {
     if (!productLoading && products) {
       const results = products.filter((product) => {
-        console.log("fitered product:", product);
+        // console.log("fitered product:", product);
         const categoryName = product.category?.name || "All";
         return product.name || categoryName ;
       });
@@ -101,19 +106,47 @@ export default function Controller() {
     }
   };
   const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const files = Array.from(e.target.files);
+    if (e.target.files && e.target.files.length > 0) {
+      let files = Array.from(e.target.files);
+      // Limit to 4 images
+      files = files.slice(0, 4);
+      // Merge with existing images if editing
+      let newFiles = files;
+      let previews = files.map((file) => URL.createObjectURL(file));
+      if (currentProduct.product_image && Array.isArray(currentProduct.product_image)) {
+        // Filter out any existing File objects (for editing)
+        const existingFiles = currentProduct.product_image.filter(f => !(f instanceof File));
+        newFiles = [...existingFiles, ...files].slice(0, 4);
+        previews = newFiles.map((file) =>
+          file instanceof File ? URL.createObjectURL(file) : (typeof file === 'string' ? `/path/to/images/${file}` : '')
+        );
+      }
+      
       setCurrentProduct({
         ...currentProduct,
-        product_image: files,
-        imagePreview: URL.createObjectURL(files[0]),
+        product_image: newFiles,
+        imagePreview: previews,
       });
     }
   };
+
+  const handleRemoveImage = (index) => {
+    const updatedImages = [...currentProduct.product_image];
+    updatedImages.splice(index, 1);
+    const updatedPreviews = [...currentProduct.imagePreview];
+    updatedPreviews.splice(index, 1);
+    setCurrentProduct({
+      ...currentProduct,
+      // product_image: updatedImages,
+      product_image: updatedPreviews,
+      imagePreview: updatedPreviews,
+    });
+  };
+
   const addProduct = () => {
     setIsEditing(false);
     setCurrentProduct({
-      admin_id: userData?.data?.[0]?.id || null,
+      admin_id: user.id || 1,
       name: "",
       description: "",
       price: 0,
@@ -124,7 +157,9 @@ export default function Controller() {
     });
     setIsModalOpen(true);
   };
+
   const updateProduct = useUpdateProduct();
+
   const editProduct = (product) => {
     setIsEditing(true);
     const mappedSpecifications = product.product_specifications?.map((spec) => {
@@ -147,10 +182,11 @@ export default function Controller() {
       specifications: mappedSpecifications,
       admin_id: product.admin_id || null,
       stock: product.stock || 1,
-      imagePreview: productImages[0] ? (typeof productImages[0] === "string" ? `/path/to/images/${productImages[0]}` : "") : "",
+      product_image: productImages[0] ? (typeof productImages[0] === "string" ? `/path/to/images/${productImages[0]}` : "") : "",
     });
     setIsModalOpen(true);
   };
+
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       deleteProductMutation.mutate({
@@ -162,7 +198,8 @@ export default function Controller() {
 
   const saveProduct = (e) => {
     e.preventDefault();
-    console.log("Attempting to save product:", currentProduct);
+    console.log("Attempting to save product:", currentProduct, "Token: ", token);
+
     if (
       !currentProduct.name ||
       !currentProduct.price ||
@@ -191,19 +228,19 @@ export default function Controller() {
     if (!isEditing || currentProduct.description) formData.append('description', currentProduct.description);
     if (!isEditing || currentProduct.stock) formData.append('stock', currentProduct.stock);
     if (!isEditing || currentProduct.category_id) formData.append('category_id', categoryIdInt);
-    const hasNewImages = currentProduct.product_image.some((file) => file instanceof File);
-    if (!isEditing || hasNewImages) {
-      currentProduct.product_image.forEach((file) => {
-        if (file instanceof File) {
-          formData.append('product_image[]', file);
-        }
-      });
-    }
-    if (!isEditing || (validSpecs.length >= 2 && validSpecs.some(spec => spec.key && spec.value))) {
-      validSpecs.forEach((spec, i) => {
-        formData.append(`product_specifications[${i}][details][${spec.key}]`, spec.value);
-      });
-    }
+
+    // Only send File objects for product_image
+    const imageFiles = currentProduct.product_image.filter(f => f instanceof File);
+    imageFiles.forEach((file) => {
+      formData.append('product_image[]', file);
+    });
+
+    // Build product_specifications as array of objects with details
+    validSpecs.forEach((spec, i) => {
+      // Laravel expects product_specifications[i][details][key] = value
+      formData.append(`product_specifications[${i}][details][${spec.key}]`, spec.value);
+    });
+
     if (isEditing) {
       if (!currentProduct.id) {
         console.error("Error: Product ID is undefined.");
@@ -374,14 +411,25 @@ export default function Controller() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
-                          {product.product_specifications[0]?.details &&
-                            Object.entries(JSON.parse(product.product_specifications[0].details)).map(
-                              ([key, value], index) => (
-                                <span key={index} className="text-sm text-emerald-900">
-                                  <strong>{key}:</strong> {value}
-                                </span>
-                              )
-                            )}
+                          {product.product_specifications[0]?.details && (() => {
+                            let details = product.product_specifications[0].details;
+                            try {
+                              const parsed = JSON.parse(details);
+                              if (parsed && typeof parsed === 'object') {
+                                return Object.entries(parsed).map(([key, value], index) => (
+                                  <span key={index} className="text-sm text-emerald-900">
+                                    <strong>{key}:</strong> {value}
+                                  </span>
+                                ));
+                              }
+                            } catch (e) {
+                              // Not JSON, fall through
+                            }
+                            // If not JSON, just show as string
+                            return (
+                              <span className="text-sm text-emerald-900">{details}</span>
+                            );
+                          })()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">
@@ -438,35 +486,44 @@ export default function Controller() {
 
               <form onSubmit={saveProduct}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  {/* Images File Selection Section */}
                   <div className="md:col-span-2">
                     <label className="block text-emerald-800 mb-2">
-                      Product Image
+                      Product Images*
                     </label>
                     <div className="flex items-center space-x-6">
                       <div className="w-40 h-40 border-2 border-dashed border-emerald-300 rounded-lg overflow-hidden bg-emerald-50 flex items-center justify-center relative">
-                        {currentProduct.imagePreview ? (
-                          <img
-                            src={currentProduct.imagePreview}
-                            alt="Product preview"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <FiUpload className="w-8 h-8 text-emerald-400" />
-                        )}
+                        <FiUpload className="w-8 h-8 text-emerald-400" />
                         <input
                           type="file"
                           accept="image/*"
+                          multiple
                           onChange={handleImageChange}
                           className="absolute inset-0 opacity-0 cursor-pointer"
+                          disabled={currentProduct.product_image && currentProduct.product_image.length >= 4}
                         />
                       </div>
                       <div className="text-sm text-emerald-600">
-                        <p>Drag & drop an image or click to browse</p>
-                        <p>Recommended: 800x1000px, max 2MB</p>
-                        <p className="mt-2 text-xs">
-                          High-quality images increase sales!
-                        </p>
+                        <p>Drag & drop images or click to browse (max 4)</p>
+                        <p>Recommended: 800x1000px, max 2MB each</p>
+                        <p className="mt-2 text-xs">High-quality images increase sales!</p>
                       </div>
+                    </div>
+                    {/* Thumbnails Preview */}
+                    <div className="flex flex-wrap gap-4 mt-4">
+                      {currentProduct.imagePreview && currentProduct.imagePreview.map((preview, idx) => (
+                        <div key={idx} className="relative w-20 h-20 rounded overflow-hidden border border-emerald-200 bg-emerald-50">
+                          <img src={preview} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(idx)}
+                            className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-bl px-1 py-0.5 text-xs text-red-600 hover:bg-red-100"
+                            style={{lineHeight: 1}}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
 

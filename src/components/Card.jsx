@@ -48,7 +48,7 @@ export default function Card({ data: product }) {
     }
   };
 
-  console.log("Product Image Parsed:", product.image);
+  // console.log("Product Image Parsed:", product.image);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

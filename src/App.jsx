@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 
 // Imported components
@@ -10,11 +10,17 @@ import SideBar from "./components/SideBar";
 import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
 import Footer from "./components/footer";
+import { useCookies } from "react-cookie";
+
+import { AuthContext } from "./utils/contexts/AuthContext";
 
 function App() {
   const [theme, setTheme] = useState("light");
   const [sidebarOpen, setSideBarOpen] = useState(false);
   const location = useLocation();
+
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const auth = useContext(AuthContext);
 
   return (
     <>
@@ -48,6 +54,8 @@ function App() {
                     >
                       Admin
                     </Link>
+
+                    <button onClick={() => alert("Token: ", auth)}>TOKEN</button>
                   </div>
                 </div>
 
@@ -96,5 +104,6 @@ function App() {
     </>
   );
 }
+
 
 export default App;
