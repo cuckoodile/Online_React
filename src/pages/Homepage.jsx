@@ -99,7 +99,11 @@ export default function Homepage() {
                 data={{
                   id: product.id,
                   name: product.name,
-                  image: JSON.parse(product.product_image)[0],
+                  image: Array.isArray(product.product_image)
+                    ? product.product_image[0]
+                    : (typeof product.product_image === "string" && product.product_image.startsWith("["))
+                      ? JSON.parse(product.product_image)[0]
+                      : product.product_image,
                   price: product.price,
                 }}
               />

@@ -186,11 +186,11 @@ export default function Controller() {
       return;
     }
     const formData = new FormData();
-    formData.append('name', currentProduct.name);
-    formData.append('price', currentProduct.price);
-    formData.append('description', currentProduct.description);
-    formData.append('stock', currentProduct.stock);
-    formData.append('category_id', categoryIdInt);
+    if (!isEditing || currentProduct.name) formData.append('name', currentProduct.name);
+    if (!isEditing || currentProduct.price) formData.append('price', currentProduct.price);
+    if (!isEditing || currentProduct.description) formData.append('description', currentProduct.description);
+    if (!isEditing || currentProduct.stock) formData.append('stock', currentProduct.stock);
+    if (!isEditing || currentProduct.category_id) formData.append('category_id', categoryIdInt);
     const hasNewImages = currentProduct.product_image.some((file) => file instanceof File);
     if (!isEditing || hasNewImages) {
       currentProduct.product_image.forEach((file) => {
@@ -210,13 +210,11 @@ export default function Controller() {
         alert("Error: Unable to update product. Product ID is missing.");
         return;
       }
-
       if (!token) {
         console.error("Error: Authorization token is missing.");
         alert("Unauthorized: Please log in again.");
         return;
       }
-
       updateProduct.mutate(
         {
           id: currentProduct.id,
@@ -228,7 +226,11 @@ export default function Controller() {
             console.log("Product updated successfully:", data);
           },
           onError: (error) => {
-            console.error("Error updating product:", error);
+            if (error?.response?.data?.errors) {
+              alert(Object.values(error.response.data.errors).flat().join('\n'));
+            } else {
+              console.error("Error updating product:", error);
+            }
           },
         }
       );
@@ -238,7 +240,6 @@ export default function Controller() {
         alert("Unauthorized: Please log in again.");
         return;
       }
-
       createProduct.mutate(
         {
           data: formData,
@@ -249,12 +250,15 @@ export default function Controller() {
             console.log("Product created successfully:", data);
           },
           onError: (error) => {
-            console.error("Error creating product:", error);
+            if (error?.response?.data?.errors) {
+              alert(Object.values(error.response.data.errors).flat().join('\n'));
+            } else {
+              console.error("Error creating product:", error);
+            }
           },
         }
       );
     }
-
     setIsModalOpen(false);
   };
 
