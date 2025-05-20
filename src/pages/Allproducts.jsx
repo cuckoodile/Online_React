@@ -34,6 +34,7 @@ export default function Allproducts() {
     error: productsError,
     isLoading: productLoading,
   } = useProducts();
+  
   const {
     data: categories,
     error: categoriesError,
