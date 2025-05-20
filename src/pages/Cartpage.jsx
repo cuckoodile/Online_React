@@ -33,7 +33,11 @@ function Cartpage() {
     return [];
   }, [initialCartItems, user]);
   
-  const [cartItems, setCartItems] = useState(filteredCartItems | []);
+  const [cartItems, setCartItems] = useState(filteredCartItems || []);
+
+  useEffect(() => {
+    setCartItems(filteredCartItems || []);
+  }, [filteredCartItems]);
  
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>
@@ -83,11 +87,14 @@ function Cartpage() {
     },
   ];
 
+  // Defensive: ensure cartItems is always an array for reduce
   const subtotal =
-    cartItems.reduce(
-      (total, item) => total + item.product.price * item.quantity,
-      0
-    ) || 0;
+    (Array.isArray(cartItems)
+      ? cartItems.reduce(
+          (total, item) => total + item.product.price * item.quantity,
+          0
+        )
+      : 0) || 0;
 
   const shipping = subtotal > 2000 ? 0 : 150;
   const total = subtotal + shipping - discount;

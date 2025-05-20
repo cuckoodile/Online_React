@@ -26,16 +26,17 @@ export default function Productpage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const productId = searchParams.get("id");
-
+  
   const { data: product, error, isLoading } = useProductsById(productId);
   const createReview = useCreateProduct();
   const updateReview = useUpdateProduct();
   const deleteReview = useDeleteProduct();
-
+  
+  
   const { user } = React.useContext(AuthContext);
   const addCartItem = useAddCartItem();
   const navigate = useNavigate();
-
+  
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -56,7 +57,6 @@ export default function Productpage() {
         );
       }
     }
-    console.log("Product ID:", productId);
   }, [product, productId]);
   // Safely handle product.product_image for all usages below
   const productImages = React.useMemo(() => {
@@ -71,9 +71,47 @@ export default function Productpage() {
     }
     return [];
   }, [product]);
-  const productSpecifications = product.product_specifications?.[0]?.details
-    ? JSON.parse(product.product_specifications[0].details)
-    : {};
+  let productSpecifications = [];
+  if (product?.product_specifications?.[0]?.details) {
+    const details = product.product_specifications[0].details;
+    if (Array.isArray(details)) {
+      productSpecifications = details;
+    } else if (typeof details === "string") {
+      try {
+        const parsed = JSON.parse(details);
+        productSpecifications = Array.isArray(parsed) ? parsed : Object.entries(parsed).map(([key, value]) => ({ key, value }));
+      } catch {
+        productSpecifications = [];
+      }
+    }
+  }
+  
+  console.log("Product:", product);
+    
+  if (isLoading) return <div className="text-center py-20">Loading...</div>;
+  if (error) return <div className="text-center py-20 text-red-500">Error loading product.</div>;
+  if (!product) return <div className="text-center py-20 text-gray-500">Product not found.</div>;
+  const handleAddToCart = async () => {
+    try {
+      await addCartItem.mutateAsync({
+        data: { user_id: user.id, product_id: product.id, quantity },
+        token: user.token
+      });
+      alert("Added to cart!");
+    } catch (e) {
+      alert("Failed to add to cart.");
+    }
+  };
+
+  const handleBuyNow = async () => {
+    try {
+      // Optionally add to cart here if you want, or skip if not needed
+      navigate("/checkout", { state: { cartItems: [{ ...product, quantity }] } });
+    } catch (e) {
+      alert("Failed to proceed to checkout.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-emerald-50 py-12">
       <div className="container mx-auto px-4 space-y-8 max-w-7xl">
@@ -89,7 +127,7 @@ export default function Productpage() {
               >
                 <img
                   src={productImages[selectedImage] || ""}
-                  alt={product.name}
+                  alt={product?.name || "Product image"}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </motion.div>
@@ -112,7 +150,7 @@ export default function Productpage() {
                       {image ? (
                         <img
                           src={image}
-                          alt={`${product.name} ${index + 1}`}
+                          alt={`${product?.name || "Product"} ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -130,10 +168,10 @@ export default function Productpage() {
             <div className="space-y-8">
               <div>
                 <p className="text-emerald-500 font-medium mb-3">
-                  {product.category.name}
+                  {product.category?.name || ""}
                 </p>
                 <h1 className="text-4xl font-bold text-emerald-900 mb-3">
-                  {product.name}
+                  {product.name || ""}
                 </h1>
                 <div className="flex items-center gap-3">
                   <div className="flex text-yellow-400">
@@ -141,13 +179,13 @@ export default function Productpage() {
                       <FiStar
                         key={i}
                         className={
-                          i < Math.floor(product.rating) ? "fill-current" : ""
+                          i < Math.floor(product.rating || 0) ? "fill-current" : ""
                         }
                       />
                     ))}
                   </div>
                   <span className="text-emerald-500">
-                    ({product.product_comments.length} reviews)
+                    ({product.product_comments?.length || 0} reviews)
                   </span>
                 </div>
               </div>
@@ -216,10 +254,14 @@ export default function Productpage() {
                   Specifications
                 </h2>
                 <ul className="grid grid-cols-2 gap-4 text-emerald-600">
-                  {Object.entries(productSpecifications).map(([key, value]) => (
-                    <li key={key} className="bg-emerald-50 p-3 rounded-lg">
-                      <strong className="text-emerald-700">{key}:</strong>{" "}
-                      {value}
+                  {productSpecifications.map((spec, idx) => (
+                    <li key={idx} className="bg-emerald-50 p-3 rounded-lg">
+                      {spec.key ? (
+                        <><strong className="text-emerald-700">{spec.key}:</strong> {spec.value}</>
+                      ) : (
+                        // If spec is a string or primitive
+                        <span>{typeof spec === 'object' ? JSON.stringify(spec) : spec}</span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -235,7 +277,7 @@ export default function Productpage() {
               Customer Reviews
             </h2>
             <div className="space-y-8">
-              {product.product_comments.map((comment) => (
+              {product.product_comments?.map((comment) => (
                 <div
                   key={comment.id}
                   className="border-b border-emerald-100 pb-8"

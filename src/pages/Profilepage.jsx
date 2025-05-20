@@ -22,7 +22,7 @@ function Profilepage() {
   const logoutMutation = useLogout();
 
   console.log("USer Data:", user);
-  
+
   // Profile state
   const {
     data: profile,
@@ -340,16 +340,36 @@ function Profilepage() {
                   <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                     <p className="text-sm text-emerald-600 mb-1">Address</p>
                     <p className="text-emerald-900 font-medium">
-      
-                      {profile?.address.house_address}, {profile.address.region},{" "}
-                      {profile.address?.city}
+                      <strong>Baranggay:</strong>{" "}
+                      {profile.data.address.baranggay}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>City:</strong> {profile.data.address.city}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>Region:</strong> {profile.data.address.region}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>District:</strong> {profile.data.address.district}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>House_Address:</strong>{" "}
+                      {profile.data.address.house_address}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>Zip Code:</strong> {profile.data.address.zip_code}
                     </p>
                   </div>
 
                   <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                     <p className="text-sm text-emerald-600 mb-1">Full Name</p>
                     <p className="text-emerald-900 font-medium">
-                      {profile.profile?.first_name} {profile.profile?.last_name}
+                      <strong>First Name:</strong>{" "}
+                      {profile.data.profile.first_name}
+                    </p>
+                    <p className="text-emerald-900 font-medium">
+                      <strong>Last Name:</strong>{" "}
+                      {profile.data.profile.last_name}
                     </p>
                   </div>
 
@@ -366,18 +386,37 @@ function Profilepage() {
             {/* Shipping Address */}
             <ProfileSection title="Shipping Address">
               <div className="space-y-4">
-                {profile.data.length > 0 &&
-                  profile.data[user?.id - 1].address && (
-                    <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                      <p className="text-sm text-emerald-600 mb-1">
-                        Shipping Address
+                <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                  <p className="text-sm text-emerald-600 mb-1">
+                    Shipping Address
+                  </p>
+                  <div className="text-emerald-900 font-medium">
+                    <span className="text-emerald-600 capitalize">
+                      <p className="text-emerald-900 font-medium">
+                        <strong>Baranggay:</strong>{" "}
+                        {profile.data.address.baranggay}
                       </p>
-
-                      <div className="text-emerald-900 font-medium">
-                        <span className="text-emerald-600 capitalize"></span>
-                      </div>
-                    </div>
-                  )}
+                      <p className="text-emerald-900 font-medium">
+                        <strong>City:</strong> {profile.data.address.city}
+                      </p>
+                      <p className="text-emerald-900 font-medium">
+                        <strong>Region:</strong> {profile.data.address.region}
+                      </p>
+                      <p className="text-emerald-900 font-medium">
+                        <strong>District:</strong>{" "}
+                        {profile.data.address.district}
+                      </p>
+                      <p className="text-emerald-900 font-medium">
+                        <strong>House_Address:</strong>{" "}
+                        {profile.data.address.house_address}
+                      </p>
+                      <p className="text-emerald-900 font-medium">
+                        <strong>Zip Code:</strong>{" "}
+                        {profile.data.address.zip_code}
+                      </p>
+                    </span>
+                  </div>
+                </div>
               </div>
             </ProfileSection>
             <div className="lg:hidden">

@@ -15,7 +15,7 @@ import { useProducts } from "@/utils/hooks/useProductsHooks";
 
 export default function Homepage() {
   const { data: products, error, isLoading } = useProducts();
-  const newArrivals = products?.slice(0, 8) || [];
+  const newArrivals = products?.slice(-12) || [];
 
   if (isLoading) return <div className="text-center">Loading...</div>;
 

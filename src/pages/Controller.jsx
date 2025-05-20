@@ -28,7 +28,6 @@ export default function Controller() {
   const { data: userData, error: userError, isLoading } = useUsers(user);
   const token = cookies.token;
 
-  // Product state
   const {
     data: products,
     error: productsError,
@@ -45,7 +44,7 @@ export default function Controller() {
     name: "",
     description: "",
     price: 0,
-    category_id: 0,
+    category_id: "",
     product_image: [],
     specifications: [],
     admin_id: user?.id || null,
@@ -115,16 +114,13 @@ export default function Controller() {
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       let files = Array.from(e.target.files);
-      // Limit to 4 images
       files = files.slice(0, 4);
-      // Merge with existing images if editing
       let newFiles = files;
       let previews = files.map((file) => URL.createObjectURL(file));
       if (
         currentProduct.product_image &&
         Array.isArray(currentProduct.product_image)
       ) {
-        // Filter out any existing File objects (for editing)
         const existingFiles = currentProduct.product_image.filter(
           (f) => !(f instanceof File)
         );
@@ -165,7 +161,7 @@ export default function Controller() {
       name: "",
       description: "",
       price: 0,
-      category_id: 0,
+      category_id: "", // Set to empty string for correct select handling
       specifications: [],
       product_image: [],
       stock: 1,
@@ -184,9 +180,40 @@ export default function Controller() {
     ) {
       mappedSpecifications = product.product_specifications.flatMap((spec) => {
         if (!spec.details) return [];
+        // If details is an array of objects
+        if (Array.isArray(spec.details)) {
+          return spec.details.flatMap((obj) => {
+            if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+              return Object.entries(obj).map(([key, value]) => ({
+                key,
+                value,
+              }));
+            }
+            return [];
+          });
+        }
+        // If details is an object
+        if (typeof spec.details === "object" && spec.details !== null) {
+          return Object.entries(spec.details).map(([key, value]) => ({
+            key,
+            value,
+          }));
+        }
+        // If details is a string, try to parse as JSON
         if (typeof spec.details === "string") {
           try {
             const parsed = JSON.parse(spec.details);
+            if (Array.isArray(parsed)) {
+              return parsed.flatMap((obj) => {
+                if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+                  return Object.entries(obj).map(([key, value]) => ({
+                    key,
+                    value,
+                  }));
+                }
+                return [];
+              });
+            }
             if (
               parsed &&
               typeof parsed === "object" &&
@@ -230,7 +257,7 @@ export default function Controller() {
       name: product.name || "",
       description: product.description || "",
       price: product.price || 0,
-      category_id: product.category_id || 0,
+      category_id: product.category_id ? String(product.category_id) : "", // Always string
       product_image: productImages,
       specifications: mappedSpecifications,
       admin_id: product.admin_id || null,
@@ -252,6 +279,12 @@ export default function Controller() {
 
   const saveProduct = (e) => {
     e.preventDefault();
+    console.log("Current Product", currentProduct);
+
+    console.log("PRICEEEE", typeof currentProduct.price);
+    currentProduct.price = parseFloat(currentProduct.price);
+    console.log("CONVERTEEED PRIICEEEEE", typeof currentProduct.price);
+
     if (
       !currentProduct.name ||
       !currentProduct.price ||
@@ -269,41 +302,63 @@ export default function Controller() {
     const formData = new FormData();
     if (!isEditing) {
       formData.append("name", currentProduct.name);
-      formData.append("price", currentProduct.price);
+      formData.append("price", parseFloat(currentProduct.price));
       formData.append("description", currentProduct.description);
       formData.append("stock", currentProduct.stock);
-      formData.append("category_id", currentProduct.category_id);
-
-      currentProduct.product_image.forEach((file) => {
-        if (file instanceof File) {
-          formData.append("product_image[]", file);
-        }
-      });
+      // Ensure category_id is sent as a string and not empty
+      if (currentProduct.category_id && currentProduct.category_id !== "") {
+        formData.append("category_id", String(currentProduct.category_id));
+      }
+      // Append images one by one
+      if (Array.isArray(currentProduct.product_image)) {
+        currentProduct.product_image.forEach((img, idx) => {
+          if (typeof img === "string") {
+            formData.append("product_image[]", img);
+          } else if (img instanceof File) {
+            formData.append("product_image[]", img);
+          }
+        });
+      }
     } else {
       formData.append("name", currentProduct.name);
-      if (currentProduct.price) formData.append("price", currentProduct.price);
+      if (currentProduct.price)
+        formData.append("price", parseFloat(currentProduct.price));
       if (currentProduct.description)
         formData.append("description", currentProduct.description);
       if (currentProduct.stock !== undefined && currentProduct.stock !== null)
         formData.append("stock", currentProduct.stock);
-      if (currentProduct.category_id)
-        formData.append("category_id", currentProduct.category_id);
+      if (currentProduct.category_id && currentProduct.category_id !== "") {
+        formData.append("category_id", String(currentProduct.category_id));
+      }
+      if (Array.isArray(currentProduct.product_image)) {
+        currentProduct.product_image.forEach((img, idx) => {
+          if (typeof img === "string") {
+            formData.append("product_image[]", img);
+          } else if (img instanceof File) {
+            formData.append("product_image[]", img);
+          }
+        });
+      }
+    }
+    for (let pair of formData.entries()) {
+      console.log("FORMDATA FINAL", pair[0] + ":", pair[1]);
+    }
 
-      const imageFiles = currentProduct.product_image.filter(
-        (f) => f instanceof File
-      );
-      imageFiles.forEach((file) => {
-        formData.append("product_image[]", file);
+    // Only append new images (File objects) to product_image[]
+    if (Array.isArray(currentProduct.product_image)) {
+      currentProduct.product_image.forEach((img) => {
+        if (img instanceof File) {
+          formData.append("product_image[]", img);
+        }
+        // Do NOT append if it's a string (URL/path)
       });
     }
-    const validSpecs = (currentProduct.specifications || []).filter(
-      (spec) => spec.key && spec.value
-    );
-    validSpecs.forEach((spec, i) => {
-      formData.append(
-        `product_specifications[${i}][details][${spec.key}]`,
-        spec.value
-      );
+
+    // For product_specifications, append as array fields
+    (currentProduct.specifications || []).forEach((spec, idx) => {
+      if (spec.key && spec.value) {
+        formData.append(`product_specifications[${idx}][details][${spec.key}]`, spec.value);
+      }
     });
 
     if (isEditing) {
@@ -311,7 +366,14 @@ export default function Controller() {
         alert("Error: Unable to update product. Product ID is missing.");
         return;
       }
-      console.log("Updating product with ID:", currentProduct.id);
+
+      // CHECK FORMDATA CONTENT
+      // {
+      //   for (let pair of formData.entries()) {
+      //     console.log(pair[0] + ":", pair[1]);
+      //   }
+      // }
+
       updateProduct.mutate(
         {
           id: currentProduct.id,
@@ -452,7 +514,6 @@ export default function Controller() {
                         <div className="flex items-center">
                           <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
                             {(() => {
-                              // Handle product_image as array or string (JSON or direct path)
                               let imgSrc = "";
                               if (Array.isArray(product.product_image)) {
                                 imgSrc = product.product_image[0];
@@ -500,21 +561,120 @@ export default function Controller() {
                                 (spec, idx) => {
                                   const details = spec.details;
                                   if (!details) return null;
+                                  // Helper to stringify nested objects
+                                  const renderValue = (value) => {
+                                    if (
+                                      typeof value === "object" &&
+                                      value !== null
+                                    ) {
+                                      return Object.entries(value)
+                                        .map(
+                                          ([k, v]) =>
+                                            `${k}: ${
+                                              Array.isArray(v) ||
+                                              typeof v === "object"
+                                                ? JSON.stringify(v)
+                                                : v
+                                            }`
+                                        )
+                                        .join(", ");
+                                    }
+                                    return value;
+                                  };
+                                  // If details is an array of objects
+                                  if (Array.isArray(details)) {
+                                    return details.map((obj, i) => {
+                                      if (
+                                        obj &&
+                                        typeof obj === "object" &&
+                                        !Array.isArray(obj)
+                                      ) {
+                                        return Object.entries(obj).map(
+                                          ([key, value], j) => (
+                                            <span
+                                              key={`${idx}-arr-${i}-${j}`}
+                                              className="text-sm text-emerald-900"
+                                            >
+                                              <strong>{key}:</strong>{" "}
+                                              {renderValue(value)}
+                                            </span>
+                                          )
+                                        );
+                                      } else {
+                                        return (
+                                          <span
+                                            key={`${idx}-arr-${i}`}
+                                            className="text-sm text-emerald-900"
+                                          >
+                                            {String(obj)}
+                                          </span>
+                                        );
+                                      }
+                                    });
+                                  }
+                                  // If details is an object (Key: Value)
+                                  if (
+                                    typeof details === "object" &&
+                                    details !== null
+                                  ) {
+                                    return Object.entries(details).map(
+                                      ([key, value], i) => (
+                                        <span
+                                          key={idx + "-obj-" + i}
+                                          className="text-sm text-emerald-900"
+                                        >
+                                          <strong>{key}:</strong>{" "}
+                                          {renderValue(value)}
+                                        </span>
+                                      )
+                                    );
+                                  }
+                                  // If details is a string, try to parse as JSON
                                   if (typeof details === "string") {
                                     try {
                                       const parsed = JSON.parse(details);
+                                      if (Array.isArray(parsed)) {
+                                        return parsed.map((obj, i) => {
+                                          if (
+                                            obj &&
+                                            typeof obj === "object" &&
+                                            !Array.isArray(obj)
+                                          ) {
+                                            return Object.entries(obj).map(
+                                              ([key, value], j) => (
+                                                <span
+                                                  key={`${idx}-str-arr-${i}-${j}`}
+                                                  className="text-sm text-emerald-900"
+                                                >
+                                                  <strong>{key}:</strong>{" "}
+                                                  {renderValue(value)}
+                                                </span>
+                                              )
+                                            );
+                                          } else {
+                                            return (
+                                              <span
+                                                key={`${idx}-str-arr-${i}`}
+                                                className="text-sm text-emerald-900"
+                                              >
+                                                {String(obj)}
+                                              </span>
+                                            );
+                                          }
+                                        });
+                                      }
                                       if (
-                                        parsed &&
                                         typeof parsed === "object" &&
-                                        !Array.isArray(parsed)
+                                        parsed !== null
                                       ) {
                                         return Object.entries(parsed).map(
                                           ([key, value], i) => (
                                             <span
-                                              key={idx + "-" + i}
+                                              key={idx + "-str-obj-" + i}
                                               className="text-sm text-emerald-900"
                                             >
-                                              <strong>{key}:</strong> {value}
+                                              <strong>{key}:</strong>{" "}
+                                              {renderValue(value)}
                                             </span>
                                           )
                                         );
@@ -530,6 +690,7 @@ export default function Controller() {
                                       );
                                     }
                                   }
+                                  // fallback for unexpected structure
                                   return null;
                                 }
                               )
@@ -676,7 +837,41 @@ export default function Controller() {
                     <label className="block text-emerald-800 mb-2">
                       Specifications
                     </label>
-
+                    {isEditing &&
+                      currentProduct.specifications &&
+                      currentProduct.specifications.length > 0 && (
+                        <div className="mb-4 p-2 bg-emerald-50 rounded">
+                          <div className="font-semibold text-emerald-700 mb-1">
+                            Existing Specifications:
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            {currentProduct.specifications.map((spec, idx) =>
+                              spec.key && spec.value ? (
+                                <span
+                                  key={idx}
+                                  className="text-sm text-emerald-900"
+                                >
+                                  <strong>{spec.key}:</strong>{" "}
+                                  {typeof spec.value === "object" &&
+                                  spec.value !== null
+                                    ? Object.entries(spec.value)
+                                        .map(
+                                          ([k, v]) =>
+                                            `${k}: ${
+                                              Array.isArray(v) ||
+                                              typeof v === "object"
+                                                ? JSON.stringify(v)
+                                                : v
+                                            }`
+                                        )
+                                        .join(", ")
+                                    : spec.value}
+                                </span>
+                              ) : null
+                            )}
+                          </div>
+                        </div>
+                      )}
                     {currentProduct.specifications?.map((spec, index) => (
                       <div
                         key={index}

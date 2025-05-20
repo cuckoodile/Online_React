@@ -1,15 +1,13 @@
 import axios from "axios";
 import { BASE_URL } from "./api_config";
 
-
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json",
   },
 });
-
 
 export const fetchProducts = async () => {
   try {
@@ -22,7 +20,6 @@ export const fetchProducts = async () => {
   }
 };
 
-
 export const fetchProductById = async (id) => {
   try {
     const response = await api.get(`/api/products/${id}`);
@@ -34,12 +31,11 @@ export const fetchProductById = async (id) => {
   }
 };
 
-
 export const createProduct = async (productData, token) => {
   try {
     const response = await api.post("/api/products", productData, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     console.log("Product created:", response.data);
@@ -50,13 +46,16 @@ export const createProduct = async (productData, token) => {
   }
 };
 
+export const updateProduct = async ({ id, data, token }) => {
+  for (let pair of data.entries()) {
+    console.log(pair[0] + ":", pair[1]);
+  }
+  console.log("Updated Data:", data);
 
-export const updateProduct = async (id, updatedData, token) => {
   try {
-    const response = await api.patch(`/api/products/${id}`, updatedData, {
+    const response = await api.patch(`/api/products/${id}`, data, {
       headers: {
-        "Authorization": `Bearer ${token}`,
-        // Let axios set Content-Type for FormData
+        Authorization: `Bearer ${token}`,
       },
     });
     console.log("Product updated:", response.data);
@@ -67,12 +66,11 @@ export const updateProduct = async (id, updatedData, token) => {
   }
 };
 
-
-export const deleteProduct = async (id,token) => {
+export const deleteProduct = async (id, token) => {
   try {
-    await api.delete(`/api/products/${id}`,{
+    await api.delete(`/api/products/${id}`, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });

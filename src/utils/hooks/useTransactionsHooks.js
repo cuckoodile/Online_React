@@ -23,7 +23,7 @@ import {
 
 // Transactions
 export const useTransactions = () => {
-  return useQuery(["transactions"], fetchTransactions);
+  return useQuery({ queryKey: ["transactions"], queryFn: fetchTransactions });
 };
 
 export const useCreateTransaction = () => {
@@ -66,15 +66,18 @@ export const useTransactionById = (id) => {
 
 // Transaction Types
 export const useTransactionTypes = () => {
-  return useQuery(["transactionTypes"], fetchTransactionTypes);
+  return useQuery({
+    queryKey: ["transactionTypes"],
+    queryFn: fetchTransactionTypes,
+  });
 };
 
 export const useTransactionTypeById = (id) => {
-  return useQuery(
-    ["transactionType", id],
-    () => fetchTransactionTypeById(id),
-    { enabled: !!id }
-  );
+  return useQuery({
+    queryKey: ["transactionType", id],
+    queryFn: () => fetchTransactionTypeById(id),
+    enabled: !!id,
+  });
 };
 
 export const useCreateTransactionType = () => {
@@ -110,15 +113,18 @@ export const useDeleteTransactionType = () => {
 
 // Transaction Statuses
 export const useTransactionStatuses = () => {
-  return useQuery(["transactionStatuses"], fetchTransactionStatuses);
+  return useQuery({
+    queryKey: ["transactionStatuses"],
+    queryFn: fetchTransactionStatuses,
+  });
 };
 
 export const useTransactionStatusById = (id) => {
-  return useQuery(
-    ["transactionStatus", id],
-    () => fetchTransactionStatusById(id),
-    { enabled: !!id }
-  );
+  return useQuery({
+    queryKey: ["transactionStatus", id],
+    queryFn: () => fetchTransactionStatusById(id),
+    enabled: !!id,
+  });
 };
 
 export const useCreateTransactionStatus = () => {
@@ -154,15 +160,18 @@ export const useDeleteTransactionStatus = () => {
 
 // Transaction Payment Methods
 export const useTransactionPaymentMethods = () => {
-  return useQuery(["transactionPaymentMethods"], fetchTransactionPaymentMethods);
+  return useQuery({
+    queryKey: ["transactionPaymentMethods"],
+    queryFn: fetchTransactionPaymentMethods,
+  });
 };
 
 export const useTransactionPaymentMethodById = (id) => {
-  return useQuery(
-    ["transactionPaymentMethod", id],
-    () => fetchTransactionPaymentMethodById(id),
-    { enabled: !!id }
-  );
+  return useQuery({
+    queryKey: ["transactionPaymentMethod", id],
+    queryFn: () => fetchTransactionPaymentMethodById(id),
+    enabled: !!id,
+  });
 };
 
 export const useCreateTransactionPaymentMethod = () => {
@@ -190,7 +199,8 @@ export const useUpdateTransactionPaymentMethod = () => {
 export const useDeleteTransactionPaymentMethod = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, token }) => deleteTransactionPaymentMethod({ id, token }),
+    mutationFn: ({ id, token }) =>
+      deleteTransactionPaymentMethod({ id, token }),
     onSuccess: () => {
       queryClient.invalidateQueries(["transactionPaymentMethods"]);
     },
