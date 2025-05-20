@@ -20,12 +20,9 @@ export default function Checkout() {
     region: '',
     province: '',
     district: '',
-    city_municipality: '',
-    barangay: '',
-    subdivision_village: '',
-    street: '',
-    lot_number: '',
-    block_number: '',
+    city: '',
+    baranggay: '',
+    house_address: '',
     zip_code: '',
     // Payment information
     cardName: '',
@@ -80,7 +77,27 @@ export default function Checkout() {
   const { data: userData, error: userError, isLoading: userLoading } = useUsers(user);
   const createTransaction = useCreateTransaction();
   
-  console.log('User Data:', userData.data[user?.id - 1].profile);
+  useEffect(() => {
+    if (
+      userData &&
+      userData.data &&
+      user?.id &&
+      userData.data[user?.id - 1] &&
+      userData.data[user?.id - 1].profile
+    ) {
+      console.log('User Data:', userData.data[user?.id - 1].profile);
+    }
+    if (
+      userData &&
+      userData.data &&
+      user?.id &&
+      userData.data[user?.id - 1] &&
+      userData.data[user?.id - 1].address
+    ) {
+      console.log('Address ID:', userData.data[user?.id - 1].address.id);
+    }
+  }, [userData, user]);
+
   useEffect(() => {
     if (userData && userData.profile) {
       setFormData((prevFormData) => ({
@@ -91,13 +108,9 @@ export default function Checkout() {
         phone: userData.data[user?.id -1 ].profile.contact_number || '',
         region: userData.data[user?.id -1 ].address?.region || '',
         province: userData.data[user?.id -1 ].address?.province || '',
-        district: userData.data[user?.id -1 ].address?.district || '',
-        city_municipality: userData.data[user?.id -1 ].address?.city_municipality || '',
-        barangay: userData.data[user?.id -1 ].address?.barangay || '',
-        subdivision_village: userData.data[user?.id -1 ].address?.subdivision_village || '',
-        street: userData.data[user?.id -1 ].address?.street || '',
-        lot_number: userData.data[user?.id -1 ].address?.lot_number || '',
-        block_number: userData.data[user?.id -1 ].address?.block_number || '',
+        city: userData.data[user?.id -1 ].address?.city || '',
+        baranggay: userData.data[user?.id -1 ].address?.baranggay || '',
+        house_address: userData.data[user?.id -1 ].address?.house_address || '',
         zip_code: userData.data[user?.id -1 ].address?.zip_code || '',
       }));
     }
@@ -117,20 +130,31 @@ export default function Checkout() {
     if (step < 2) {
       setStep(step + 1);
     } else {
+      const addressId =
+        userData &&
+        userData.data &&
+        user?.id &&
+        userData.data[user?.id - 1] &&
+        userData.data[user?.id - 1].address
+          ? userData.data[user?.id - 1].address.id
+          : null;
+
+      if (!addressId) {
+        alert('Address information is missing. Please update your profile.');
+        return;
+      }
+
       const transactionData = {
+        user_id: user?.id,
         payment_method_id: paymentMethodMap[paymentMethod],
         type_id: typeId,
         status_id: statusId,
-        region: formData.region,
-        province: formData.province,
-        district: formData.district,
-        city_municipality: formData.city_municipality,
-        barangay: formData.barangay,
-        subdivision_village: formData.subdivision_village || null,
-        street: formData.street || null,
-        lot_number: formData.lot_number || null,
-        block_number: formData.block_number || null,
-        zip_code: formData.zip_code,
+        address_id: addressId,
+        products: cartItems.map(item => ({ 
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
       };
       try {
         await createTransaction.mutateAsync({data:transactionData,token:user?.token});
@@ -279,45 +303,21 @@ export default function Checkout() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">District*</label>
-                          <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.district}
-                          </div>
-                        </div>
-                        <div>
                           <label className="block text-emerald-800 mb-2 text-sm">City/Municipality*</label>
                           <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.city_municipality}
+                            {userData.data[user?.id - 1].address.city}
                           </div>
                         </div>
                         <div>
                           <label className="block text-emerald-800 mb-2 text-sm">Barangay*</label>
                           <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.barangay}
+                            {userData.data[user?.id - 1].address.baranggay}
                           </div>
                         </div>
                         <div>
                           <label className="block text-emerald-800 mb-2 text-sm">Subdivision/Village</label>
                           <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.subdivision_village}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Street</label>
-                          <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.street}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Lot Number</label>
-                          <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.lot_number}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Block Number</label>
-                          <div className="p-3 border border-emerald-200 rounded-lg bg-gray-50">
-                            {userData.data[user?.id - 1].address.block_number}
+                            {userData.data[user?.id - 1].address.house_address}
                           </div>
                         </div>
                         <div>
@@ -338,36 +338,24 @@ export default function Checkout() {
                           <input type="text" name="province" value={formData.province} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                         </div>
                         <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">District*</label>
-                          <input type="text" name="district" value={formData.district} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                          <label className="block text-emerald-800 mb-2 text-sm">City*</label>
+                          <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                         </div>
                         <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">City/Municipality*</label>
-                          <input type="text" name="city_municipality" value={formData.city_municipality} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                          <label className="block text-emerald-800 mb-2 text-sm">Baranggay*</label>
+                          <input type="text" name="baranggay" value={formData.baranggay} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
                         </div>
                         <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Barangay*</label>
-                          <input type="text" name="barangay" value={formData.barangay} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Subdivision/Village</label>
-                          <input type="text" name="subdivision_village" value={formData.subdivision_village} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Street</label>
-                          <input type="text" name="street" value={formData.street} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Lot Number</label>
-                          <input type="text" name="lot_number" value={formData.lot_number} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
-                        </div>
-                        <div>
-                          <label className="block text-emerald-800 mb-2 text-sm">Block Number</label>
-                          <input type="text" name="block_number" value={formData.block_number} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                          <label className="block text-emerald-800 mb-2 text-sm">House Address</label>
+                          <input type="text" name="house_address" value={formData.house_address} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
                         </div>
                         <div>
                           <label className="block text-emerald-800 mb-2 text-sm">Zip Code*</label>
                           <input type="text" name="zip_code" value={formData.zip_code} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required />
+                        </div>
+                        <div>
+                          <label className="block text-emerald-800 mb-2 text-sm">District</label>
+                          <input type="text" name="district" value={formData.district} onChange={handleChange} className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
                         </div>
                       </>
                     )}

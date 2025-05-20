@@ -25,11 +25,7 @@ export default function Controller() {
 
   const [cookies] = useCookies();
 
-  const {
-    data: userData,
-    error: userError,
-    isLoading,
-  } = useUsers(user);
+  const { data: userData, error: userError, isLoading } = useUsers(user);
   const token = cookies.token;
 
   // Product state
@@ -55,13 +51,14 @@ export default function Controller() {
     admin_id: user?.id || null,
     stock: 1,
   });
+  const [originalProductName, setOriginalProductName] = useState("");
 
   const {
     data: categories,
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useCategory();
-  
+
   const createProduct = useCreateProduct();
   const deleteProductMutation = useDeleteProduct();
 
@@ -84,10 +81,13 @@ export default function Controller() {
       setFilteredProducts([]);
     }
   }, [searchTerm, products, productLoading]);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name.startsWith("specificationKey") || name.startsWith("specificationValue")) {
+    if (
+      name.startsWith("specificationKey") ||
+      name.startsWith("specificationValue")
+    ) {
       const updatedSpecifications = [...currentProduct.specifications];
       const index = parseInt(name.replace(/\D/g, ""), 10);
       if (name.startsWith("specificationKey")) {
@@ -120,15 +120,23 @@ export default function Controller() {
       // Merge with existing images if editing
       let newFiles = files;
       let previews = files.map((file) => URL.createObjectURL(file));
-      if (currentProduct.product_image && Array.isArray(currentProduct.product_image)) {
+      if (
+        currentProduct.product_image &&
+        Array.isArray(currentProduct.product_image)
+      ) {
         // Filter out any existing File objects (for editing)
-        const existingFiles = currentProduct.product_image.filter(f => !(f instanceof File));
+        const existingFiles = currentProduct.product_image.filter(
+          (f) => !(f instanceof File)
+        );
         newFiles = [...existingFiles, ...files].slice(0, 4);
         previews = newFiles.map((file) =>
-          file instanceof File ? URL.createObjectURL(file) : (typeof file === 'string' ? `/path/to/images/${file}` : '')
+          file instanceof File
+            ? URL.createObjectURL(file)
+            : typeof file === "string"
+            ? `/path/to/images/${file}`
+            : ""
         );
       }
-      
       setCurrentProduct({
         ...currentProduct,
         product_image: newFiles,
@@ -169,16 +177,25 @@ export default function Controller() {
 
   const editProduct = (product) => {
     setIsEditing(true);
-    // Always flatten all specifications, handling both JSON and plain string
     let mappedSpecifications = [];
-    if (product.product_specifications && product.product_specifications.length > 0) {
+    if (
+      product.product_specifications &&
+      product.product_specifications.length > 0
+    ) {
       mappedSpecifications = product.product_specifications.flatMap((spec) => {
         if (!spec.details) return [];
         if (typeof spec.details === "string") {
           try {
             const parsed = JSON.parse(spec.details);
-            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-              return Object.entries(parsed).map(([key, value]) => ({ key, value }));
+            if (
+              parsed &&
+              typeof parsed === "object" &&
+              !Array.isArray(parsed)
+            ) {
+              return Object.entries(parsed).map(([key, value]) => ({
+                key,
+                value,
+              }));
             }
           } catch {
             return [{ key: "Details", value: spec.details }];
@@ -197,6 +214,17 @@ export default function Controller() {
         productImages = [];
       }
     }
+    let imagePreview = [];
+    if (productImages.length > 0) {
+      imagePreview = productImages.map((img) => {
+        if (typeof img === "string") {
+          return img.startsWith("http") || img.startsWith("/")
+            ? img
+            : `/path/to/images/${img}`;
+        }
+        return "";
+      });
+    }
     setCurrentProduct({
       id: product.id,
       name: product.name || "",
@@ -207,8 +235,9 @@ export default function Controller() {
       specifications: mappedSpecifications,
       admin_id: product.admin_id || null,
       stock: product.stock || 1,
-      product_image: productImages[0] ? (typeof productImages[0] === "string" ? `/path/to/images/${productImages[0]}` : "") : "",
+      imagePreview: imagePreview,
     });
+    setOriginalProductName(product.name || "");
     setIsModalOpen(true);
   };
 
@@ -238,22 +267,43 @@ export default function Controller() {
       return;
     }
     const formData = new FormData();
-    if (!isEditing || currentProduct.name) formData.append('name', currentProduct.name);
-    if (!isEditing || currentProduct.price) formData.append('price', currentProduct.price);
-    if (!isEditing || currentProduct.description) formData.append('description', currentProduct.description);
-    if (!isEditing || currentProduct.stock) formData.append('stock', currentProduct.stock);
-    if (!isEditing || currentProduct.category_id) formData.append('category_id', categoryIdInt);
+    if (!isEditing) {
+      formData.append("name", currentProduct.name);
+      formData.append("price", currentProduct.price);
+      formData.append("description", currentProduct.description);
+      formData.append("stock", currentProduct.stock);
+      formData.append("category_id", currentProduct.category_id);
 
-    // Only send File objects for product_image
-    const imageFiles = currentProduct.product_image.filter(f => f instanceof File);
-    imageFiles.forEach((file) => {
-      formData.append('product_image[]', file);
-    });
+      currentProduct.product_image.forEach((file) => {
+        if (file instanceof File) {
+          formData.append("product_image[]", file);
+        }
+      });
+    } else {
+      formData.append("name", currentProduct.name);
+      if (currentProduct.price) formData.append("price", currentProduct.price);
+      if (currentProduct.description)
+        formData.append("description", currentProduct.description);
+      if (currentProduct.stock !== undefined && currentProduct.stock !== null)
+        formData.append("stock", currentProduct.stock);
+      if (currentProduct.category_id)
+        formData.append("category_id", currentProduct.category_id);
 
-    // Build product_specifications as array of objects with details
+      const imageFiles = currentProduct.product_image.filter(
+        (f) => f instanceof File
+      );
+      imageFiles.forEach((file) => {
+        formData.append("product_image[]", file);
+      });
+    }
+    const validSpecs = (currentProduct.specifications || []).filter(
+      (spec) => spec.key && spec.value
+    );
     validSpecs.forEach((spec, i) => {
-      // Laravel expects product_specifications[i][details][key] = value
-      formData.append(`product_specifications[${i}][details][${spec.key}]`, spec.value);
+      formData.append(
+        `product_specifications[${i}][details][${spec.key}]`,
+        spec.value
+      );
     });
 
     if (isEditing) {
@@ -261,6 +311,7 @@ export default function Controller() {
         alert("Error: Unable to update product. Product ID is missing.");
         return;
       }
+      console.log("Updating product with ID:", currentProduct.id);
       updateProduct.mutate(
         {
           id: currentProduct.id,
@@ -273,7 +324,9 @@ export default function Controller() {
           },
           onError: (error) => {
             if (error?.response?.data?.errors) {
-              alert(Object.values(error.response.data.errors).flat().join('\n'));
+              alert(
+                Object.values(error.response.data.errors).flat().join("\n")
+              );
             } else {
               console.error("Error updating product:", error);
             }
@@ -292,7 +345,9 @@ export default function Controller() {
           },
           onError: (error) => {
             if (error?.response?.data?.errors) {
-              alert(Object.values(error.response.data.errors).flat().join('\n'));
+              alert(
+                Object.values(error.response.data.errors).flat().join("\n")
+              );
             } else {
               console.error("Error creating product:", error);
             }
@@ -306,7 +361,10 @@ export default function Controller() {
   const saveSpecification = () => {
     setCurrentProduct({
       ...currentProduct,
-      specifications: [...currentProduct.specifications, { key: "", value: "" }],
+      specifications: [
+        ...currentProduct.specifications,
+        { key: "", value: "" },
+      ],
     });
     setIsAddingSpec(true);
   };
@@ -321,6 +379,7 @@ export default function Controller() {
     return <div className="text-center py-16">Error loading categories</div>;
   }
 
+  console.log("Current Product:", currentProduct.id);
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
       <div className="container mx-auto px-4">
@@ -397,10 +456,14 @@ export default function Controller() {
                               let imgSrc = "";
                               if (Array.isArray(product.product_image)) {
                                 imgSrc = product.product_image[0];
-                              } else if (typeof product.product_image === "string") {
+                              } else if (
+                                typeof product.product_image === "string"
+                              ) {
                                 try {
                                   const arr = JSON.parse(product.product_image);
-                                  imgSrc = Array.isArray(arr) ? arr[0] : product.product_image;
+                                  imgSrc = Array.isArray(arr)
+                                    ? arr[0]
+                                    : product.product_image;
                                 } catch {
                                   imgSrc = product.product_image;
                                 }
@@ -430,33 +493,46 @@ export default function Controller() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex flex-col">
-                          {product.product_specifications && product.product_specifications.length > 0
-                            ? product.product_specifications.map((spec, idx) => {
-                                const details = spec.details;
-                                if (!details) return null;
-                                if (typeof details === "string") {
-                                  try {
-                                    const parsed = JSON.parse(details);
-                                    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-                                      return Object.entries(parsed).map(
-                                        ([key, value], i) => (
-                                          <span key={idx + '-' + i} className="text-sm text-emerald-900">
-                                            <strong>{key}:</strong> {value}
-                                          </span>
-                                        )
+                        <div className="flex flex-col">
+                          {product.product_specifications &&
+                          product.product_specifications.length > 0
+                            ? product.product_specifications.map(
+                                (spec, idx) => {
+                                  const details = spec.details;
+                                  if (!details) return null;
+                                  if (typeof details === "string") {
+                                    try {
+                                      const parsed = JSON.parse(details);
+                                      if (
+                                        parsed &&
+                                        typeof parsed === "object" &&
+                                        !Array.isArray(parsed)
+                                      ) {
+                                        return Object.entries(parsed).map(
+                                          ([key, value], i) => (
+                                            <span
+                                              key={idx + "-" + i}
+                                              className="text-sm text-emerald-900"
+                                            >
+                                              <strong>{key}:</strong> {value}
+                                            </span>
+                                          )
+                                        );
+                                      }
+                                    } catch {
+                                      return (
+                                        <span
+                                          key={idx}
+                                          className="text-sm text-emerald-900"
+                                        >
+                                          {details}
+                                        </span>
                                       );
                                     }
-                                  } catch {
-                                    return (
-                                      <span key={idx} className="text-sm text-emerald-900">
-                                        {details}
-                                      </span>
-                                    );
                                   }
+                                  return null;
                                 }
-                                return null;
-                              })
+                              )
                             : null}
                         </div>
                       </td>
@@ -528,30 +604,43 @@ export default function Controller() {
                           multiple
                           onChange={handleImageChange}
                           className="absolute inset-0 opacity-0 cursor-pointer"
-                          disabled={currentProduct.product_image && currentProduct.product_image.length >= 4}
+                          disabled={
+                            currentProduct.product_image &&
+                            currentProduct.product_image.length >= 4
+                          }
                         />
                       </div>
                       <div className="text-sm text-emerald-600">
                         <p>Drag & drop images or click to browse (max 4)</p>
                         <p>Recommended: 800x1000px, max 2MB each</p>
-                        <p className="mt-2 text-xs">High-quality images increase sales!</p>
+                        <p className="mt-2 text-xs">
+                          High-quality images increase sales!
+                        </p>
                       </div>
                     </div>
                     {/* Thumbnails Preview */}
                     <div className="flex flex-wrap gap-4 mt-4">
-                      {currentProduct.imagePreview && currentProduct.imagePreview.map((preview, idx) => (
-                        <div key={idx} className="relative w-20 h-20 rounded overflow-hidden border border-emerald-200 bg-emerald-50">
-                          <img src={preview} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-bl px-1 py-0.5 text-xs text-red-600 hover:bg-red-100"
-                            style={{lineHeight: 1}}
+                      {currentProduct.imagePreview &&
+                        currentProduct.imagePreview.map((preview, idx) => (
+                          <div
+                            key={idx}
+                            className="relative w-20 h-20 rounded overflow-hidden border border-emerald-200 bg-emerald-50"
                           >
-                            ×
-                          </button>
-                        </div>
-                      ))}
+                            <img
+                              src={preview}
+                              alt={`Preview ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(idx)}
+                              className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-bl px-1 py-0.5 text-xs text-red-600 hover:bg-red-100"
+                              style={{ lineHeight: 1 }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
                     </div>
                   </div>
 
@@ -589,7 +678,10 @@ export default function Controller() {
                     </label>
 
                     {currentProduct.specifications?.map((spec, index) => (
-                      <div key={index} className="flex items-center space-x-2 mb-2">
+                      <div
+                        key={index}
+                        className="flex items-center space-x-2 mb-2"
+                      >
                         <input
                           type="text"
                           name={`specificationKey_${index}`}
