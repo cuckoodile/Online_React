@@ -21,7 +21,8 @@ function Profilepage() {
   const { user, setUser, logout } = useContext(AuthContext);
   const logoutMutation = useLogout();
 
-  console.log("USer Data:",user)
+  console.log("USer Data:", user);
+  
   // Profile state
   const {
     data: profile,
@@ -191,8 +192,8 @@ function Profilepage() {
     </div>
   );
 
-  console.log("Profile Data:", profile.data[user?.id - 1]);
-  console.log("Profile Address:", profile.data[user?.id + 1].profile.address);
+  console.log("Profile Data:", profile.data);
+  console.log("Profile Address:", profile.data.address);
 
   return (
     <div className="min-h-screen bg-emerald-50 py-8">
@@ -334,38 +335,31 @@ function Profilepage() {
             {/* Personal Information */}
             <ProfileSection title="Personal Information">
               <div className="space-y-4">
-                {profile.data.length > 0 && (
-                  <div className="space-y-4">
-                    {/* Personal Information */}
-                    <div
-                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                    >
-                      <p className="text-sm text-emerald-600 mb-1">Address</p>
-                      <p className="text-emerald-900 font-medium">
-                        {profile?.data?.address?.house_address}, {profile?.data?.address?.region}, {profile?.data?.address?.city}
-                      </p>
-                    </div>
-
-                    <div
-
-                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                    >
-                      <p className="text-sm text-emerald-600 mb-1">Full Name</p>
-                      <p className="text-emerald-900 font-medium">
-                        {profile.data.profile?.first_name} {profile.data.profile?.last_name}
-                      </p>
-                    </div>
-
-                    <div
-                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                    >
-                      <p className="text-sm text-emerald-600 mb-1">
-                        {/* {key.charAt(0).toUpperCase() + key.slice(1)} */}
-                      </p>
-                      {/* <p className="text-emerald-900 font-medium">{value}</p> */}
-                    </div>
+                <div className="space-y-4">
+                  {/* Personal Information */}
+                  <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <p className="text-sm text-emerald-600 mb-1">Address</p>
+                    <p className="text-emerald-900 font-medium">
+      
+                      {profile?.address.house_address}, {profile.address.region},{" "}
+                      {profile.address?.city}
+                    </p>
                   </div>
-                )}
+
+                  <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <p className="text-sm text-emerald-600 mb-1">Full Name</p>
+                    <p className="text-emerald-900 font-medium">
+                      {profile.profile?.first_name} {profile.profile?.last_name}
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <p className="text-sm text-emerald-600 mb-1">
+                      {/* {key.charAt(0).toUpperCase() + key.slice(1)} */}
+                    </p>
+                    {/* <p className="text-emerald-900 font-medium">{value}</p> */}
+                  </div>
+                </div>
               </div>
             </ProfileSection>
 
@@ -379,12 +373,9 @@ function Profilepage() {
                         Shipping Address
                       </p>
 
-                          <div
-                            className="text-emerald-900 font-medium"
-                          >
-                            <span className="text-emerald-600 capitalize">
-                            </span>
-                          </div>
+                      <div className="text-emerald-900 font-medium">
+                        <span className="text-emerald-600 capitalize"></span>
+                      </div>
                     </div>
                   )}
               </div>

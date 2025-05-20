@@ -69,7 +69,7 @@ export const fetchUsers = async (data) => {
   console.log("Attempt to fetch user data: ", data);
 
   try {
-    const response = await api.get("/api/users", {
+    const response = await api.get(`/api/users/${data.id}`, {
       headers: {
         Authorization: `Bearer ${data.token}`,
       },
