@@ -68,9 +68,16 @@ export default function Controller() {
   useEffect(() => {
     if (!productLoading && products) {
       const results = products.filter((product) => {
-        // console.log("fitered product:", product);
-        const categoryName = product.category?.name || "All";
-        return product.name || categoryName ;
+        const categoryName = product.category?.name || "";
+        const name = product.name || "";
+        const description = product.description || "";
+        const search = searchTerm.trim().toLowerCase();
+        if (!search) return true;
+        return (
+          name.toLowerCase().includes(search) ||
+          categoryName.toLowerCase().includes(search) ||
+          description.toLowerCase().includes(search)
+        );
       });
       setFilteredProducts(results);
     } else {
@@ -162,15 +169,33 @@ export default function Controller() {
 
   const editProduct = (product) => {
     setIsEditing(true);
-    const mappedSpecifications = product.product_specifications?.map((spec) => {
-      const details = JSON.parse(spec.details || "{}");
-      return Object.entries(details).map(([key, value]) => ({ key, value }));
-    }).flat() || [];
+    // Always flatten all specifications, handling both JSON and plain string
+    let mappedSpecifications = [];
+    if (product.product_specifications && product.product_specifications.length > 0) {
+      mappedSpecifications = product.product_specifications.flatMap((spec) => {
+        if (!spec.details) return [];
+        if (typeof spec.details === "string") {
+          try {
+            const parsed = JSON.parse(spec.details);
+            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+              return Object.entries(parsed).map(([key, value]) => ({ key, value }));
+            }
+          } catch {
+            return [{ key: "Details", value: spec.details }];
+          }
+        }
+        return [];
+      });
+    }
     let productImages = [];
-    try {
-      productImages = JSON.parse(product.product_image);
-    } catch {
-      productImages = [];
+    if (Array.isArray(product.product_image)) {
+      productImages = product.product_image;
+    } else if (typeof product.product_image === "string") {
+      try {
+        productImages = JSON.parse(product.product_image);
+      } catch {
+        productImages = [];
+      }
     }
     setCurrentProduct({
       id: product.id,
@@ -198,8 +223,6 @@ export default function Controller() {
 
   const saveProduct = (e) => {
     e.preventDefault();
-    console.log("Attempting to save product:", currentProduct, "Token: ", token);
-
     if (
       !currentProduct.name ||
       !currentProduct.price ||
@@ -212,14 +235,6 @@ export default function Controller() {
     }
     if (!token) {
       alert("Unauthorized: Please log in again.");
-      return;
-    }
-    const categoryIdInt = parseInt(currentProduct.category_id, 10);
-    const validSpecs = currentProduct.specifications.filter(
-      (spec) => spec.key && spec.value
-    );
-    if (validSpecs.length < 2) {
-      alert("Please provide at least 2 specifications.");
       return;
     }
     const formData = new FormData();
@@ -243,13 +258,7 @@ export default function Controller() {
 
     if (isEditing) {
       if (!currentProduct.id) {
-        console.error("Error: Product ID is undefined.");
         alert("Error: Unable to update product. Product ID is missing.");
-        return;
-      }
-      if (!token) {
-        console.error("Error: Authorization token is missing.");
-        alert("Unauthorized: Please log in again.");
         return;
       }
       updateProduct.mutate(
@@ -272,11 +281,6 @@ export default function Controller() {
         }
       );
     } else {
-      if (!token) {
-        console.error("Error: Authorization token is missing.");
-        alert("Unauthorized: Please log in again.");
-        return;
-      }
       createProduct.mutate(
         {
           data: formData,
@@ -388,11 +392,27 @@ export default function Controller() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-16 w-16 rounded-md overflow-hidden bg-emerald-100 flex-shrink-0">
-                            <img
-                              src={product.product_image}
-                              alt={product.name}
-                              className="h-full w-full object-cover"
-                            />
+                            {(() => {
+                              // Handle product_image as array or string (JSON or direct path)
+                              let imgSrc = "";
+                              if (Array.isArray(product.product_image)) {
+                                imgSrc = product.product_image[0];
+                              } else if (typeof product.product_image === "string") {
+                                try {
+                                  const arr = JSON.parse(product.product_image);
+                                  imgSrc = Array.isArray(arr) ? arr[0] : product.product_image;
+                                } catch {
+                                  imgSrc = product.product_image;
+                                }
+                              }
+                              return (
+                                <img
+                                  src={imgSrc}
+                                  alt={product.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              );
+                            })()}
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-emerald-900">
@@ -411,25 +431,33 @@ export default function Controller() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
-                          {product.product_specifications[0]?.details && (() => {
-                            let details = product.product_specifications[0].details;
-                            try {
-                              const parsed = JSON.parse(details);
-                              if (parsed && typeof parsed === 'object') {
-                                return Object.entries(parsed).map(([key, value], index) => (
-                                  <span key={index} className="text-sm text-emerald-900">
-                                    <strong>{key}:</strong> {value}
-                                  </span>
-                                ));
-                              }
-                            } catch (e) {
-                              // Not JSON, fall through
-                            }
-                            // If not JSON, just show as string
-                            return (
-                              <span className="text-sm text-emerald-900">{details}</span>
-                            );
-                          })()}
+                          {product.product_specifications && product.product_specifications.length > 0
+                            ? product.product_specifications.map((spec, idx) => {
+                                const details = spec.details;
+                                if (!details) return null;
+                                if (typeof details === "string") {
+                                  try {
+                                    const parsed = JSON.parse(details);
+                                    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+                                      return Object.entries(parsed).map(
+                                        ([key, value], i) => (
+                                          <span key={idx + '-' + i} className="text-sm text-emerald-900">
+                                            <strong>{key}:</strong> {value}
+                                          </span>
+                                        )
+                                      );
+                                    }
+                                  } catch {
+                                    return (
+                                      <span key={idx} className="text-sm text-emerald-900">
+                                        {details}
+                                      </span>
+                                    );
+                                  }
+                                }
+                                return null;
+                              })
+                            : null}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900">

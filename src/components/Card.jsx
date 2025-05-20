@@ -2,8 +2,8 @@ import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { FiShoppingCart, FiHeart, FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { useAddCartItem } from "../utils/hooks/useCartsHooks"; // Import the hook
-import { useUsers } from "../utils/hooks/userUsersHooks"; // Import user hook
+import { useAddCartItem } from "../utils/hooks/useCartsHooks";
+import { useUsers } from "../utils/hooks/userUsersHooks";
 import { AuthContext } from "@/utils/contexts/AuthContext";
 
 export default function Card({ data: product }) {

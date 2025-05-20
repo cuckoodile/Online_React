@@ -7,7 +7,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Card from "@/components/Card";
 import Footer from "@/components/footer";
 import { useProducts } from "../utils/hooks/useProductsHooks";
@@ -47,12 +47,17 @@ export default function Allproducts() {
   const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const location = useLocation();
+
+  // Get search term from query param
+  const searchParams = new URLSearchParams(location.search);
+  const searchTerm = searchParams.get("search")?.toLowerCase() || "";
 
   useEffect(() => {
     if (products) {
       setFilteredProducts(filterAndSortProducts());
     }
-  }, [products, selectedCategory, priceRange, sortBy]);
+  }, [products, selectedCategory, priceRange, sortBy, searchTerm]);
 
   const filterAndSortProducts = () => {
     let result = products.filter((product) => {
@@ -69,7 +74,19 @@ export default function Allproducts() {
         }
       }
 
-      return categoryMatch && priceMatch;
+      // Search filter: match name, category, or description
+      let searchMatch = true;
+      if (searchTerm) {
+        const name = product.name?.toLowerCase() || "";
+        const category = product.category?.name?.toLowerCase() || "";
+        const description = product.description?.toLowerCase() || "";
+        searchMatch =
+          name.includes(searchTerm) ||
+          category.includes(searchTerm) ||
+          description.includes(searchTerm);
+      }
+
+      return categoryMatch && priceMatch && searchMatch;
     });
 
     // Sort the filtered products
@@ -101,7 +118,7 @@ export default function Allproducts() {
     return <div className="text-center py-16">Error loading products</div>;
   }
 
-  console.log("Category", categories)
+  console.log("Category", categories);
   console.log("Products:", products);
   if (!productLoading && !categoriesLoading) {
     return (
@@ -229,15 +246,30 @@ export default function Allproducts() {
             }
           >
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <Card key={product.id}
-                data={{
-                  id: product.id,
-                  name: product.name,
-                  image: JSON.parse(product.product_image)[0],
-                  price: product.price,
-                }}/>
-              ))
+              filteredProducts.map((product) => {
+                // Safely parse product_image
+                let images = [];
+                if (Array.isArray(product.product_image)) {
+                  images = product.product_image;
+                } else if (typeof product.product_image === "string") {
+                  try {
+                    images = JSON.parse(product.product_image);
+                  } catch (e) {
+                    images = [];
+                  }
+                }
+                return (
+                  <Card
+                    key={product.id}
+                    data={{
+                      id: product.id,
+                      name: product.name,
+                      image: images[0],
+                      price: product.price,
+                    }}
+                  />
+                );
+              })
             ) : (
               <div className="col-span-full py-16 text-center">
                 <h3 className="text-xl font-medium text-gray-700 mb-2">

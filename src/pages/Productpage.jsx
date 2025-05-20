@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiMinus, FiPlus, FiHeart, FiShare2, FiStar, FiShoppingCart, FiX, FiMessageSquare, FiImage } from 'react-icons/fi';
-import { useProductsById, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/utils/hooks/useProductsHooks';
-import { useLocation } from 'react-router-dom';
-import { useAddCartItem } from '@/utils/hooks/useCartsHooks';
-import { AuthContext } from '@/utils/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiMinus,
+  FiPlus,
+  FiHeart,
+  FiShare2,
+  FiStar,
+  FiShoppingCart,
+  FiX,
+  FiMessageSquare,
+  FiImage,
+} from "react-icons/fi";
+import {
+  useProductsById,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "@/utils/hooks/useProductsHooks";
+import { useLocation } from "react-router-dom";
+import { useAddCartItem } from "@/utils/hooks/useCartsHooks";
+import { AuthContext } from "@/utils/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Productpage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const productId = searchParams.get('id');
+  const productId = searchParams.get("id");
 
   const { data: product, error, isLoading } = useProductsById(productId);
   const createReview = useCreateProduct();
@@ -25,110 +40,37 @@ export default function Productpage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
   const [reviewForm, setReviewForm] = useState({
     rating: 5,
-    comment: ''
+    comment: "",
   });
-  console.log('Product Data:', JSON.parse(product.product_image)[0]);
-  console.log('Product ID:', productId);
-  const productImages = product?.product_image
-    ? (() => {
-        try {
-          return JSON.parse(product.product_image);
-        } catch (error) {
-          console.error("Error parsing product.product_image:", error);
-          return [];
-        }
-      })()
-    : [];
-
-  const imageHandler = () => {
-    return productImages[selectedImage] || '';
-  };
-  const handleReviewChange = (e) => {
-    const { name, value } = e.target;
-    setReviewForm({
-      ...reviewForm,
-      [name]: value
-    });
-  };
-
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createReview.mutateAsync({ ...reviewForm, productId: product.id });
-      setIsReviewModalOpen(false);
-      setReviewForm({ rating: 5, comment: '' });
-    } catch (err) {
-      console.error('Error submitting review:', err);
+  React.useEffect(() => {
+    if (product && product.product_image) {
+      try {
+        console.log("Product Data:", JSON.parse(product.product_image)[0]);
+      } catch (e) {
+        console.log(
+          "Product Data: (invalid product_image)",
+          product.product_image
+        );
+      }
     }
-  };
-
-  const handleReplySubmit = async (reviewId) => {
-    if (replyText.trim() === '') return;
-    try {
-      await updateReview.mutateAsync({ id: reviewId, updatedData: { reply: replyText } });
-      setReplyingTo(null);
-      setReplyText('');
-    } catch (err) {
-      console.error('Error submitting reply:', err);
+    console.log("Product ID:", productId);
+  }, [product, productId]);
+  // Safely handle product.product_image for all usages below
+  const productImages = React.useMemo(() => {
+    if (product && product.product_image) {
+      try {
+        return Array.isArray(product.product_image)
+          ? product.product_image
+          : JSON.parse(product.product_image);
+      } catch (e) {
+        return [];
+      }
     }
-  };
-
-  const handleDeleteReview = async (reviewId) => {
-    try {
-      await deleteReview.mutateAsync(reviewId);
-    } catch (err) {
-      console.error('Error deleting review:', err);
-    }
-  };
-
-  const handleAddToCart = async () => {
-    if (!user) {
-      alert('Please log in to add items to your cart.');
-      return;
-    }
-    try {
-      await addCartItem.mutateAsync({
-        data: { product_id: product.id, quantity, user_id: user.id },
-        token: user.token,
-      });
-      alert('Added to cart!');
-    } catch (err) {
-      alert('Failed to add to cart.');
-      console.error(err);
-    }
-  };
-
-  const handleBuyNow = async () => {
-    if (!user) {
-      alert('Please log in to buy products.');
-      return;
-    }
-    try {
-      await addCartItem.mutateAsync({
-        data: { product_id: product.id, quantity, user_id: user.id },
-        token: user.token,
-      });
-      navigate('/checkout', { state: { buyNow: true, product: { ...product, quantity } } });
-    } catch (err) {
-      alert('Failed to proceed to checkout.');
-      console.error(err);
-    }
-  };
-
-  if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center py-8 text-red-600">Error loading product data.</div>;
-  }
-
-  if (!product) {
-    return <div className="text-center py-8 text-gray-600">No product data available.</div>;
-  }
+    return [];
+  }, [product]);
   const productSpecifications = product.product_specifications?.[0]?.details
     ? JSON.parse(product.product_specifications[0].details)
     : {};
@@ -146,7 +88,7 @@ export default function Productpage() {
                 className="aspect-square rounded-xl overflow-hidden shadow-sm"
               >
                 <img
-                  src={imageHandler()}
+                  src={productImages[selectedImage] || ""}
                   alt={product.name}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -159,15 +101,19 @@ export default function Productpage() {
                       key={index}
                       onClick={() => setSelectedImage(index)}
                       className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200
-                        ${selectedImage === index ? 'border-emerald-500 scale-105' : 'border-gray-100 hover:border-emerald-300'}
-                        ${!image ? 'bg-gray-100' : ''}`}
+                        ${
+                          selectedImage === index
+                            ? "border-emerald-500 scale-105"
+                            : "border-gray-100 hover:border-emerald-300"
+                        }
+                        ${!image ? "bg-gray-100" : ""}`}
                       disabled={!image}
                     >
                       {image ? (
-                        <img 
-                          src={image} 
-                          alt={`${product.name} ${index + 1}`} 
-                          className="w-full h-full object-cover" 
+                        <img
+                          src={image}
+                          alt={`${product.name} ${index + 1}`}
+                          className="w-full h-full object-cover"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -183,15 +129,26 @@ export default function Productpage() {
             {/* Product Info */}
             <div className="space-y-8">
               <div>
-                <p className="text-emerald-500 font-medium mb-3">{product.category.name}</p>
-                <h1 className="text-4xl font-bold text-emerald-900 mb-3">{product.name}</h1>
+                <p className="text-emerald-500 font-medium mb-3">
+                  {product.category.name}
+                </p>
+                <h1 className="text-4xl font-bold text-emerald-900 mb-3">
+                  {product.name}
+                </h1>
                 <div className="flex items-center gap-3">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
-                      <FiStar key={i} className={i < Math.floor(product.rating) ? 'fill-current' : ''} />
+                      <FiStar
+                        key={i}
+                        className={
+                          i < Math.floor(product.rating) ? "fill-current" : ""
+                        }
+                      />
                     ))}
                   </div>
-                  <span className="text-emerald-500">({product.product_comments.length} reviews)</span>
+                  <span className="text-emerald-500">
+                    ({product.product_comments.length} reviews)
+                  </span>
                 </div>
               </div>
 
@@ -207,7 +164,9 @@ export default function Productpage() {
                 <div className="space-y-6 py-6 border-y border-emerald-100">
                   {/* Quantity Selector */}
                   <div className="flex items-center gap-4">
-                    <span className="text-emerald-900 font-medium text-lg">Quantity:</span>
+                    <span className="text-emerald-900 font-medium text-lg">
+                      Quantity:
+                    </span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -215,15 +174,21 @@ export default function Productpage() {
                       >
                         <FiMinus className="text-emerald-600 text-lg" />
                       </button>
-                      <span className="w-12 text-center font-medium text-lg">{quantity}</span>
+                      <span className="w-12 text-center font-medium text-lg">
+                        {quantity}
+                      </span>
                       <button
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                        onClick={() =>
+                          setQuantity(Math.min(product.stock, quantity + 1))
+                        }
                         className="p-2.5 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition-colors"
                       >
                         <FiPlus className="text-emerald-600 text-lg" />
                       </button>
                     </div>
-                    <span className="text-emerald-500">({product.stock} available)</span>
+                    <span className="text-emerald-500">
+                      ({product.stock} available)
+                    </span>
                   </div>
 
                   {/* Add to Cart and Buy Now Buttons */}
@@ -247,11 +212,14 @@ export default function Productpage() {
 
               {/* Product Specifications */}
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-emerald-900">Specifications</h2>
+                <h2 className="text-2xl font-bold text-emerald-900">
+                  Specifications
+                </h2>
                 <ul className="grid grid-cols-2 gap-4 text-emerald-600">
                   {Object.entries(productSpecifications).map(([key, value]) => (
                     <li key={key} className="bg-emerald-50 p-3 rounded-lg">
-                      <strong className="text-emerald-700">{key}:</strong> {value}
+                      <strong className="text-emerald-700">{key}:</strong>{" "}
+                      {value}
                     </li>
                   ))}
                 </ul>
@@ -263,17 +231,29 @@ export default function Productpage() {
         {/* Reviews Section */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-10">
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-emerald-900">Customer Reviews</h2>
+            <h2 className="text-3xl font-bold text-emerald-900">
+              Customer Reviews
+            </h2>
             <div className="space-y-8">
               {product.product_comments.map((comment) => (
-                <div key={comment.id} className="border-b border-emerald-100 pb-8">
+                <div
+                  key={comment.id}
+                  className="border-b border-emerald-100 pb-8"
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-emerald-900 text-lg">User {comment.user_id}</h3>
-                    <span className="text-sm text-emerald-500">{new Date(comment.created_at).toLocaleDateString()}</span>
+                    <h3 className="font-semibold text-emerald-900 text-lg">
+                      User {comment.user_id}
+                    </h3>
+                    <span className="text-sm text-emerald-500">
+                      {new Date(comment.created_at).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex text-yellow-400 mb-3">
                     {[...Array(5)].map((_, i) => (
-                      <FiStar key={i} className={i < comment.rating ? 'fill-current' : ''} />
+                      <FiStar
+                        key={i}
+                        className={i < comment.rating ? "fill-current" : ""}
+                      />
                     ))}
                   </div>
                   <p className="text-emerald-600 text-lg">{comment.comment}</p>
