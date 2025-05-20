@@ -21,6 +21,7 @@ function Profilepage() {
   const { user, setUser, logout } = useContext(AuthContext);
   const logoutMutation = useLogout();
 
+  console.log("USer Data:",user)
   // Profile state
   const {
     data: profile,
@@ -275,7 +276,7 @@ function Profilepage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    logout(); 
+                    logout();
                     window.location.href = "/login";
                   }}
                   className="px-6 py-3 border-2 border-red-500 text-red-500 
@@ -336,57 +337,33 @@ function Profilepage() {
                 {profile.data.length > 0 && (
                   <div className="space-y-4">
                     {/* Personal Information */}
-                    {Object.entries(profile.data[user?.id - 1]).map(([key, value]) => {
-                      if (key === "address") {
-                        return (
-                          <div
-                            key={key}
-                            className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                          >
-                            <p className="text-sm text-emerald-600 mb-1">
-                              Address
-                            </p>
-                            <p className="text-emerald-900 font-medium">
-                              {value.house_address}, {value.region},{" "}
-                              {value.city}
-                            </p>
-                          </div>
-                        );
-                      } else if (key === "profile") {
-                        return (
-                          <div
-                            key={key}
-                            className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                          >
-                            <p className="text-sm text-emerald-600 mb-1">
-                              Full Name
-                            </p>
-                            <p className="text-emerald-900 font-medium">
-                              {value.first_name} {value.last_name}
-                            </p>
-                          </div>
-                        );
-                      } else if (
-                        key !== "id" &&
-                        key !== "created_at" &&
-                        key !== "updated_at"
-                      ) {
-                        return (
-                          <div
-                            key={key}
-                            className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                          >
-                            <p className="text-sm text-emerald-600 mb-1">
-                              {key.charAt(0).toUpperCase() + key.slice(1)}
-                            </p>
-                            <p className="text-emerald-900 font-medium">
-                              {value}
-                            </p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
+                    <div
+                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      <p className="text-sm text-emerald-600 mb-1">Address</p>
+                      <p className="text-emerald-900 font-medium">
+                        {profile?.data?.address?.house_address}, {profile?.data?.address?.region}, {profile?.data?.address?.city}
+                      </p>
+                    </div>
+
+                    <div
+
+                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      <p className="text-sm text-emerald-600 mb-1">Full Name</p>
+                      <p className="text-emerald-900 font-medium">
+                        {profile.data.profile?.first_name} {profile.data.profile?.last_name}
+                      </p>
+                    </div>
+
+                    <div
+                      className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      <p className="text-sm text-emerald-600 mb-1">
+                        {/* {key.charAt(0).toUpperCase() + key.slice(1)} */}
+                      </p>
+                      {/* <p className="text-emerald-900 font-medium">{value}</p> */}
+                    </div>
                   </div>
                 )}
               </div>
@@ -395,32 +372,21 @@ function Profilepage() {
             {/* Shipping Address */}
             <ProfileSection title="Shipping Address">
               <div className="space-y-4">
-                {profile.data.length > 0 && profile.data[user?.id - 1].address && (
-                  <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                    <p className="text-sm text-emerald-600 mb-1">
-                      Shipping Address
-                    </p>
-                    {Object.entries(profile.data[user?.id - 1].address)
-                      .filter(
-                        ([key]) =>
-                          ![
-                            "id",
-                            "user_id",
-                            "name",
-                            "created_at",
-                            "updated_at",
-                          ].includes(key)
-                      )
-                      .map(([key, value]) => (
-                        <div key={key} className="text-emerald-900 font-medium">
-                          <span className="text-emerald-600 capitalize">
-                            {key}:{" "}
-                          </span>
-                          {value}
-                        </div>
-                      ))}
-                  </div>
-                )}
+                {profile.data.length > 0 &&
+                  profile.data[user?.id - 1].address && (
+                    <div className="p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                      <p className="text-sm text-emerald-600 mb-1">
+                        Shipping Address
+                      </p>
+
+                          <div
+                            className="text-emerald-900 font-medium"
+                          >
+                            <span className="text-emerald-600 capitalize">
+                            </span>
+                          </div>
+                    </div>
+                  )}
               </div>
             </ProfileSection>
             <div className="lg:hidden">

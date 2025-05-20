@@ -1,11 +1,14 @@
 import React, { use, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
-import { useUpdateCartItem, useDeleteCartItem } from "@/utils/hooks/useCartsHooks";
+import {
+  useUpdateCartItem,
+  useDeleteCartItem,
+} from "@/utils/hooks/useCartsHooks";
 import debounce from "lodash.debounce";
 
 export default function CartCard({ item, onUpdateQuantity, token, onDelete }) {
-  const [localQuantity, setLocalQuantity] = useState(0);
+  const [localQuantity, setLocalQuantity] = useState(item.quantity | 0);
   const updateCartItemMutation = useUpdateCartItem();
   const deleteCartItemMutation = useDeleteCartItem();
 
@@ -13,10 +16,10 @@ export default function CartCard({ item, onUpdateQuantity, token, onDelete }) {
     debounce((id, quantity) => {
       updateCartItemMutation.mutate({
         id,
-        data: {quantity},
+        data: { quantity },
         token,
       });
-      onUpdateQuantity(id, quantity,token);
+      onUpdateQuantity(id, quantity, token);
     }, 800),
     [onUpdateQuantity, token]
   );
@@ -27,21 +30,25 @@ export default function CartCard({ item, onUpdateQuantity, token, onDelete }) {
     debouncedUpdate(id, newQuantity);
   };
 
-  useEffect(() => {
-    setLocalQuantity(item.quantity);
-  }, []);
+  // useEffect(() => {
+  //   setLocalQuantity(item.quantity);
+  // }, [localQuantity]);
+
   const removeItem = (id) => {
-    deleteCartItemMutation.mutate({
-      id,
-      token,
-    }, {
-      onSuccess: () => {
-        if (typeof onDelete === 'function') {
-          onDelete(id);
-          console.log("Item removed successfully");
-        }
+    deleteCartItemMutation.mutate(
+      {
+        id,
+        token,
+      },
+      {
+        onSuccess: () => {
+          if (typeof onDelete === "function") {
+            onDelete(id);
+            console.log("Item removed successfully");
+          }
+        },
       }
-    });
+    );
   };
 
   return (

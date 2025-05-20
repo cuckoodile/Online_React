@@ -11,28 +11,35 @@ const withAuth = (WrappedComponent) => {
     const navigate = useNavigate();
     const { user, login } = useContext(AuthContext);
 
-    // Example: Check authentication status (this can be based on context, local storage, etc.)
-    const token = cookies.token; // Example: Check token in localStorage
-
-    if (!token) {
+    if (!cookies.token) {
       console.log("No token");
 
       return <Navigate to="/login" />;
     } else {
       if (!user) {
-        console.log("Persists token", token);
-        checkUserAPI(token).then((res) => {
-          if (res?.ok) {
-            console.log("check user data", res);
-            login(res);
-          } else {
-            navigate("/login");
-          }
-        });
+        console.log("Persists token", cookies.token);
+        checkUserAPI(cookies.token)
+          .then(async (res) => {
+            console.log("pasok?");
+
+            if (res?.ok) {
+              console.log("check user data", res);
+              login(res);
+            } else {
+              navigate("/login");
+            }
+          })
+          .then(() => {
+            console.log("HOC User data: ", user);
+          });
       }
     }
+    if (user) {
+      console.log("HOC User data: ", user);
+      return <WrappedComponent {...props} />;
+    }
 
-    return <WrappedComponent {...props} />;
+    return <h1>LOADING....</h1>;
   };
 
   return WithAuth;

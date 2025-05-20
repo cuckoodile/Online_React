@@ -10,6 +10,8 @@ const api = axios.create({
 });
 
 export const logInAPI = async (data) => {
+  console.log("Attempt to log in data: ", data);
+
   try {
     const response = await api.post("/api/login", data);
     console.log("User logged in: ", response.data);
@@ -36,18 +38,31 @@ export const logOutAPI = async (token) => {
   }
 
 export const checkUserAPI = async (token) => {
+  console.log("Attempt to log in data: ", token);
+
   try {
     const response = await api.get("/api/user", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Checked user logged in: ", response.data.data);
-    return response.data;
+    console.log("Checked user logged in: ", response.data);
+    return await response.data;
   } catch (error) {
     console.error("Login Error: ", error);
     throw new Error("Failed to login");
   }
+
+  // const response = await fetch(`${BASE_URL}/api/user/`,{
+  //   method:"GET",
+  //   headers:{
+  //     Authorization: `Bearer ${token}`
+  //   }
+  // })
+  // const res = await response.json()
+
+  // console.log("Response",res)
+  // return res.data;
 };
 
 export const fetchUsers = async (data) => {

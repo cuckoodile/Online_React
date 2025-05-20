@@ -20,24 +20,21 @@ function Cartpage() {
   console.log("User from AuthContext:", user);
 
   const {
-    data: initialCartItems = [],
+    data: initialCartItems,
     error: cartError,
     isLoading: cartLoading,
   } = useCartItems({ user_id: user?.id, token: user?.token });
 
-  const [cartItems, setCartItems] = useState([]);
-
+  
   const filteredCartItems = useMemo(() => {
     if (initialCartItems?.length > 0) {
       return initialCartItems.filter((item) => item.user_id === user?.id);
     }
     return [];
   }, [initialCartItems, user]);
-
-  useEffect(() => {
-    setCartItems(filteredCartItems);
-  }, []);
-
+  
+  const [cartItems, setCartItems] = useState(filteredCartItems | []);
+ 
   const updateItemQuantity = (id, newQuantity) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>

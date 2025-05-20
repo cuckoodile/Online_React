@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { FiShoppingCart, FiHeart, FiSearch } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAddCartItem } from "../utils/hooks/useCartsHooks";
 import { useUsers } from "../utils/hooks/userUsersHooks";
 import { AuthContext } from "@/utils/contexts/AuthContext";
@@ -10,19 +10,22 @@ export default function Card({ data: product }) {
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
   
-  const { user } = useContext(AuthContext);
-  const token = user?.token;
-  const {
-    data: userData,
-    error: userError,
-    isLoading
-  } = useUsers(user);
-
+  
   const handleNavigate = (path) => {
     navigate(`${path}?id=${product.id}`);
   };
 
   const handleAddToCart = (e) => {
+    const { user } = useContext(AuthContext);
+    if(user){
+    const token = user?.token;
+    const {
+      data: userData,
+      error: userError,
+      isLoading
+    } = useUsers(user);
+  
+
     e.stopPropagation();
     if (isLoading) {
       console.log("User data is still loading...");
@@ -46,6 +49,9 @@ export default function Card({ data: product }) {
     } else {
       console.error("User data is undefined or missing user_id.");
     }
+  }else{
+    Navigate('/login')
+  }
   };
 
   // console.log("Product Image Parsed:", product.image);

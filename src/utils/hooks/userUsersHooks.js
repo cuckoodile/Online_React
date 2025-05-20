@@ -10,6 +10,7 @@ import {
 export const useUsers = (data) => {
   return useQuery({
     queryKey: ['users'],
+    // enabled: !!data,
     queryFn: () => fetchUsers(data),
   });
 };
