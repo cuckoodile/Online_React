@@ -36,6 +36,13 @@ export default function Productpage() {
   const { user } = React.useContext(AuthContext);
   const addCartItem = useAddCartItem();
   const navigate = useNavigate();
+
+  // Redirect to /login if not authenticated
+  React.useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
   
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -105,8 +112,7 @@ export default function Productpage() {
 
   const handleBuyNow = async () => {
     try {
-      // Optionally add to cart here if you want, or skip if not needed
-      navigate("/checkout", { state: { cartItems: [{ ...product, quantity }] } });
+      navigate("/checkout", { state: { buyNow: true, product: { ...product, quantity } } });
     } catch (e) {
       alert("Failed to proceed to checkout.");
     }

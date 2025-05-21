@@ -66,16 +66,16 @@ export default function Checkout() {
           ? JSON.parse(item.product.product_image)[0]
           : "",
       }));
-    } else if (buyNowProduct?.product) {
+    } else if (buyNowProduct) {
       return [
         {
           id: buyNowProduct.id,
-          name: buyNowProduct.product?.name || "Unknown Product",
+          name: buyNowProduct.name || "Unknown Product",
           price: parseFloat(buyNowProduct.price) || 0,
           quantity: buyNowProduct.quantity || 1,
-          image: Array.isArray(buyNowProduct?.product_image)
+          image: Array.isArray(buyNowProduct.product_image)
             ? buyNowProduct.product_image[0]
-            : buyNowProduct?.product_image
+            : buyNowProduct.product_image
             ? JSON.parse(buyNowProduct.product_image)[0]
             : "",
         },
@@ -188,7 +188,11 @@ export default function Checkout() {
           });
         }
       }
-      navigate("/cart");
+      if (buyNowProduct) {
+        navigate("/");
+      } else {
+        navigate("/cart");
+      }
     } catch (error) {
       console.error("Error placing order:", error);
       alert("Failed to place order. Please try again.");
