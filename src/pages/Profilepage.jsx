@@ -192,6 +192,12 @@ function Profilepage() {
     </div>
   );
 
+  function handleFormatDate(timestamp) {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long" };
+    return date.toLocaleDateString("en-US", options);
+  }
+
   console.log("Profile Data:", profile.data);
   console.log("Profile Address:", profile.data.address);
 
@@ -238,7 +244,9 @@ function Profilepage() {
 
               <div className="sm:ml-6 text-center sm:text-left mt-4 sm:mt-0 mb-1">
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-800 to-teal-600 bg-clip-text text-transparent drop-shadow-sm">
-                  {profile.fullName}
+                  {profile.data.profile.first_name +
+                    " " +
+                    profile.data.profile.last_name}
                 </h2>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 mt-2">
                   <span
@@ -309,7 +317,9 @@ function Profilepage() {
               <div className="bg-emerald-50 rounded-lg p-3 px-5 flex items-center">
                 <div className="text-emerald-700 font-medium mr-6">
                   Member since:{" "}
-                  <span className="text-emerald-900">May 2025</span>
+                  <span className="text-emerald-900">
+                    {handleFormatDate(profile?.data.created_at)}
+                  </span>
                 </div>
                 <div className="text-emerald-700 font-medium mr-6">
                   Orders: <span className="text-emerald-900">2</span>
