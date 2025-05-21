@@ -277,7 +277,7 @@ export default function Productpage() {
               Customer Reviews
             </h2>
             <div className="space-y-8">
-              {product.product_comments?.map((comment) => (
+              {product?.product_comments?.length > 0 ? (product.product_comments?.map((comment) => (
                 <div
                   key={comment.id}
                   className="border-b border-emerald-100 pb-8"
@@ -300,7 +300,7 @@ export default function Productpage() {
                   </div>
                   <p className="text-emerald-600 text-lg">{comment.comment}</p>
                 </div>
-              ))}
+              ))) : <h1 className="text-center text-5xl font-bold">No Reviews</h1>}
             </div>
           </div>
         </div>

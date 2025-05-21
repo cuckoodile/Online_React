@@ -6,7 +6,7 @@ import {
   useUpdateProduct,
 } from "@/utils/hooks/useProductsHooks";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use, useRef } from "react";
 import {
   FiPlus,
   FiEdit2,
@@ -27,6 +27,8 @@ export default function Controller() {
 
   const { data: userData, error: userError, isLoading } = useUsers(user);
   const token = cookies.token;
+
+  const formRef = useRef(null);
 
   const {
     data: products,
@@ -280,7 +282,7 @@ export default function Controller() {
   const saveProduct = (e) => {
     e.preventDefault();
     console.log("Current Product", currentProduct);
-
+    console.log("wewewewew", e.target);
     console.log("PRICEEEE", typeof currentProduct.price);
     currentProduct.price = parseFloat(currentProduct.price);
     console.log("CONVERTEEED PRIICEEEEE", typeof currentProduct.price);
@@ -299,7 +301,19 @@ export default function Controller() {
       alert("Unauthorized: Please log in again.");
       return;
     }
-    const formData = new FormData();
+
+    const formData = new FormData(formRef.current);
+
+    let files = formRef.current.files;
+
+    // for (let i = 0; i < files.length; i++) {
+    //   formData.append("product_image[]", files[i]);
+
+    //   console.log("Append image ", files[i]);
+    // }
+
+    console.log("Files ", files);
+
     if (!isEditing) {
       formData.append("name", currentProduct.name);
       formData.append("price", parseFloat(currentProduct.price));
@@ -309,17 +323,15 @@ export default function Controller() {
       if (currentProduct.category_id && currentProduct.category_id !== "") {
         formData.append("category_id", String(currentProduct.category_id));
       }
-      // Append images one by one
+      // // Append images one by one
       if (Array.isArray(currentProduct.product_image)) {
-        currentProduct.product_image.forEach((img, idx) => {
-          if (typeof img === "string") {
-            formData.append("product_image[]", img);
-          } else if (img instanceof File) {
-            formData.append("product_image[]", img);
-          }
+        currentProduct?.product_image.forEach((img, index) => {
+            
+            formData.append(`product_image[${index}]`, img);
         });
       }
-    } else {
+    }
+    if (isEditing) {
       formData.append("name", currentProduct.name);
       if (currentProduct.price)
         formData.append("price", parseFloat(currentProduct.price));
@@ -330,7 +342,9 @@ export default function Controller() {
       if (currentProduct.category_id && currentProduct.category_id !== "") {
         formData.append("category_id", String(currentProduct.category_id));
       }
+      
       if (Array.isArray(currentProduct.product_image)) {
+        
         currentProduct.product_image.forEach((img, idx) => {
           if (typeof img === "string") {
             formData.append("product_image[]", img);
@@ -345,21 +359,26 @@ export default function Controller() {
     }
 
     // Only append new images (File objects) to product_image[]
-    if (Array.isArray(currentProduct.product_image)) {
-      currentProduct.product_image.forEach((img) => {
-        if (img instanceof File) {
-          formData.append("product_image[]", img);
-        }
-        // Do NOT append if it's a string (URL/path)
-      });
-    }
+    // if (Array.isArray(currentProduct.product_image)) {
+    //   currentProduct.product_image.forEach((img) => {
+    //     if (img instanceof File) {
+    //       formData.append("product_image[]", img);
+    //     }
+    //     // Do NOT append if it's a string (URL/path)
+    //   });
+    // }
 
     // For product_specifications, append as array fields
     (currentProduct.specifications || []).forEach((spec, idx) => {
       if (spec.key && spec.value) {
-        formData.append(`product_specifications[${idx}][details][${spec.key}]`, spec.value);
+        formData.append(
+          `product_specifications[${idx}][details][${spec.key}]`,
+          spec.value
+        );
       }
     });
+
+  
 
     if (isEditing) {
       if (!currentProduct.id) {
@@ -749,7 +768,7 @@ export default function Controller() {
                 </button>
               </div>
 
-              <form onSubmit={saveProduct}>
+              <form onSubmit={saveProduct} ref={formRef}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   {/* Images File Selection Section */}
                   <div className="md:col-span-2">
@@ -762,6 +781,7 @@ export default function Controller() {
                         <input
                           type="file"
                           accept="image/*"
+                          name="product_image"
                           multiple
                           onChange={handleImageChange}
                           className="absolute inset-0 opacity-0 cursor-pointer"
@@ -772,6 +792,17 @@ export default function Controller() {
                         />
                       </div>
                       <div className="text-sm text-emerald-600">
+                        <button
+                          onClick={() =>
+                            console.log(
+                              "Image from currentProduct",
+                              formRef.current.files
+                            )
+                          }
+                          className="bg-red-600 text-white p-2"
+                        >
+                          hehehe
+                        </button>
                         <p>Drag & drop images or click to browse (max 4)</p>
                         <p>Recommended: 800x1000px, max 2MB each</p>
                         <p className="mt-2 text-xs">

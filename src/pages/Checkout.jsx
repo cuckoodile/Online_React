@@ -57,25 +57,25 @@ export default function Checkout() {
     if (location.state?.cartItems) {
       return location.state.cartItems.map((item) => ({
         id: item.id,
-        name: item.product.name,
-        price: item.product.price,
+        name: item.product?.name || "Unknown Product",
+        price: item.product?.price || 0,
         quantity: item.quantity,
-        image: Array.isArray(item.product.product_image)
+        image: Array.isArray(item.product?.product_image)
           ? item.product.product_image[0]
-          : item.product.product_image
+          : item.product?.product_image
           ? JSON.parse(item.product.product_image)[0]
           : "",
       }));
-    } else if (buyNowProduct) {
+    } else if (buyNowProduct?.product) {
       return [
         {
           id: buyNowProduct.id,
-          name: buyNowProduct.name,
-          price: parseFloat(buyNowProduct.price),
+          name: buyNowProduct.product?.name || "Unknown Product",
+          price: parseFloat(buyNowProduct.price) || 0,
           quantity: buyNowProduct.quantity || 1,
-          image: Array.isArray(buyNowProduct.product_image)
+          image: Array.isArray(buyNowProduct?.product_image)
             ? buyNowProduct.product_image[0]
-            : buyNowProduct.product_image
+            : buyNowProduct?.product_image
             ? JSON.parse(buyNowProduct.product_image)[0]
             : "",
         },

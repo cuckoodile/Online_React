@@ -68,7 +68,7 @@ export default function CartCard({ item, onUpdateQuantity, token, onDelete }) {
       </button>
 
       <img
-        src={item.product.product_image}
+        src={item.product.product_image[0]}
         alt={item.name}
         className="w-20 h-20 object-cover rounded-lg"
       />

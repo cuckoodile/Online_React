@@ -12,7 +12,6 @@ const api = axios.create({
 export const fetchProducts = async () => {
   try {
     const response = await api.get("/api/products");
-    // console.log("API Response:", response.data.data);
     return await response.data.data;
   } catch (error) {
     console.error("API Error (fetchProducts):", error);
@@ -32,9 +31,11 @@ export const fetchProductById = async (id) => {
 };
 
 export const createProduct = async (productData, token) => {
+  console.log("Product Data:",productData)
   try {
     const response = await api.post("/api/products", productData, {
       headers: {
+        "Content-Type": "application/JSON",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -47,19 +48,16 @@ export const createProduct = async (productData, token) => {
 };
 
 export const updateProduct = async ({ id, data, token }) => {
-  for (let pair of data.entries()) {
-    console.log(pair[0] + ":", pair[1]);
-  }
-  console.log("Updated Data:", data);
-
+  console.log("Data",data)
   try {
     const response = await api.patch(`/api/products/${id}`, data, {
       headers: {
+        "Content-Type": "application/JSON",
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Product updated:", response.data);
-    return response.data;
+    console.log("Product updated:", response);
+    return response;
   } catch (error) {
     console.error("API Error (updateProduct):", error);
     throw new Error("Failed to update product");
@@ -70,8 +68,8 @@ export const deleteProduct = async (id, token) => {
   try {
     await api.delete(`/api/products/${id}`, {
       headers: {
+      "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
     });
     console.log("Product deleted with ID:", id);

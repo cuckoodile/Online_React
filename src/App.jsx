@@ -16,11 +16,15 @@ import { AuthContext } from "./utils/contexts/AuthContext";
 
 function App() {
   const [theme, setTheme] = useState("light");
+  const { user } = useContext(AuthContext);
   const [sidebarOpen, setSideBarOpen] = useState(false);
   const location = useLocation();
 
   const [cookies, setCookie, removeCookie] = useCookies();
   const auth = useContext(AuthContext);
+
+  console.log("APP USER DATA: ", user);
+  console.log("APP USER ROLE: ", user?.roles[0]);
 
   return (
     <>
@@ -45,17 +49,17 @@ function App() {
                       to="/allproducts"
                       className="hover:text-emerald-300 transition-colors"
                     >
-                      Shop
+                      All Products
                     </Link>
 
-                    <Link
-                      to="/admin"
-                      className="hover:text-emerald-300 transition-colors"
-                    >
-                      Admin
-                    </Link>
-
-                    <button onClick={() => alert("Token: ", auth)}>TOKEN</button>
+                    {user?.roles[0] == "admin" ? (
+                      <Link
+                        to="/admin"
+                        className="hover:text-emerald-300 transition-colors"
+                      >
+                        Admin
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
 
@@ -104,6 +108,5 @@ function App() {
     </>
   );
 }
-
 
 export default App;

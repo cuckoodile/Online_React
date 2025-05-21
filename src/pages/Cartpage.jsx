@@ -256,12 +256,6 @@ function Cartpage() {
                     Proceed to Checkout
                   </motion.button>
                 </Link>
-
-                <div className="mt-4 text-center">
-                  <p className="text-emerald-600 text-sm">
-                    Secure checkout powered by Stripe
-                  </p>
-                </div>
               </div>
             </div>
           </div>
