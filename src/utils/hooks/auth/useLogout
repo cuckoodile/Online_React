@@ -1,0 +1,68 @@
+import { BASE_URL } from "@/utils/APIs/api_config";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (token) => logoutAPI(token),
+    mutationKey: ["currentUser"],
+    onSuccess: () => {
+      queryClient.invalidateQueries(["currentUser"]);
+    },
+  });
+};
+
+/* 
+username
+timestamp
+profile: {
+  first_name
+  last_name
+  contact
+  role
+  profile_image
+  timestamp
+  address: {
+    region
+    province
+    city
+    baranggay
+    house_address
+    zip_code
+    timestamp
+  }
+  transaction: {
+    type_id
+    status_id
+    payment_id
+  }
+}
+*/
+
+const logoutAPI = async (token) => {
+  console.log("Logout Invoked.");
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/logout`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const res = await response.json();
+
+    if (!res.ok) {
+      throw new Error("Logout failed");
+    }
+
+    console.log("Logout response: ", res);
+    return await res.data;
+  } catch (error) {
+    console.error("Logout Error: ", error);
+    throw new Error("Failed to logout");
+  }
+};
