@@ -187,12 +187,9 @@ export default function Checkout() {
             token: user?.token,
           });
         }
-      }
-      if (buyNowProduct) {
-        navigate("/");
-      } else {
         navigate("/cart");
-      }
+      }else{
+        navigate("/");}
     } catch (error) {
       console.error("Error placing order:", error);
       alert("Failed to place order. Please try again.");
